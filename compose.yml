@@ -1,8 +1,6 @@
 services:
   backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
+    image: registry.anuraj.net/foodcheck-backend:${TAG:-latest}
     ports:
       - "8999:8999"
     env_file:
