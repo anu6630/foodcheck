@@ -34,3 +34,10 @@ backend/
 - **Data Safety**: Validate all incoming payloads before processing. Use schema validator libraries (e.g. Zod, Joi) at entry boundaries.
 - **Error Handling**: Use explicit domain error types. Catch system exceptions (database errors, timeout errors) in the adapters/infrastructure layer, map them to domain-specific failures, and return them gracefully. Do not leak raw database errors to the frontend.
 - **Migrations**: Database schema updates must be written as migration files. Never modify db schema in place without migrations.
+
+## 4. Database Setup & Supabase Guidelines
+- **Database Provider**: Use **Supabase** (PostgreSQL) as the database.
+- **Separate Database**: You must create and connect to a **separate database** in the same Supabase cluster (e.g., a dedicated database name other than the default `postgres`).
+- **Connection Configuration**: Configure connection strings (`DATABASE_URL`, `DIRECT_URL`) to target this specific database in the Supabase cluster.
+- **ORM / Migrations**: Use migration tools (such as Prisma or standard Postgres migrations) configured to run specifically against this database.
+

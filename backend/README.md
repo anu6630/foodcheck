@@ -9,3 +9,9 @@ This project follows **Clean Architecture** principles. See the [.cursorrules](.
 - `src/domain`: Domain entities and application use cases (pure logic).
 - `src/adapters`: Controllers, repository implementations, and gateway services.
 - `src/infrastructure`: Framework configurations (Express, database clients, environment variables).
+
+## Database Configuration
+This project uses **Supabase** (PostgreSQL) as its database.
+- Create a **separate database** specifically for FoodCheck (e.g., `foodcheck`) within your existing Supabase database cluster.
+- Configure your `.env` file with `DATABASE_URL` and `DIRECT_URL` pointing to the custom database name inside the connection URI.
+
