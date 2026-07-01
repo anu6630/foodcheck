@@ -1,0 +1,36 @@
+# Mobile App Agent Coding Rules (Clean Architecture)
+
+You are an expert mobile frontend AI agent working on the `mobile` app of the FoodCheck mono-repo. You must follow these rules strictly.
+
+## 1. Clean Architecture Structure
+All mobile app code must be organized into clean architectural layers:
+
+```
+mobile/
+├── lib/ (or src/)
+│   ├── domain/           # Core Layer (Pure logic, no UI or framework dependencies)
+│   │   ├── entities/     # Domain data models (e.g., Product, Ingredient, Country)
+│   │   ├── usecases/     # Executable use cases (e.g., SearchProductByName, ParseLabelVision)
+│   │   └── repositories/ # Interfaces for repositories
+│   │
+│   ├── data/             # Data Layer (Retrieval and caching)
+│   │   ├── models/       # Data transfer objects (DTOs), JSON parsers, database entities
+│   │   ├── datasources/  # HTTP API client wrapper, local cache client (Hive, SQLite, SharedPrefs)
+│   │   └── repositories/ # Concrete implementation of domain repository interfaces (handles cache-vs-network policy)
+│   │
+│   └── presentation/     # Presentation Layer (UI & State)
+│       ├── state/        # State managers (BLoC, Riverpod, ViewModels, or equivalent)
+│       ├── widgets/      # Reusable UI elements (custom buttons, badges, result cards)
+│       └── pages/        # Entire screens (Search Results, Product Details, Ingredient Analysis)
+```
+
+## 2. Layer Constraints (Strict)
+- **Domain Layer**: Must contain no frameworks or libraries related to UI (Flutter widgets, UIKit, SwiftUI), databases, or network serialization. Keep entities and use-cases platform-agnostic.
+- **Data Layer**: Responsible for mapping backend/external JSON and DB models into Domain Entities using data mappers. It must handle all error mapping (e.g., mapping `SocketException` or HTTP `500` status to domain-level `ServerFailure` or `NetworkFailure`).
+- **Presentation Layer**: UI elements must be thin. They should delegate user actions directly to the state management layer (e.g., ViewModel or BLoC), and render UI reactively based on state changes. Do not trigger HTTP calls or write to files directly from views.
+
+## 3. General Principles
+- **India-First Default**: Default configurations should focus on India-specific rules, supporting Hindi ingredient search and localized ingredient taxonomies.
+- **Offline-First**: Cache core database rules and taxonomy locally to ensure rapid response times even without network access.
+- **Aesthetic Excellence**: Follow high-fidelity, polished, modern design guidelines. Ensure contrast compliance, clean spacing, smooth micro-animations, and full support for Dark Mode.
+- **Error Handling**: Use a functional error return style (e.g., Either/Result type pattern) from data and domain layers rather than throwing unhandled exceptions to the UI.

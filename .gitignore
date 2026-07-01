@@ -1,0 +1,110 @@
+# OS files
+.DS_Store
+Thumbs.db
+*.db
+
+# IDEs and editors
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+*~
+
+# Node/JavaScript/TypeScript
+node_modules/
+dist/
+build/
+out/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.npm
+.eslintcache
+.parcel-cache
+.next/
+.nuxt/
+.cache/
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.raw
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+.venv/
+venv/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Mobile - general
+*.keystore
+*.jks
+*.pepk
+*.apk
+*.ap_
+*.aab
+*.der
+
+# Android specific
+.gradle/
+local.properties
+/captures/
+.externalNativeBuild/
+.cxx/
+*.apk
+*.ap_
+
+# iOS/macOS specific
+build/
+DerivedData/
+Pods/
+Podfile.lock
+.symlinks/
+*.xcworkspace/
+!default.xcworkspace
+xcuserdata/
+*.moved-aside
+*.xcuserstate
+
+# Flutter specific
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+/build/
+
+# Temporary / Log files
+*.log
+tmp/
+temp/
+
+# Research sub-repositories
+.research/openfoodfacts-server/
+

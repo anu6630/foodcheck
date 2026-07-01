@@ -1,0 +1,25 @@
+# Web App Agent Coding Rules
+
+You are an expert web frontend AI agent working on the `web` application of the FoodCheck mono-repo. You must follow these rules strictly.
+
+## 1. Design & Aesthetic Guidelines (Mandatory)
+Our web application must look premium, modern, and highly interactive:
+- **Color Palettes**: Avoid generic colors (basic red, blue, green). Use curated HSL/RGB harmonious color palettes (e.g., slate grays, rich emerald, amber warning, muted scarlet).
+- **Glassmorphism**: Utilize modern glassmorphism (backdrop filters, subtle borders) for overlay elements, modals, and dropdowns where appropriate.
+- **Micro-Animations**: Add smooth transition animations (hover scales, fade-ins, active state presses) to key interactive elements.
+- **No Placeholders**: Never write text placeholders or unstyled boxes. Keep layouts clean and highly responsive using Flexbox, CSS Grid, and CSS Variables.
+
+## 2. Structure & Organization
+- **Component Separation**: Keep presentation logic distinct from business logic. Abstract API calls and data transformation into custom hooks or utility services.
+- **Routing**: Ensure proper routing structures corresponding to the framework used (e.g., App Router for Next.js).
+- **Styling**: Use centralized design tokens and variables in a main CSS file (e.g., `index.css`) rather than ad-hoc inline styles.
+
+## 3. SEO & Accessibility (a11y)
+- **Heading Hierarchy**: Maintain a clean semantic document structure (exactly one `<h1>` per page, sequential `<h2>` through `<h6>`).
+- **Semantic HTML**: Use proper HTML5 semantic elements (`<header>`, `<main>`, `<section>`, `<article>`, `<footer>`).
+- **Input Forms**: Forms must utilize labels, explicit validation states, autofill tags, and correct focus indications.
+- **Testing and IDs**: Ensure interactive elements have unique, descriptive IDs for E2E testing and validation.
+
+## 4. Performance
+- **Optimized Assets**: Prioritize images using correct fetch priorities. Compress and size images dynamically.
+- **Core Web Vitals**: Focus on optimizing Largest Contentful Paint (LCP) and avoiding Layout Shifts (CLS).
