@@ -1,0 +1,45 @@
+name: Trigger Jenkins deploy
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+concurrency:
+  group: jenkins-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Jenkins build
+        env:
+          JENKINS_URL: ${{ secrets.JENKINS_URL }}
+          JENKINS_USER: ${{ secrets.JENKINS_USER }}
+          JENKINS_TOKEN: ${{ secrets.JENKINS_TOKEN }}
+          JENKINS_JOB: ${{ secrets.JENKINS_JOB }}
+          GIT_REF: ${{ github.ref }}
+          GIT_SHA: ${{ github.sha }}
+          GIT_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          test -n "${JENKINS_URL}" && test -n "${JENKINS_USER}" && test -n "${JENKINS_TOKEN}" && test -n "${JENKINS_JOB}"
+
+          COOKIE_JAR="$(mktemp)"
+          trap 'rm -f "${COOKIE_JAR}"' EXIT
+
+          CRUMB_JSON=$(curl -fsS -c "${COOKIE_JAR}" -u "${JENKINS_USER}:${JENKINS_TOKEN}" \
+            "${JENKINS_URL}/crumbIssuer/api/json")
+          CRUMB=$(echo "${CRUMB_JSON}" | jq -r '.crumb')
+          CRUMB_FIELD=$(echo "${CRUMB_JSON}" | jq -r '.crumbRequestField')
+
+          URL="${JENKINS_URL}/${JENKINS_JOB}/buildWithParameters"
+          curl -fsS -b "${COOKIE_JAR}" -u "${JENKINS_USER}:${JENKINS_TOKEN}" \
+            -H "${CRUMB_FIELD}: ${CRUMB}" -X POST \
+            --data-urlencode "GIT_REF=${GIT_REF}" \
+            --data-urlencode "GIT_SHA=${GIT_SHA}" \
+            --data-urlencode "GIT_REPO=${GIT_REPO}" \
+            "${URL}"
+
+          echo "Triggered: ${URL} (ref=${GIT_REF} sha=${GIT_SHA} repo=${GIT_REPO})"
