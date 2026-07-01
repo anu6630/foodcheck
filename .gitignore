@@ -108,3 +108,7 @@ temp/
 # Research sub-repositories
 .research/openfoodfacts-server/
 
+# Test outputs and binaries
+target/
+fastapi.log
+*.jar
