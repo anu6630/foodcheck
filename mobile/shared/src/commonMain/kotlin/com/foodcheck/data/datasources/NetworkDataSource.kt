@@ -14,33 +14,59 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.builtins.ListSerializer
 
 class NetworkDataSource(
-    private val client: HttpClient,
-    var baseUrl: String = "https://lifeexp-api.up.railway.app"
+    private val client: HttpClient
 ) {
     private val json = Json {
         ignoreUnknownKeys = true
         coerceInputValues = true
     }
 
-    suspend fun searchProducts(query: String, countries: List<String>): List<SearchProductResult> {
+    companion object {
+        private const val PRIMARY_URL = "https://foodcheck-aws-api.anuraj.net"
+        private const val SECONDARY_URL = "https://foodcheck-k3-api.anuraj.net"
+    }
+
+    private var activeBaseUrl = PRIMARY_URL
+
+    private suspend fun <T> runWithFallback(block: suspend (String) -> T): T {
+        try {
+            return block(activeBaseUrl)
+        } catch (e: Exception) {
+            println("Request failed on $activeBaseUrl: ${e.message}. Trying fallback...")
+            if (activeBaseUrl == PRIMARY_URL) {
+                activeBaseUrl = SECONDARY_URL
+                try {
+                    return block(activeBaseUrl)
+                } catch (e2: Exception) {
+                    activeBaseUrl = PRIMARY_URL // Reset to primary
+                    throw e2
+                }
+            } else {
+                activeBaseUrl = PRIMARY_URL // Reset to primary
+                throw e
+            }
+        }
+    }
+
+    suspend fun searchProducts(query: String, countries: List<String>): List<SearchProductResult> = runWithFallback { baseUrl ->
         val response = client.get("$baseUrl/api/products/search") {
             parameter("q", query)
             parameter("countries", countries.joinToString(","))
         }
         val text = response.bodyAsText()
-        return json.decodeFromString(ListSerializer(SearchProductResult.serializer()), text)
+        json.decodeFromString(ListSerializer(SearchProductResult.serializer()), text)
     }
 
-    suspend fun getProductDetails(barcode: String, countries: List<String>): SearchProductResult? {
+    suspend fun getProductDetails(barcode: String, countries: List<String>): SearchProductResult? = runWithFallback { baseUrl ->
         val response = client.get("$baseUrl/api/products/$barcode") {
             parameter("countries", countries.joinToString(","))
         }
-        if (response.status.value == 404) return null
+        if (response.status.value == 404) return@runWithFallback null
         val text = response.bodyAsText()
-        return json.decodeFromString(SearchProductResult.serializer(), text)
+        json.decodeFromString(SearchProductResult.serializer(), text)
     }
 
-    suspend fun scanImage(imageBytes: ByteArray, countries: List<String>): ScanResult {
+    suspend fun scanImage(imageBytes: ByteArray, countries: List<String>): ScanResult = runWithFallback { baseUrl ->
         val response = client.submitFormWithBinaryData(
             url = "$baseUrl/api/scan",
             formData = formData {
@@ -52,6 +78,6 @@ class NetworkDataSource(
             }
         )
         val text = response.bodyAsText()
-        return json.decodeFromString(ScanResult.serializer(), text)
+        json.decodeFromString(ScanResult.serializer(), text)
     }
 }
