@@ -10,34 +10,47 @@ backend/
 ├── src/
 │   ├── domain/           # Core Layer (No external library dependencies)
 │   │   ├── entities/     # Enterprise business rules (e.g., Product, Ingredient)
-│   │   ├── use-cases/    # Application business rules (e.g., AnalyzeIngredientsUseCase)
+│   │   ├── usecases/     # Application business rules (e.g., AnalyzeIngredientsUseCase)
 │   │   └── interfaces/   # Boundary ports (e.g., IIngredientRepository, IVisionService)
 │   │
 │   ├── adapters/         # Interface Adapters Layer (Glue code)
-│   │   ├── controllers/  # Receives request inputs, calls use-cases, returns presenter output
-│   │   ├── repositories/ # Concrete implementations of domain repository interfaces
+│   │   ├── controllers/  # Receives request inputs (FastAPI routers), calls use-cases
+│   │   ├── repositories/ # Concrete implementations of domain repository interfaces (SQLAlchemy, SQLModel)
 │   │   └── services/     # Concrete implementations of external APIs/services (e.g., GeminiVisionService)
 │   │
 │   └── infrastructure/   # Frameworks & Drivers Layer (Configuration and libraries)
-│       ├── database/     # DB client instances, migrations, ORM schemas (Prisma, Knex, etc.)
-│       ├── webserver/    # Web server framework initialization (Express, Fastify, etc.) and routes
+│       ├── database/     # DB client instances, migrations (Alembic), schemas
+│       ├── webserver/    # Web server framework initialization (FastAPI) and routes
 │       └── config/       # Environment configs and setup
+│
+├── tests/
+│   └── karate/           # Karate API Automation Testing Suite
+│       ├── features/     # Feature files (.feature)
+│       └── karate-config.js
 ```
 
 ## 2. Layer Constraints (Strict)
-- **Domain Layer**: Must be pure. It must not import any web framework (e.g., Express), database ORM/client (e.g., Prisma, Mongoose), or external SDKs. Dependencies must be defined as TS interfaces/abstract classes.
+- **Domain Layer**: Must be pure. It must not import any web framework (e.g., FastAPI), database ORM/client (e.g., SQLAlchemy), or external SDKs. Dependencies must be defined as Python abstract base classes (ABCs) or Protocols.
 - **Adapters Layer**: Glues the domain and infrastructure layers. Controllers must validate input parameters, instantiate/invoke use cases, and format output. Repositories must implement the domain's repository interfaces and map database-specific records to domain entities using mappers.
 - **Infrastructure Layer**: Contains the actual database clients, framework routing declarations, and external HTTP network requests (e.g. calls to Open Food Facts API, Gemini API).
 
 ## 3. General Principles
 - **Dependency Injection**: Use dependency injection to supply use cases with repository/service instances. Do not instantiate repositories inside use cases.
-- **Data Safety**: Validate all incoming payloads before processing. Use schema validator libraries (e.g. Zod, Joi) at entry boundaries.
+- **Data Safety**: Validate all incoming payloads before processing. Use Pydantic models for strict data validation and parsing at entry boundaries.
 - **Error Handling**: Use explicit domain error types. Catch system exceptions (database errors, timeout errors) in the adapters/infrastructure layer, map them to domain-specific failures, and return them gracefully. Do not leak raw database errors to the frontend.
-- **Migrations**: Database schema updates must be written as migration files. Never modify db schema in place without migrations.
+- **Migrations**: Database schema updates must be written as migration files (e.g., via Alembic). Never modify db schema in place without migrations.
 
 ## 4. Database Setup & Supabase Guidelines
 - **Database Provider**: Use **Supabase** (PostgreSQL) as the database.
 - **Separate Database**: You must create and connect to a **separate database** in the same Supabase cluster (e.g., a dedicated database name other than the default `postgres`).
 - **Connection Configuration**: Configure connection strings (`DATABASE_URL`, `DIRECT_URL`) to target this specific database in the Supabase cluster.
-- **ORM / Migrations**: Use migration tools (such as Prisma or standard Postgres migrations) configured to run specifically against this database.
+- **ORM / Migrations**: Use Alembic (or standard SQL migration scripts) configured to run specifically against this database.
 
+## 5. API Automation (Karate Framework)
+- **Integration Testing**: All backend endpoints must have corresponding integration tests written using the **Karate Framework** (`.feature` files).
+- **Standards**: Verify request validation, response HTTP codes, response latency, and JSON schema compatibility.
+- **Offline/Stubbing**: Mock external dependencies (like Gemini API or Open Food Facts API) within the Karate suite or use local stubs to ensure tests are deterministic and runnable offline.
+
+## 6. Gemini Integration & Credentials
+- **Authentication**: Use `GOOGLE_API_KEY` for authenticating the Gemini API client. This key is fetched from Railway environments.
+- **Integration**: Leverage the official Google GenAI SDK (Python) to send images and parse product intents/ingredients lists.
