@@ -22,7 +22,7 @@ class NetworkDataSource(
     }
 
     companion object {
-        private const val PRIMARY_URL = "https://foodcheck-aws-api.anuraj.net"
+        private const val PRIMARY_URL = "https://foodcheck-aws-api.lifex.biz"
         private const val SECONDARY_URL = "https://foodcheck-k3-api.anuraj.net"
     }
 
