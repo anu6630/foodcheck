@@ -18,6 +18,7 @@ def get_connection_urls():
     2. An async connection URL (for FastAPI/SQLAlchemy)
     """
     raw_url = os.getenv("DATABASE_URL", DEFAULT_RAW_URL)
+    raw_url = raw_url.strip('"').strip("'")
     
     # Clean up standard postgres/postgresql protocols
     if raw_url.startswith("postgres://"):
