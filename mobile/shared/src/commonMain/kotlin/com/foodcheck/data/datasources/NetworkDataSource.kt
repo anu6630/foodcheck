@@ -27,8 +27,19 @@ class NetworkDataSource(
     }
 
     private var activeBaseUrl = PRIMARY_URL
+    private var customBaseUrl: String? = null
+
+    var baseUrl: String
+        get() = customBaseUrl ?: activeBaseUrl
+        set(value) {
+            customBaseUrl = value
+        }
 
     private suspend fun <T> runWithFallback(block: suspend (String) -> T): T {
+        val custom = customBaseUrl
+        if (custom != null) {
+            return block(custom)
+        }
         try {
             return block(activeBaseUrl)
         } catch (e: Exception) {
