@@ -185,9 +185,10 @@ class SQLAlchemyIngredientRepository(IIngredientRepository):
             func.lower(DBIngredient.name) == cleaned_name
         ]
         
-        e_match = re.match(r'(?i)^e[- ]?(\d+[a-z]?)$', cleaned_name)
+        e_match = re.search(r'(?i)\be[- ]?(\d+[a-z]?)\b', cleaned_name)
         if e_match:
             conditions.append(DBIngredient.e_number == f"E{e_match.group(1).upper()}")
+
             
         stmt = select(DBIngredient).where(or_(*conditions))
         res = await self.session.execute(stmt)

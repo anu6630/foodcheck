@@ -36,3 +36,17 @@ Scenario: Query non-existent barcode (returns 404)
   Given path 'api/products/999999999999'
   When method get
   Then status 404
+
+Scenario: Query barcode not in local DB but found on Open Food Facts (caching check)
+  Given path 'api/products/5449000000996'
+  When method get
+  Then status 200
+  And match response.product.source == 'open_food_facts'
+  And match response.product.name == 'Mock Product'
+  
+  # A second query fetches it from local DB cache
+  Given path 'api/products/5449000000996'
+  When method get
+  Then status 200
+  And match response.product.name == 'Mock Product'
+

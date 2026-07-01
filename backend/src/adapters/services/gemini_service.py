@@ -22,8 +22,8 @@ class GeminiVisionService(IVisionService):
             return self._get_mock_response(image_bytes, mock_type)
 
         try:
-            # Using gemini-1.5-flash as the primary image analyzer
-            model = genai.GenerativeModel("gemini-1.5-flash")
+            # Using gemini-2.5-flash as the primary image analyzer
+            model = genai.GenerativeModel("gemini-2.5-flash")
             
             prompt = """
             You are an expert food safety assistant for the FoodCheck app.
@@ -80,6 +80,14 @@ class GeminiVisionService(IVisionService):
                 "barcode": "111111111111",
                 "ingredients_text": "wheat flour, water, yeast, potassium bromate, salt"
             }
+        elif m_type == "ingredients_hindi":
+            return {
+                "intent": "ingredients",
+                "product_name": None,
+                "brand": None,
+                "barcode": None,
+                "ingredients_text": "टाइटानियम डाइऑक्साइड, E211, E102"
+            }
         else:
             # Default mock: ingredients list scan
             return {
@@ -89,3 +97,4 @@ class GeminiVisionService(IVisionService):
                 "barcode": None,
                 "ingredients_text": "potassium bromate, E171, tartrazine, water, wheat flour, sugar"
             }
+

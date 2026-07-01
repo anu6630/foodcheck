@@ -37,3 +37,16 @@ Scenario: Scan image with product packaging containing potassium bromate (Tradit
   And match response.data.product.name == 'Sliced White Bread'
   # Severity in India should be red (potassium bromate is banned)
   And match response.data.severity == 'red'
+
+Scenario: Scan image with multilingual (Hindi) ingredients list intent
+  Given path 'api/scan'
+  And multipart file image = { read: 'dummy.jpg', filename: 'dummy.jpg', contentType: 'image/jpeg' }
+  And header x-mock-image-type = 'ingredients_hindi'
+  When method post
+  Then status 200
+  And match response.intent == 'ingredients'
+  And match response.ingredients == '#[]'
+  # Validate E171 matches through Hindi translation "टाइटानियम डाइऑक्साइड"
+  And match response.ingredients[?(@.id=='additive-e171')].name == ['Titanium dioxide']
+
+
