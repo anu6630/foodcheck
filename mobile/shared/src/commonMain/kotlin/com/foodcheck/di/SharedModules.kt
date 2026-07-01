@@ -7,6 +7,8 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import com.foodcheck.data.datasources.NetworkDataSource
 import com.foodcheck.data.datasources.LocalCacheDataSource
+import com.foodcheck.data.network.ApiHealthMonitor
+import com.foodcheck.data.network.installFallbackInterceptor
 import com.foodcheck.data.repositories.ProductRepository
 import com.foodcheck.domain.repositories.IProductRepository
 import com.foodcheck.domain.usecases.SearchProductsUseCase
@@ -23,12 +25,15 @@ val sharedModule = module {
                     coerceInputValues = true
                 })
             }
-        }
+        }.apply { installFallbackInterceptor() }
     }
 
     // Datasources
     single { NetworkDataSource(get()) }
     single { LocalCacheDataSource() }
+
+    // Proactively steers the active backend tier back to primary once healthy again.
+    single { ApiHealthMonitor() }
 
     // Repositories
     single<IProductRepository> { ProductRepository(get(), get()) }

@@ -2,12 +2,15 @@ package com.foodcheck.data.datasources
 
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
+import io.ktor.client.request.header
 import io.ktor.client.request.parameter
 import io.ktor.client.statement.bodyAsText
 import io.ktor.client.request.forms.submitFormWithBinaryData
 import io.ktor.client.request.forms.formData
 import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
+import com.foodcheck.data.newClientRequestId
+import com.foodcheck.data.network.BackendConfig
 import com.foodcheck.domain.entities.SearchProductResult
 import com.foodcheck.domain.entities.ScanResult
 import kotlinx.serialization.json.Json
@@ -21,65 +24,39 @@ class NetworkDataSource(
         coerceInputValues = true
     }
 
-    companion object {
-        private const val PRIMARY_URL = "https://foodcheck-aws-api.lifex.biz"
-        private const val SECONDARY_URL = "https://foodcheck-k3-api.anuraj.net"
-    }
-
-    private var activeBaseUrl = PRIMARY_URL
-    private var customBaseUrl: String? = null
-
+    // Retained for the manual backend-URL override UI (App.kt); delegates to BackendConfig, the
+    // single source of truth also used by the fallback interceptor and health monitor.
     var baseUrl: String
-        get() = customBaseUrl ?: activeBaseUrl
+        get() = BackendConfig.baseUrl
         set(value) {
-            customBaseUrl = value
+            BackendConfig.customBaseUrl = value
         }
 
-    private suspend fun <T> runWithFallback(block: suspend (String) -> T): T {
-        val custom = customBaseUrl
-        if (custom != null) {
-            return block(custom)
-        }
-        try {
-            return block(activeBaseUrl)
-        } catch (e: Exception) {
-            println("Request failed on $activeBaseUrl: ${e.message}. Trying fallback...")
-            if (activeBaseUrl == PRIMARY_URL) {
-                activeBaseUrl = SECONDARY_URL
-                try {
-                    return block(activeBaseUrl)
-                } catch (e2: Exception) {
-                    activeBaseUrl = PRIMARY_URL // Reset to primary
-                    throw e2
-                }
-            } else {
-                activeBaseUrl = PRIMARY_URL // Reset to primary
-                throw e
-            }
-        }
-    }
-
-    suspend fun searchProducts(query: String, countries: List<String>): List<SearchProductResult> = runWithFallback { baseUrl ->
-        val response = client.get("$baseUrl/api/products/search") {
+    suspend fun searchProducts(query: String, countries: List<String>): List<SearchProductResult> {
+        val response = client.get("${BackendConfig.baseUrl}/api/products/search") {
             parameter("q", query)
             parameter("countries", countries.joinToString(","))
         }
         val text = response.bodyAsText()
-        json.decodeFromString(ListSerializer(SearchProductResult.serializer()), text)
+        return json.decodeFromString(ListSerializer(SearchProductResult.serializer()), text)
     }
 
-    suspend fun getProductDetails(barcode: String, countries: List<String>): SearchProductResult? = runWithFallback { baseUrl ->
-        val response = client.get("$baseUrl/api/products/$barcode") {
+    suspend fun getProductDetails(barcode: String, countries: List<String>): SearchProductResult? {
+        val response = client.get("${BackendConfig.baseUrl}/api/products/$barcode") {
             parameter("countries", countries.joinToString(","))
         }
-        if (response.status.value == 404) return@runWithFallback null
+        if (response.status.value == 404) return null
         val text = response.bodyAsText()
-        json.decodeFromString(SearchProductResult.serializer(), text)
+        return json.decodeFromString(SearchProductResult.serializer(), text)
     }
 
-    suspend fun scanImage(imageBytes: ByteArray, countries: List<String>): ScanResult = runWithFallback { baseUrl ->
+    suspend fun scanImage(imageBytes: ByteArray, countries: List<String>): ScanResult {
+        // Generated once per logical call; the fallback interceptor reuses this same request
+        // (headers included) when it retries on the alternate host, so the key stays stable
+        // across the retry.
+        val idempotencyKey = newClientRequestId()
         val response = client.submitFormWithBinaryData(
-            url = "$baseUrl/api/scan",
+            url = "${BackendConfig.baseUrl}/api/scan",
             formData = formData {
                 append("file", imageBytes, Headers.build {
                     append(HttpHeaders.ContentType, "image/jpeg")
@@ -87,8 +64,10 @@ class NetworkDataSource(
                 })
                 append("countries", countries.joinToString(","))
             }
-        )
+        ) {
+            header("Idempotency-Key", idempotencyKey)
+        }
         val text = response.bodyAsText()
-        json.decodeFromString(ScanResult.serializer(), text)
+        return json.decodeFromString(ScanResult.serializer(), text)
     }
 }
