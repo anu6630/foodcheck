@@ -1,8 +1,15 @@
 package com.foodcheck.di
 
+import com.foodcheck.presentation.state.IngredientDetailViewModel
+import com.foodcheck.presentation.state.ProductDetailViewModel
+import com.foodcheck.presentation.state.ScanViewModel
+import com.foodcheck.presentation.state.SearchViewModel
+import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
-import com.foodcheck.presentation.state.MainViewModel
 
 val appModule = module {
-    factory { MainViewModel(get(), get(), get()) }
+    viewModel { SearchViewModel(get()) }
+    viewModel { ProductDetailViewModel(get()) }
+    viewModel { IngredientDetailViewModel(get()) }
+    viewModel { ScanViewModel(get()) }
 }

@@ -1,54 +1,82 @@
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Query, Header
 from sqlalchemy.ext.asyncio import AsyncSession
-from typing import Optional, List
+from typing import List, Optional
 
 from src.infrastructure.database.database import get_db_session
 from src.adapters.repositories import SQLAlchemyProductRepository, SQLAlchemyIngredientRepository
-from src.adapters.services.gemini_service import GeminiVisionService
+from src.adapters.services.gemini_agent_service import GeminiScanAgentService
 from src.adapters.services.off_service import OpenFoodFactsService
-from src.domain.usecases import SearchProductUseCase, GetProductDetailsUseCase, ScanImageUseCase
+from src.domain.usecases import (
+    SearchProductUseCase,
+    GetProductDetailsUseCase,
+    ScanWithAgentUseCase,
+    UnifiedSearchUseCase,
+    GetIngredientDetailsUseCase
+)
 
 router = APIRouter(prefix="/api")
 
-def get_countries_list(countries: str = Query("IN", description="Comma-separated country codes (e.g. IN,EU,US)")) -> List[str]:
-    return [c.strip().upper() for c in countries.split(",") if c.strip()]
-
 @router.post("/scan")
 async def scan_image(
-    image: UploadFile = File(...),
-    countries: List[str] = Depends(get_countries_list),
+    images: List[UploadFile] = File(...),
     x_mock_image_type: Optional[str] = Header(None, alias="x-mock-image-type"),
     db: AsyncSession = Depends(get_db_session)
 ):
     try:
-        # Read uploaded image bytes
-        image_bytes = await image.read()
-        
+        # Read uploaded image bytes (1-2 images: e.g. front-of-pack and/or ingredients label)
+        image_bytes_list = [await img.read() for img in images]
+
         # Instantiate dependencies
         product_repo = SQLAlchemyProductRepository(db)
         ingredient_repo = SQLAlchemyIngredientRepository(db)
-        vision_service = GeminiVisionService()
-        lookup_service = OpenFoodFactsService()
-        
+        agent_service = GeminiScanAgentService(product_repo, ingredient_repo)
+
         # Execute use case
-        usecase = ScanImageUseCase(vision_service, product_repo, ingredient_repo, lookup_service)
-        result = await usecase.execute(image_bytes, countries, mock_type=x_mock_image_type)
-        
+        usecase = ScanWithAgentUseCase(agent_service, ingredient_repo)
+        result = await usecase.execute(image_bytes_list, mock_type=x_mock_image_type)
+
         return result
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Image scanning failed: {str(e)}")
 
+@router.get("/search")
+async def unified_search(
+    q: str = Query("", description="Unified search query across products and ingredients"),
+    db: AsyncSession = Depends(get_db_session)
+):
+    try:
+        product_repo = SQLAlchemyProductRepository(db)
+        ingredient_repo = SQLAlchemyIngredientRepository(db)
+        usecase = UnifiedSearchUseCase(product_repo, ingredient_repo)
+        result = await usecase.execute(q)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Search failed: {str(e)}")
+
+@router.get("/ingredients/{ingredient_id}")
+async def get_ingredient_details(
+    ingredient_id: str,
+    db: AsyncSession = Depends(get_db_session)
+):
+    ingredient_repo = SQLAlchemyIngredientRepository(db)
+    usecase = GetIngredientDetailsUseCase(ingredient_repo)
+    result = await usecase.execute(ingredient_id)
+
+    if not result:
+        raise HTTPException(status_code=404, detail="Ingredient not found")
+
+    return result
+
 @router.get("/products/search")
 async def search_products(
     q: str = Query("", description="Product name or brand search query"),
-    countries: List[str] = Depends(get_countries_list),
     db: AsyncSession = Depends(get_db_session)
 ):
     try:
         product_repo = SQLAlchemyProductRepository(db)
         usecase = SearchProductUseCase(product_repo)
-        results = await usecase.execute(q, countries)
+        results = await usecase.execute(q)
         return results
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Search failed: {str(e)}")
@@ -56,16 +84,15 @@ async def search_products(
 @router.get("/products/{barcode}")
 async def get_product_details(
     barcode: str,
-    countries: List[str] = Depends(get_countries_list),
     db: AsyncSession = Depends(get_db_session)
 ):
     product_repo = SQLAlchemyProductRepository(db)
     lookup_service = OpenFoodFactsService()
-    
+
     usecase = GetProductDetailsUseCase(product_repo, lookup_service)
-    result = await usecase.execute(barcode, countries)
-    
+    result = await usecase.execute(barcode)
+
     if not result:
         raise HTTPException(status_code=404, detail="Product not found")
-        
+
     return result

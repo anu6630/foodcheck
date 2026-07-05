@@ -58,6 +58,6 @@ class ApiHealthMonitor {
     }
 
     private companion object {
-        const val HEALTH_POLL_INTERVAL_MS = 45_000L
+        const val HEALTH_POLL_INTERVAL_MS = 20_000L
     }
 }

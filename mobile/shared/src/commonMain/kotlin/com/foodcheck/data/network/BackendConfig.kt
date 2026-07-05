@@ -14,7 +14,7 @@ object BackendConfig {
     var activeBaseUrl: String = PRIMARY_URL
         internal set
 
-    var customBaseUrl: String? = null
+    var customBaseUrl: String? = "http://192.168.1.5:8999"
 
     /** Effective base URL requests should use: manual override wins, else the active tier. */
     val baseUrl: String

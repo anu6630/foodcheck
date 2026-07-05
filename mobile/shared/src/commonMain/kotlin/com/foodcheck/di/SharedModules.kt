@@ -13,7 +13,9 @@ import com.foodcheck.data.repositories.ProductRepository
 import com.foodcheck.domain.repositories.IProductRepository
 import com.foodcheck.domain.usecases.SearchProductsUseCase
 import com.foodcheck.domain.usecases.GetProductDetailsUseCase
-import com.foodcheck.domain.usecases.ScanImageUseCase
+import com.foodcheck.domain.usecases.ScanUseCase
+import com.foodcheck.domain.usecases.UnifiedSearchUseCase
+import com.foodcheck.domain.usecases.GetIngredientDetailsUseCase
 
 val sharedModule = module {
     // HttpClient
@@ -41,5 +43,7 @@ val sharedModule = module {
     // Use cases
     single { SearchProductsUseCase(get()) }
     single { GetProductDetailsUseCase(get()) }
-    single { ScanImageUseCase(get()) }
+    single { ScanUseCase(get()) }
+    single { UnifiedSearchUseCase(get()) }
+    single { GetIngredientDetailsUseCase(get()) }
 }

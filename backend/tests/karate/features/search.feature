@@ -19,3 +19,30 @@ Scenario: Search with specific country filter (EU)
   When method get
   Then status 200
   And match response[0].severity == 'red'
+
+Scenario: Unified search returns grouped products and ingredients (not interleaved)
+  Given path 'api/search'
+  And param q = 'sodium benzoate'
+  When method get
+  Then status 200
+  And match response.products == '#[]'
+  And match response.ingredients == '#[]'
+  # "Sodium benzoate" itself should rank first (exact/near-exact match)
+  And match response.ingredients[0].id == 'additive-e211'
+  And match response.ingredients[0].name == 'Sodium benzoate'
+  And match response.ingredients[0].severity == 'amber'
+
+Scenario: Unified search matches a product by name
+  Given path 'api/search'
+  And param q = 'White Cookie Frosting'
+  When method get
+  Then status 200
+  And match response.products == '#[]'
+  And match response.products[0].product.name == 'White Cookie Frosting'
+
+Scenario: Unified search with a query matching neither products nor ingredients
+  Given path 'api/search'
+  And param q = 'zzz_no_such_thing_zzz'
+  When method get
+  Then status 200
+  And match response == { products: [], ingredients: [] }

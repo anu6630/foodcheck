@@ -20,23 +20,25 @@ kotlin {
         }
     }
     
-    listOf(
+    val iosTargets = listOf(
         iosX64(),
         iosArm64(),
         iosSimulatorArm64()
-    ).forEach { iosTarget ->
+    )
+    iosTargets.forEach { iosTarget ->
         iosTarget.binaries.framework {
             baseName = "composeApp"
             isStatic = true
+            export(project(":shared"))
         }
     }
-    
+
     sourceSets {
         val commonMain by getting
         val androidMain by getting
-        
+
         commonMain.dependencies {
-            implementation(project(":shared"))
+            api(project(":shared"))
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material3)
@@ -48,9 +50,13 @@ kotlin {
             implementation(libs.kotlinx.datetime)
             implementation(compose.materialIconsExtended)
             
+            // Navigation
+            implementation(libs.navigation.compose)
+
             // Dependency Injection
             implementation(libs.koin.core)
             implementation(libs.koin.compose)
+            implementation(libs.koin.compose.viewmodel)
             
             // Networking & Serialization
             implementation(libs.kotlinx.serialization.json)
@@ -65,10 +71,19 @@ kotlin {
             implementation(libs.androidx.appcompat)
             implementation(libs.androidx.core.ktx)
             implementation(libs.ktor.client.okhttp)
-            
+
             // Dependency Injection
             implementation(libs.koin.android)
-            implementation(libs.koin.androidx.compose)
+        }
+
+        val iosMain by creating {
+            dependsOn(commonMain)
+            dependencies {
+                implementation(libs.ktor.client.darwin)
+            }
+        }
+        iosTargets.forEach { iosTarget ->
+            getByName("${iosTarget.name}Main").dependsOn(iosMain)
         }
     }
 }

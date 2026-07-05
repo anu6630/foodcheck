@@ -15,11 +15,12 @@ kotlin {
     
     jvm("desktop")
     
-    listOf(
+    val iosTargets = listOf(
         iosX64(),
         iosArm64(),
         iosSimulatorArm64()
-    ).forEach { iosTarget ->
+    )
+    iosTargets.forEach { iosTarget ->
         iosTarget.binaries.framework {
             baseName = "shared"
             isStatic = true
@@ -32,15 +33,25 @@ kotlin {
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.kotlinx.datetime)
             implementation(libs.koin.core)
-            
+
             // Networking & Serialization
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.ktor.client.content.negotiation)
         }
-        
+
         commonTest.dependencies {
             implementation(libs.kotlin.test)
+        }
+
+        val iosMain by creating {
+            dependsOn(commonMain.get())
+            dependencies {
+                implementation(libs.ktor.client.darwin)
+            }
+        }
+        iosTargets.forEach { iosTarget ->
+            getByName("${iosTarget.name}Main").dependsOn(iosMain)
         }
     }
 }

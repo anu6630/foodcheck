@@ -45,3 +45,12 @@ class Product:
     category: Optional[str]
     source: str  # "local" | "open_food_facts"
     ingredients: List[ProductIngredient] = field(default_factory=list)
+
+@dataclass
+class ScanAgentResult:
+    """Structured result of the scan agent's analysis of one or more product images."""
+    product_name: Optional[str] = None
+    brand: Optional[str] = None
+    country_hint: Optional[str] = None
+    ingredients_text: Optional[str] = None
+    candidates: List[tuple] = field(default_factory=list)  # List[Tuple[Product, int]] - (product, score 0-100)

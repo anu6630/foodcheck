@@ -1,5 +1,5 @@
 import re
-from typing import List, Optional
+from typing import List, Optional, Tuple
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from sqlalchemy import select, or_, func
@@ -98,6 +98,43 @@ class SQLAlchemyProductRepository(IProductRepository):
         db_prods = res.scalars().all()
         return [to_domain_product(p) for p in db_prods]
 
+    async def search_by_ingredient_names(self, names: List[str]) -> List[Tuple[Product, float]]:
+        cleaned_names = [n.strip() for n in names if n and n.strip()]
+        if not cleaned_names:
+            return []
+
+        # Resolve ingredient ids matching any of the provided names, either directly
+        # against the ingredient's primary name or via its synonym table.
+        direct_conditions = [DBIngredient.name.ilike(f"%{n}%") for n in cleaned_names]
+        stmt_direct = select(DBIngredient.id).where(or_(*direct_conditions))
+        res = await self.session.execute(stmt_direct)
+        ingredient_ids = set(res.scalars().all())
+
+        synonym_conditions = [DBIngredientName.name.ilike(f"%{n}%") for n in cleaned_names]
+        stmt_syn = select(DBIngredientName.ingredient_id).where(or_(*synonym_conditions))
+        res = await self.session.execute(stmt_syn)
+        ingredient_ids.update(res.scalars().all())
+
+        if not ingredient_ids:
+            return []
+
+        # Reuse search_by_name("") to load the full (small) product catalog with
+        # ingredients/bans eager-loaded, then intersect ingredient-id sets in Python.
+        # This mirrors the same ratio semantics ScanImageUseCase used to compute inline.
+        all_products = await self.search_by_name("")
+        results: List[Tuple[Product, float]] = []
+        for p in all_products:
+            p_ing_ids = {pi.ingredient.id for pi in p.ingredients}
+            if not p_ing_ids:
+                continue
+            intersect = p_ing_ids.intersection(ingredient_ids)
+            if intersect:
+                ratio = len(intersect) / max(len(p_ing_ids), 1)
+                results.append((p, ratio))
+
+        results.sort(key=lambda r: r[1], reverse=True)
+        return results
+
     async def save(self, product: Product) -> Product:
         # Check if already exists by barcode
         stmt = select(DBProduct).where(DBProduct.barcode == product.barcode)
@@ -173,6 +210,67 @@ class SQLAlchemyIngredientRepository(IIngredientRepository):
         res = await self.session.execute(stmt)
         db_ing = res.scalar_one_or_none()
         return to_domain_ingredient(db_ing) if db_ing else None
+
+    async def search_ingredients(self, query: str, limit: int = 10) -> List[Ingredient]:
+        cleaned = (query or "").strip()
+        if not cleaned:
+            return []
+        cleaned_lower = cleaned.lower()
+        like_pattern = f"%{cleaned}%"
+
+        def rank_for(text: Optional[str]) -> int:
+            # 0 = exact match, 1 = prefix match, 2 = substring match, 3 = no match
+            if not text:
+                return 3
+            t = text.lower()
+            if t == cleaned_lower:
+                return 0
+            if t.startswith(cleaned_lower):
+                return 1
+            if cleaned_lower in t:
+                return 2
+            return 3
+
+        candidate_ranks: dict = {}
+
+        # Direct matches against the ingredient's own name/e_number
+        stmt_direct = select(DBIngredient.id, DBIngredient.name, DBIngredient.e_number).where(
+            or_(
+                DBIngredient.name.ilike(like_pattern),
+                DBIngredient.e_number.ilike(like_pattern)
+            )
+        )
+        res = await self.session.execute(stmt_direct)
+        for ing_id, name, e_number in res.all():
+            rank = min(rank_for(name), rank_for(e_number))
+            candidate_ranks[ing_id] = min(candidate_ranks.get(ing_id, 3), rank)
+
+        # Matches against the synonym table
+        stmt_syn = select(DBIngredientName.ingredient_id, DBIngredientName.name).where(
+            DBIngredientName.name.ilike(like_pattern)
+        )
+        res = await self.session.execute(stmt_syn)
+        for ing_id, name in res.all():
+            rank = rank_for(name)
+            candidate_ranks[ing_id] = min(candidate_ranks.get(ing_id, 3), rank)
+
+        if not candidate_ranks:
+            return []
+
+        ranked_ids = sorted(candidate_ranks.keys(), key=lambda i: candidate_ranks[i])[:limit]
+
+        # Eager-load full ingredients (names + bans), same as get_by_id, preserving rank order
+        stmt = (
+            select(DBIngredient)
+            .options(
+                selectinload(DBIngredient.names),
+                selectinload(DBIngredient.bans)
+            )
+            .where(DBIngredient.id.in_(ranked_ids))
+        )
+        res = await self.session.execute(stmt)
+        db_ings = {ing.id: ing for ing in res.scalars().all()}
+        return [to_domain_ingredient(db_ings[i]) for i in ranked_ids if i in db_ings]
 
     async def find_by_name_or_synonym(self, name: str) -> Optional[Ingredient]:
         if not name:

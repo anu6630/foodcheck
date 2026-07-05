@@ -7,6 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import com.foodcheck.data.network.ApiHealthMonitor
 import com.foodcheck.di.sharedModule
 import com.foodcheck.di.appModule
+import com.foodcheck.util.rememberImagePickerLauncher
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.GlobalContext
 import org.koin.core.context.startKoin
@@ -27,7 +28,7 @@ class MainActivity : ComponentActivity() {
 
         enableEdgeToEdge()
         setContent {
-            App()
+            App(imagePickerLauncher = rememberImagePickerLauncher())
         }
     }
 }
