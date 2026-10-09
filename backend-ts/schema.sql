@@ -177,3 +177,53 @@ CREATE TABLE IF NOT EXISTS ingredient_requests (
   category VARCHAR(100),
   requester_notes TEXT
 );
+
+CREATE TABLE IF NOT EXISTS app_users (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  device_key VARCHAR(80) NOT NULL UNIQUE,
+  phone VARCHAR(32) UNIQUE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS scans (
+  id SERIAL PRIMARY KEY,
+  user_id UUID NOT NULL REFERENCES app_users(id) ON DELETE CASCADE,
+  ingredients_text TEXT,
+  snapshot JSONB NOT NULL DEFAULT '[]',
+  image_key TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS shelf_items (
+  id SERIAL PRIMARY KEY,
+  user_id UUID NOT NULL REFERENCES app_users(id) ON DELETE CASCADE,
+  scan_id INTEGER NOT NULL REFERENCES scans(id) ON DELETE CASCADE,
+  display_name VARCHAR(255) NOT NULL,
+  brand VARCHAR(255),
+  barcode VARCHAR(50),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS stories (
+  id SERIAL PRIMARY KEY,
+  user_id UUID NOT NULL REFERENCES app_users(id) ON DELETE CASCADE,
+  scan_id INTEGER NOT NULL REFERENCES scans(id) ON DELETE CASCADE,
+  caption TEXT,
+  snapshot JSONB NOT NULL DEFAULT '[]',
+  published_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS story_comments (
+  id SERIAL PRIMARY KEY,
+  story_id INTEGER NOT NULL REFERENCES stories(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES app_users(id) ON DELETE CASCADE,
+  body TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS story_likes (
+  story_id INTEGER NOT NULL REFERENCES stories(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES app_users(id) ON DELETE CASCADE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  PRIMARY KEY (story_id, user_id)
+);

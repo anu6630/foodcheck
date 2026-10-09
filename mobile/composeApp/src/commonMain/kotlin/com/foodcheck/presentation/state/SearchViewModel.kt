@@ -2,6 +2,8 @@ package com.foodcheck.presentation.state
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.foodcheck.data.datasources.NetworkDataSource
+import com.foodcheck.data.dto.ShelfItemDto
 import com.foodcheck.domain.entities.UnifiedSearchResult
 import com.foodcheck.domain.usecases.UnifiedSearchUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,7 +16,8 @@ import kotlinx.coroutines.launch
 
 @OptIn(FlowPreview::class)
 class SearchViewModel(
-    private val unifiedSearchUseCase: UnifiedSearchUseCase
+    private val unifiedSearchUseCase: UnifiedSearchUseCase,
+    private val network: NetworkDataSource
 ) : ViewModel() {
 
     private val _query = MutableStateFlow("")
@@ -29,6 +32,9 @@ class SearchViewModel(
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error.asStateFlow()
 
+    private val _shelf = MutableStateFlow<List<ShelfItemDto>>(emptyList())
+    val shelf: StateFlow<List<ShelfItemDto>> = _shelf.asStateFlow()
+
     init {
         // collectLatest cancels the in-flight request for a stale keystroke as soon as a newer
         // one arrives, so a slow response to an earlier partial query (e.g. "s") can never land
@@ -39,6 +45,7 @@ class SearchViewModel(
                 .collectLatest { q ->
                     if (q.isBlank()) {
                         _results.value = UnifiedSearchResult()
+                        _shelf.value = emptyList()
                         _error.value = null
                         return@collectLatest
                     }
@@ -47,6 +54,11 @@ class SearchViewModel(
                     unifiedSearchUseCase(q)
                         .onSuccess { _results.value = it }
                         .onFailure { _error.value = it.message ?: "Failed to search" }
+                    _shelf.value = try {
+                        network.listShelf(q).items
+                    } catch (_: Exception) {
+                        emptyList()
+                    }
                     _loading.value = false
                 }
         }

@@ -4,7 +4,7 @@ import composeApp
 enum LandingTab {
     case scan
     case search
-    case submit
+    case feed
 }
 
 struct LandingView: View {
@@ -16,6 +16,7 @@ struct LandingView: View {
     @State private var activeIngredientId: String? = nil
     @State private var isSearching = false
     @State private var showSubmitSheet = false
+    @State private var showMyList = false
     
     var body: some View {
         NavigationStack {
@@ -76,7 +77,8 @@ struct LandingView: View {
                             },
                             onIngredientClick: { ingId in
                                 self.activeIngredientId = ingId
-                            }
+                            },
+                            onSavedToList: { showMyList = true }
                         )
                     case .search:
                         SearchView(
@@ -86,17 +88,13 @@ struct LandingView: View {
                             },
                             onIngredientClick: { ingId in
                                 self.activeIngredientId = ingId
-                            }
-                        )
-                    case .submit:
-                        ScanView(
-                            onConfidentMatch: { barcode in
-                                self.activeBarcode = barcode
                             },
-                            onIngredientClick: { ingId in
-                                self.activeIngredientId = ingId
-                            }
+                            onMyListClick: { showMyList = true }
                         )
+                    case .feed:
+                        FeedView(onIngredientClick: { ingId in
+                            self.activeIngredientId = ingId
+                        })
                     }
                     
                     Spacer()
@@ -108,7 +106,7 @@ struct LandingView: View {
                     VStack {
                         Spacer()
                         
-                        HStack(spacing: 48) {
+                        HStack(spacing: 20) {
                             TabButton(
                                 icon: "doc.text.viewfinder",
                                 title: "Scan",
@@ -126,6 +124,16 @@ struct LandingView: View {
                             ) {
                                 withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                                     selectedTab = .search
+                                }
+                            }
+
+                            TabButton(
+                                icon: "bubble.left.and.bubble.right",
+                                title: "Feed",
+                                isActive: selectedTab == .feed
+                            ) {
+                                withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                                    selectedTab = .feed
                                 }
                             }
 
@@ -191,6 +199,12 @@ struct LandingView: View {
             }
             .sheet(isPresented: $showSubmitSheet) {
                 SubmitRequestView()
+            }
+            .sheet(isPresented: $showMyList) {
+                ShelfListView(onIngredientClick: { ingId in
+                    showMyList = false
+                    self.activeIngredientId = ingId
+                })
             }
             .onAppear {
                 withAnimation(.easeInOut(duration: 25).repeatForever(autoreverses: true)) {

@@ -22,4 +22,10 @@ sealed class ScanOutcome {
         val ingredients: List<AnnotatedIngredient> = emptyList()
     ) : ScanOutcome()
     data class IngredientsOnly(val ingredients: List<AnnotatedIngredient>) : ScanOutcome()
+
+    fun labelIngredients(): List<AnnotatedIngredient> = when (this) {
+        is Confident -> ingredients
+        is Suggestions -> ingredients
+        is IngredientsOnly -> ingredients
+    }
 }

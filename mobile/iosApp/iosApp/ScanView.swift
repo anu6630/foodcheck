@@ -5,9 +5,15 @@ struct ScanView: View {
     @StateObject private var model = ObservableScanModel()
     @Environment(\.dismiss) var dismiss
     
-    // Callbacks to notify parent views when a match is found
     var onConfidentMatch: (String) -> Void
     var onIngredientClick: (String) -> Void
+    var onSavedToList: () -> Void = {}
+
+    @State private var showSave = false
+    @State private var showShare = false
+    @State private var saveName = ""
+    @State private var saveBrand = ""
+    @State private var caption = ""
     
     var body: some View {
         VStack(spacing: 24) {
@@ -40,74 +46,54 @@ struct ScanView: View {
                     }
                     Spacer()
                 } else if let outcome = model.outcome {
-                    Spacer()
-                    
-                    if let confident = outcome as? ScanOutcome.Confident {
-                        Button(action: {
-                            onConfidentMatch(confident.product.product.barcode)
-                            dismiss()
-                        }) {
-                            VStack(spacing: 14) {
-                                Image(systemName: "checkmark.circle.fill")
-                                    .font(.system(size: 52))
-                                    .foregroundColor(.green)
-                                Text("Match Found!")
-                                    .font(.system(size: 18, weight: .bold))
-                                    .foregroundColor(.white)
-                                Text(confident.product.product.name)
-                                    .font(.body)
-                                    .foregroundColor(.white.opacity(0.8))
-                                    .multilineTextAlignment(.center)
-                                Text("Tap to view details")
-                                    .font(.caption)
-                                    .foregroundColor(Color(red: 0.06, green: 0.73, blue: 0.51))
-                            }
-                            .padding(24)
-                            .frame(maxWidth: .infinity)
-                            .background(Color.white.opacity(0.04))
-                            .cornerRadius(20)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 20)
-                                    .stroke(Color.white.opacity(0.12), lineWidth: 1)
-                            )
-                        }
-                        .buttonStyle(ScaleButtonStyle())
-                    } else if let suggestions = outcome as? ScanOutcome.Suggestions {
-                        VStack(alignment: .leading, spacing: 14) {
-                            Text("Scan result")
-                                .font(.headline)
-                                .foregroundColor(.white)
-                            if !suggestions.ingredients.isEmpty {
-                                Text("From the label")
-                                    .font(.subheadline)
-                                    .foregroundColor(.white.opacity(0.7))
-                                ScrollView {
-                                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 140))], alignment: .leading, spacing: 8) {
-                                        ForEach(suggestions.ingredients, id: \.self) { annotated in
-                                            Button(action: {
-                                                onIngredientClick(annotated.id!)
-                                                dismiss()
-                                            }) {
-                                                IngredientChipView(ing: annotated)
+                    let ingredients = outcome.labelIngredients()
+                    let similar = (outcome as? ScanOutcome.Suggestions)?.candidates ?? []
+                    VStack(alignment: .leading, spacing: 14) {
+                        Text("From this label")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                        Text("Status is for these names under published rules. Not a certificate for a brand.")
+                            .font(.caption)
+                            .foregroundColor(.white.opacity(0.5))
+                        if ingredients.isEmpty {
+                            Text("No ingredients could be read from the photo.")
+                                .foregroundColor(.white.opacity(0.5))
+                        } else {
+                            ScrollView {
+                                LazyVGrid(columns: [GridItem(.adaptive(minimum: 140))], alignment: .leading, spacing: 8) {
+                                    ForEach(ingredients, id: \.self) { annotated in
+                                        Button(action: {
+                                            if let id = annotated.id {
+                                                onIngredientClick(id)
                                             }
+                                        }) {
+                                            IngredientChipView(ing: annotated)
                                         }
                                     }
                                 }
-                                .frame(maxHeight: 160)
                             }
-                            Text("Possible catalog matches")
+                            .frame(maxHeight: 180)
+                        }
+                        HStack {
+                            Button("Save to my list") { showSave = true }
+                                .font(.system(size: 14, weight: .bold))
+                                .foregroundColor(Color(red: 0.06, green: 0.73, blue: 0.51))
+                            Button("Share as story") { showShare = true }
+                                .font(.system(size: 14, weight: .bold))
+                                .foregroundColor(Color(red: 0.06, green: 0.73, blue: 0.51))
+                        }
+                        if !similar.isEmpty {
+                            Text("Similar packs")
                                 .font(.subheadline)
-                                .foregroundColor(.white.opacity(0.7))
-                            Text("These are similar packs — not a confirmed match.")
+                                .foregroundColor(.white)
+                            Text("These are similar packs in the catalog — not a confirmed match.")
                                 .font(.caption)
                                 .foregroundColor(.white.opacity(0.5))
-                            
                             ScrollView {
                                 LazyVStack(spacing: 10) {
-                                    ForEach(suggestions.candidates, id: \.self) { candidate in
+                                    ForEach(similar, id: \.self) { candidate in
                                         Button(action: {
                                             onConfidentMatch(candidate.product.barcode)
-                                            dismiss()
                                         }) {
                                             HStack {
                                                 VStack(alignment: .leading, spacing: 4) {
@@ -120,8 +106,8 @@ struct ScanView: View {
                                                         .foregroundColor(.gray)
                                                 }
                                                 Spacer()
-                                                Image(systemName: "chevron.right")
-                                                    .foregroundColor(.white.opacity(0.3))
+                                                Text("\(candidate.matchScore)%")
+                                                    .foregroundColor(Color(red: 0.06, green: 0.73, blue: 0.51))
                                             }
                                             .padding(16)
                                             .background(Color.white.opacity(0.04))
@@ -131,31 +117,29 @@ struct ScanView: View {
                                 }
                             }
                         }
-                    } else if let ingredientsOnly = outcome as? ScanOutcome.IngredientsOnly {
-                        VStack(alignment: .leading, spacing: 14) {
-                            Text("No Product Match")
-                                .font(.headline)
-                                .foregroundColor(.white)
-                            Text("We couldn't match a product, but we found these ingredients:")
-                                .font(.subheadline)
-                                .foregroundColor(.white.opacity(0.6))
-                            
-                            ScrollView {
-                                LazyVGrid(columns: [GridItem(.adaptive(minimum: 140))], alignment: .leading, spacing: 8) {
-                                    ForEach(ingredientsOnly.ingredients, id: \.self) { annotated in
-                                        Button(action: {
-                                            onIngredientClick(annotated.id!)
-                                            dismiss()
-                                        }) {
-                                            IngredientChipView(ing: annotated)
-                                        }
-                                    }
-                                }
-                            }
-                        }
                     }
-                    
-                    Spacer()
+                    .padding(.horizontal, 20)
+                    .alert("Save to my list", isPresented: $showSave) {
+                        TextField("Name this pack", text: $saveName)
+                        TextField("Brand (optional)", text: $saveBrand)
+                        Button("Save") {
+                            model.saveToShelf(name: saveName, brand: saveBrand)
+                        }
+                        Button("Cancel", role: .cancel) {}
+                    }
+                    .alert("Share as story", isPresented: $showShare) {
+                        TextField("Caption (optional)", text: $caption)
+                        Button("Publish story") { model.publishStory(caption: caption) }
+                        Button("Cancel", role: .cancel) {}
+                    }
+                    .alert("Done", isPresented: Binding(
+                        get: { model.actionMessage != nil },
+                        set: { if !$0 { model.clearActionMessage() } }
+                    )) {
+                        Button("OK") { model.clearActionMessage() }
+                    } message: {
+                        Text(model.actionMessage ?? "")
+                    }
                 } else {
                     Spacer()
                     

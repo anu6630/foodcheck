@@ -8,6 +8,7 @@ struct SearchView: View {
     // Callbacks to notify parent view when item clicked
     var onConfidentMatch: (String) -> Void
     var onIngredientClick: (String) -> Void
+    var onMyListClick: () -> Void = {}
     
     var body: some View {
         VStack(spacing: 0) {
@@ -37,7 +38,12 @@ struct SearchView: View {
             )
             .padding(.horizontal, 20)
             .padding(.top, 10)
-            .padding(.bottom, 16)
+            .padding(.bottom, 8)
+
+            Button("My list") { onMyListClick() }
+                .font(.system(size: 14, weight: .bold))
+                .foregroundColor(Color(red: 0.06, green: 0.73, blue: 0.51))
+                .padding(.bottom, 8)
             
             // Search States
             if model.loading {

@@ -9,10 +9,12 @@ import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 val appModule = module {
-    viewModel { SearchViewModel(get()) }
+    viewModel { SearchViewModel(get(), get()) }
     viewModel { ProductDetailViewModel(get()) }
     viewModel { IngredientDetailViewModel(get()) }
-    viewModel { ScanViewModel(get()) }
+    viewModel { ScanViewModel(get(), get()) }
+    viewModel { com.foodcheck.presentation.state.FeedViewModel(get()) }
+    viewModel { com.foodcheck.presentation.state.ShelfViewModel(get()) }
     viewModel {
         SubmitRequestViewModel(
             submitProductRequestUseCase = get(),

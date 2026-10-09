@@ -67,6 +67,7 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Forum
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Icon
@@ -87,10 +88,11 @@ import com.foodcheck.presentation.navigation.Route
 import com.foodcheck.presentation.screens.IngredientDetailScreen
 import com.foodcheck.presentation.screens.LandingScreen
 import com.foodcheck.presentation.screens.ProductDetailScreen
-import com.foodcheck.presentation.screens.ScanCaptureScreen
 import com.foodcheck.presentation.screens.ScanSuggestionsScreen
 import com.foodcheck.presentation.screens.SearchResultsScreen
 import com.foodcheck.presentation.screens.SubmitRequestScreen
+import com.foodcheck.presentation.screens.FeedScreen
+import com.foodcheck.presentation.screens.ShelfListScreen
 import com.foodcheck.presentation.state.ScanViewModel
 import com.foodcheck.presentation.theme.AppColors
 import com.foodcheck.util.ImagePickerLauncher
@@ -111,6 +113,7 @@ fun App(imagePickerLauncher: ImagePickerLauncher) {
     var isSearching by remember { mutableStateOf(false) }
     var clearQueryTrigger by remember { mutableStateOf(0) }
     var showScanSheet by remember { mutableStateOf(false) }
+    val scanViewModel: ScanViewModel = koinViewModel()
 
     var activeProductBarcode by remember { mutableStateOf<String?>(null) }
     var activeIngredientId by remember { mutableStateOf<String?>(null) }
@@ -255,14 +258,14 @@ fun App(imagePickerLauncher: ImagePickerLauncher) {
             ) {
                 NavHost(navController = navController, startDestination = Route.Landing) {
                     composable<Route.Landing> {
-                        val scanViewModel: ScanViewModel = koinViewModel()
                         Box(modifier = Modifier.fillMaxSize()) {
                             SearchResultsScreen(
                                 initialQuery = "",
                                 onQueryChange = { isSearching = it },
                                 clearQueryTrigger = clearQueryTrigger,
                                 onProductClick = { result -> onProductClick(result.product.barcode) },
-                                onIngredientClick = { ing -> ing.id?.let { onIngredientClick(it) } }
+                                onIngredientClick = { ing -> ing.id?.let { onIngredientClick(it) } },
+                                onMyListClick = { navController.navigate(Route.MyList) }
                             )
 
                             // Floating Bottom Tab Bar overlay
@@ -282,7 +285,7 @@ fun App(imagePickerLauncher: ImagePickerLauncher) {
                                 ) {
                                     Row(
                                         modifier = Modifier.padding(horizontal = 24.dp, vertical = 10.dp),
-                                        horizontalArrangement = Arrangement.spacedBy(36.dp),
+                                        horizontalArrangement = Arrangement.spacedBy(16.dp),
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
                                         TabButtonCompose(
@@ -296,6 +299,12 @@ fun App(imagePickerLauncher: ImagePickerLauncher) {
                                             title = "Scan",
                                             isActive = false,
                                             onClick = { showScanSheet = true }
+                                        )
+                                        TabButtonCompose(
+                                            icon = Icons.Default.Forum,
+                                            title = "Feed",
+                                            isActive = false,
+                                            onClick = { navController.navigate(Route.Feed) }
                                         )
                                         TabButtonCompose(
                                             icon = Icons.Default.Add,
@@ -314,19 +323,13 @@ fun App(imagePickerLauncher: ImagePickerLauncher) {
                                 onDismiss = { showScanSheet = false },
                                 imagePickerLauncher = imagePickerLauncher,
                                 viewModel = scanViewModel,
-                                onScanOutcome = { outcome ->
-                                    when (outcome) {
-                                        is ScanOutcome.Confident -> {
-                                            onProductClick(outcome.product.product.barcode)
-                                        }
-                                        else -> navController.navigate(Route.ScanSuggestions)
-                                    }
+                                onScanOutcome = { _ ->
+                                    navController.navigate(Route.ScanSuggestions)
                                 }
                             )
                         }
                     }
                     composable<Route.ScanSuggestions> {
-                        val scanViewModel: ScanViewModel = koinViewModel()
                         ScanSuggestionsScreen(
                             viewModel = scanViewModel,
                             onCandidateClick = { candidate ->
@@ -334,6 +337,18 @@ fun App(imagePickerLauncher: ImagePickerLauncher) {
                                     popUpTo(Route.Landing)
                                 }
                             },
+                            onIngredientClick = { ing -> ing.id?.let { onIngredientClick(it) } }
+                        )
+                    }
+                    composable<Route.Feed> {
+                        FeedScreen(
+                            onBack = { navController.popBackStack() },
+                            onIngredientClick = { ing -> ing.id?.let { onIngredientClick(it) } }
+                        )
+                    }
+                    composable<Route.MyList> {
+                        ShelfListScreen(
+                            onBack = { navController.popBackStack() },
                             onIngredientClick = { ing -> ing.id?.let { onIngredientClick(it) } }
                         )
                     }

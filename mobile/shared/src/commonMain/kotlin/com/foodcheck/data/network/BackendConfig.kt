@@ -18,6 +18,17 @@ object BackendConfig {
     /** Set to a LAN URL for local dev; null uses [activeBaseUrl] (Neon by default). */
     var customBaseUrl: String? = null
 
+    /** Anonymous device identity for shelf/stories. Persist on the platform; do not log. */
+    var deviceKey: String = ""
+
+    fun ensureDeviceKey(): String {
+        if (deviceKey.isBlank()) {
+            val alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-"
+            deviceKey = buildString { repeat(32) { append(alphabet.random()) } }
+        }
+        return deviceKey
+    }
+
     /** Effective base URL requests should use: manual override wins, else the active tier. */
     val baseUrl: String
         get() = customBaseUrl ?: activeBaseUrl

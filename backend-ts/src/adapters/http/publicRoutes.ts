@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import { communityRoutes } from "./communityRoutes.js";
 import { PgDataSourceRepository } from "../repositories/dataSourceRepository.js";
 import { PgIngredientRepository } from "../repositories/ingredientRepository.js";
 import { PgProductRepository } from "../repositories/productRepository.js";
@@ -17,6 +18,7 @@ import {
 } from "../../domain/usecases.js";
 
 export const publicRoutes = new Hono();
+publicRoutes.route("/", communityRoutes);
 
 publicRoutes.post("/scan", async (c) => {
   try {

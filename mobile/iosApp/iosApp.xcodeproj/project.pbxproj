@@ -19,6 +19,8 @@
 		DBF2178339A7B6A37F096AF1 /* iosAppApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 404608725152C3067E7030FA /* iosAppApp.swift */; };
 		F353B468C9204817BBD6634B /* ProductDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD24A79E3E224BDA865DDF3E /* ProductDetailView.swift */; };
 		F9C881D94E614BDB532C1DEE /* IngredientDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72B0BF81A7E62C9DB148500C /* IngredientDetailView.swift */; };
+		A11FEED01C0FFEE01C0DE001 /* FeedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11FEED01C0FFEE01C0DE002 /* FeedView.swift */; };
+		A11SHELF1C0FFEE01C0DE003 /* ShelfListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11SHELF1C0FFEE01C0DE004 /* ShelfListView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -36,6 +38,8 @@
 		F635E8312D9ED765E1BF2556 /* ScanView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanView.swift; sourceTree = "<group>"; };
 		FC87A9121261381380399B50 /* ImagePickerPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePickerPresenter.swift; sourceTree = "<group>"; };
 		FCD17061B3F25017464A6143 /* FlowLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlowLayout.swift; sourceTree = "<group>"; };
+		A11FEED01C0FFEE01C0DE002 /* FeedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedView.swift; sourceTree = "<group>"; };
+		A11SHELF1C0FFEE01C0DE004 /* ShelfListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShelfListView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -55,6 +59,8 @@
 				DD24A79E3E224BDA865DDF3E /* ProductDetailView.swift */,
 				F635E8312D9ED765E1BF2556 /* ScanView.swift */,
 				E7BE4AACAB34743ADF91B179 /* SearchView.swift */,
+				A11FEED01C0FFEE01C0DE002 /* FeedView.swift */,
+				A11SHELF1C0FFEE01C0DE004 /* ShelfListView.swift */,
 			);
 			path = iosApp;
 			sourceTree = "<group>";
@@ -168,6 +174,8 @@
 				F353B468C9204817BBD6634B /* ProductDetailView.swift in Sources */,
 				B187B9898404A6BCC3C5245E /* ScanView.swift in Sources */,
 				182025D08B87193AC4AFA3C3 /* SearchView.swift in Sources */,
+				A11FEED01C0FFEE01C0DE001 /* FeedView.swift in Sources */,
+				A11SHELF1C0FFEE01C0DE003 /* ShelfListView.swift in Sources */,
 				DBF2178339A7B6A37F096AF1 /* iosAppApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

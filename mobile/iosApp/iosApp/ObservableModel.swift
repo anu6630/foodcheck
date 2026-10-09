@@ -1,3 +1,4 @@
+import Foundation
 import SwiftUI
 import composeApp
 
@@ -113,11 +114,13 @@ class ObservableScanModel: ObservableObject {
     @Published var loading: Bool = false
     @Published var statusText: String = "Reading label..."
     @Published var error: String? = nil
+    @Published var actionMessage: String? = nil
     
     private var outcomeWatcher: FlowWatcher<ScanOutcome>?
     private var loadingWatcher: FlowWatcher<KotlinBoolean>?
     private var statusTextWatcher: FlowWatcher<NSString>?
     private var errorWatcher: FlowWatcher<NSString>?
+    private var actionWatcher: FlowWatcher<NSString>?
     
     init() {
         self.outcomeWatcher = FlowWatcher(flow: viewModel.outcome) { [weak self] val in
@@ -131,6 +134,9 @@ class ObservableScanModel: ObservableObject {
         }
         self.errorWatcher = FlowWatcher(flow: viewModel.error) { [weak self] val in
             DispatchQueue.main.async { self?.error = val as String? }
+        }
+        self.actionWatcher = FlowWatcher(flow: viewModel.actionMessage) { [weak self] val in
+            DispatchQueue.main.async { self?.actionMessage = val as String? }
         }
     }
     
@@ -146,11 +152,95 @@ class ObservableScanModel: ObservableObject {
     func clear() {
         viewModel.clear()
     }
+
+    func saveToShelf(name: String, brand: String) {
+        viewModel.saveToShelf(displayName: name, brand: brand.isEmpty ? nil : brand)
+    }
+
+    func publishStory(caption: String) {
+        viewModel.publishStory(caption: caption)
+    }
+
+    func clearActionMessage() {
+        viewModel.clearActionMessage()
+    }
     
     deinit {
         outcomeWatcher?.close()
         loadingWatcher?.close()
         statusTextWatcher?.close()
+        errorWatcher?.close()
+        actionWatcher?.close()
+    }
+}
+
+class ObservableFeedModel: ObservableObject {
+    let viewModel = ViewModelProvider.shared.getFeedViewModel()
+    @Published var stories: [StoryDto] = []
+    @Published var selected: StoryDto? = nil
+    @Published var error: String? = nil
+
+    private var storiesWatcher: FlowWatcher<NSArray>?
+    private var selectedWatcher: FlowWatcher<StoryDto>?
+    private var errorWatcher: FlowWatcher<NSString>?
+
+    init() {
+        storiesWatcher = FlowWatcher(flow: viewModel.stories) { [weak self] val in
+            DispatchQueue.main.async {
+                self?.stories = (val as? [StoryDto]) ?? (val as? NSArray)?.compactMap { $0 as? StoryDto } ?? []
+            }
+        }
+        selectedWatcher = FlowWatcher(flow: viewModel.selected) { [weak self] val in
+            DispatchQueue.main.async { self?.selected = val as StoryDto? }
+        }
+        errorWatcher = FlowWatcher(flow: viewModel.error) { [weak self] val in
+            DispatchQueue.main.async { self?.error = val as String? }
+        }
+        viewModel.load()
+    }
+
+    func open(id: Int32) { viewModel.open(id: id) }
+    func close() { viewModel.close() }
+    func comment(_ body: String) { viewModel.comment(body: body) }
+    func like() { viewModel.like() }
+
+    deinit {
+        storiesWatcher?.close()
+        selectedWatcher?.close()
+        errorWatcher?.close()
+    }
+}
+
+class ObservableShelfModel: ObservableObject {
+    let viewModel = ViewModelProvider.shared.getShelfViewModel()
+    @Published var items: [ShelfItemDto] = []
+    @Published var query: String = ""
+    @Published var error: String? = nil
+
+    private var itemsWatcher: FlowWatcher<NSArray>?
+    private var queryWatcher: FlowWatcher<NSString>?
+    private var errorWatcher: FlowWatcher<NSString>?
+
+    init() {
+        itemsWatcher = FlowWatcher(flow: viewModel.items) { [weak self] val in
+            DispatchQueue.main.async {
+                self?.items = (val as? [ShelfItemDto]) ?? (val as? NSArray)?.compactMap { $0 as? ShelfItemDto } ?? []
+            }
+        }
+        queryWatcher = FlowWatcher(flow: viewModel.query) { [weak self] val in
+            DispatchQueue.main.async { self?.query = val as String? ?? "" }
+        }
+        errorWatcher = FlowWatcher(flow: viewModel.error) { [weak self] val in
+            DispatchQueue.main.async { self?.error = val as String? }
+        }
+        viewModel.load(q: "")
+    }
+
+    func search(_ q: String) { viewModel.load(q: q) }
+
+    deinit {
+        itemsWatcher?.close()
+        queryWatcher?.close()
         errorWatcher?.close()
     }
 }

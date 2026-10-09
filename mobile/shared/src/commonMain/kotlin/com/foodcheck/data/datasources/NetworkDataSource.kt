@@ -16,6 +16,12 @@ import io.ktor.http.contentType
 import com.foodcheck.data.newClientRequestId
 import com.foodcheck.data.dto.ScanResponse
 import com.foodcheck.data.dto.RequestSubmitResponse
+import com.foodcheck.data.dto.CommunityIdResponse
+import com.foodcheck.data.dto.CommentsResponse
+import com.foodcheck.data.dto.LikeResponse
+import com.foodcheck.data.dto.ShelfListResponse
+import com.foodcheck.data.dto.StoryDto
+import com.foodcheck.data.dto.StoryListResponse
 import com.foodcheck.data.network.BackendConfig
 import com.foodcheck.domain.entities.IngredientDetail
 import com.foodcheck.domain.entities.SearchProductResult
@@ -44,6 +50,97 @@ class NetworkDataSource(
         set(value) {
             BackendConfig.customBaseUrl = value
         }
+
+    private fun io.ktor.client.request.HttpRequestBuilder.deviceKey() {
+        header("X-Device-Key", BackendConfig.ensureDeviceKey())
+    }
+
+    suspend fun saveToShelf(
+        displayName: String,
+        brand: String?,
+        ingredientsText: String,
+        snapshotJson: String,
+        image: ByteArray?,
+    ): CommunityIdResponse {
+        val response = client.submitFormWithBinaryData(
+            url = "${BackendConfig.baseUrl}/api/me/shelf",
+            formData = formData {
+                append("display_name", displayName)
+                brand?.let { append("brand", it) }
+                append("ingredients_text", ingredientsText)
+                append("snapshot", snapshotJson)
+                image?.let { bytes ->
+                    append("image", bytes, Headers.build {
+                        append(HttpHeaders.ContentType, "image/jpeg")
+                        append(HttpHeaders.ContentDisposition, "filename=\"label.jpg\"")
+                    })
+                }
+            }
+        ) { deviceKey() }
+        return decodeOrThrow(response.bodyAsText(), response.status.value, CommunityIdResponse.serializer())
+    }
+
+    suspend fun listShelf(query: String = ""): ShelfListResponse {
+        val response = client.get("${BackendConfig.baseUrl}/api/me/shelf") {
+            deviceKey()
+            if (query.isNotBlank()) parameter("q", query)
+        }
+        return decodeOrThrow(response.bodyAsText(), response.status.value, ShelfListResponse.serializer())
+    }
+
+    suspend fun publishStory(
+        caption: String,
+        ingredientsText: String,
+        snapshotJson: String,
+        image: ByteArray?,
+    ): CommunityIdResponse {
+        val response = client.submitFormWithBinaryData(
+            url = "${BackendConfig.baseUrl}/api/stories",
+            formData = formData {
+                if (caption.isNotBlank()) append("caption", caption)
+                append("ingredients_text", ingredientsText)
+                append("snapshot", snapshotJson)
+                image?.let { bytes ->
+                    append("image", bytes, Headers.build {
+                        append(HttpHeaders.ContentType, "image/jpeg")
+                        append(HttpHeaders.ContentDisposition, "filename=\"label.jpg\"")
+                    })
+                }
+            }
+        ) { deviceKey() }
+        return decodeOrThrow(response.bodyAsText(), response.status.value, CommunityIdResponse.serializer())
+    }
+
+    suspend fun listStories(): StoryListResponse {
+        val response = client.get("${BackendConfig.baseUrl}/api/stories")
+        return decodeOrThrow(response.bodyAsText(), response.status.value, StoryListResponse.serializer())
+    }
+
+    suspend fun getStory(id: Int): StoryDto {
+        val response = client.get("${BackendConfig.baseUrl}/api/stories/$id")
+        return decodeOrThrow(response.bodyAsText(), response.status.value, StoryDto.serializer())
+    }
+
+    fun storyPhotoUrl(id: Int): String = "${BackendConfig.baseUrl}/api/stories/$id/photo"
+
+    suspend fun addComment(storyId: Int, body: String): CommunityIdResponse {
+        val response = client.post("${BackendConfig.baseUrl}/api/stories/$storyId/comments") {
+            deviceKey()
+            contentType(ContentType.Application.Json)
+            setBody("""{"body":${json.encodeToString(kotlinx.serialization.serializer<String>(), body)}}""")
+        }
+        return decodeOrThrow(response.bodyAsText(), response.status.value, CommunityIdResponse.serializer())
+    }
+
+    suspend fun toggleLike(storyId: Int): LikeResponse {
+        val response = client.post("${BackendConfig.baseUrl}/api/stories/$storyId/like") { deviceKey() }
+        return decodeOrThrow(response.bodyAsText(), response.status.value, LikeResponse.serializer())
+    }
+
+    suspend fun listComments(storyId: Int): CommentsResponse {
+        val response = client.get("${BackendConfig.baseUrl}/api/stories/$storyId/comments")
+        return json.decodeFromString(CommentsResponse.serializer(), response.bodyAsText())
+    }
 
     suspend fun searchProducts(query: String): List<SearchProductResult> {
         val response = client.get("${BackendConfig.baseUrl}/api/products/search") {
@@ -165,5 +262,22 @@ class NetworkDataSource(
         }
         val text = response.bodyAsText()
         return json.decodeFromString(RequestSubmitResponse.serializer(), text)
+    }
+
+    private fun <T> decodeOrThrow(
+        text: String,
+        status: Int,
+        serializer: kotlinx.serialization.DeserializationStrategy<T>
+    ): T {
+        if (status >= 400) {
+            val detail = try {
+                json.decodeFromString(kotlinx.serialization.json.JsonObject.serializer(), text)["detail"]
+                    ?.toString()?.trim('"')
+            } catch (_: Exception) {
+                text
+            }
+            throw Exception(detail?.ifBlank { "Request failed ($status)" } ?: "Request failed ($status)")
+        }
+        return json.decodeFromString(serializer, text)
     }
 }

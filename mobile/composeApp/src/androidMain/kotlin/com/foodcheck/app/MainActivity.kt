@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.SystemBarStyle
 import com.foodcheck.data.network.ApiHealthMonitor
+import com.foodcheck.data.network.BackendConfig
 import com.foodcheck.di.sharedModule
 import com.foodcheck.di.appModule
 import com.foodcheck.util.rememberImagePickerLauncher
@@ -16,6 +17,11 @@ import org.koin.core.context.startKoin
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val prefs = getSharedPreferences("foodcheck", MODE_PRIVATE)
+        val stored = prefs.getString("device_key", null)
+        if (!stored.isNullOrBlank()) BackendConfig.deviceKey = stored
+        prefs.edit().putString("device_key", BackendConfig.ensureDeviceKey()).apply()
 
         if (GlobalContext.getOrNull() == null) {
             startKoin {

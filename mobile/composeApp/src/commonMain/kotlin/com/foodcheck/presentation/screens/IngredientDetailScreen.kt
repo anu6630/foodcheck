@@ -289,8 +289,8 @@ fun IngredientDetailScreen(
                                         if (meta.isNotBlank() && meta != foodName) {
                                             Text(meta, color = AppColors.TextMuted, fontSize = 11.sp)
                                         }
-                                        if (lim.note != null) {
-                                            Text(lim.note, color = AppColors.TextMuted, fontSize = 11.sp)
+                                        lim.note?.let { note ->
+                                            Text(note, color = AppColors.TextMuted, fontSize = 11.sp)
                                         }
                                     }
                                     Text(
@@ -346,8 +346,8 @@ fun IngredientDetailScreen(
                                     if (src.retrievedAt.isNotBlank()) {
                                         Text("Captured ${src.retrievedAt.take(10)}", color = AppColors.TextMuted, fontSize = 11.sp)
                                     }
-                                    if (src.citation != null) {
-                                        Text(src.citation, color = Color.Gray, fontSize = 11.sp)
+                                    src.citation?.let { citation ->
+                                        Text(citation, color = Color.Gray, fontSize = 11.sp)
                                     }
                                     val collected = src.url?.takeIf { it.isNotBlank() }
                                     if (collected != null) {
