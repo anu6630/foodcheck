@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.SystemBarStyle
 import com.foodcheck.data.network.ApiHealthMonitor
 import com.foodcheck.di.sharedModule
 import com.foodcheck.di.appModule
@@ -26,7 +27,10 @@ class MainActivity : ComponentActivity() {
         // ApiHealthMonitor.start() is idempotent, so re-running it on activity recreation is safe.
         GlobalContext.get().get<ApiHealthMonitor>().start()
 
-        enableEdgeToEdge()
+        enableEdgeToEdge(
+            statusBarStyle = SystemBarStyle.dark(android.graphics.Color.TRANSPARENT),
+            navigationBarStyle = SystemBarStyle.dark(android.graphics.Color.TRANSPARENT)
+        )
         setContent {
             App(imagePickerLauncher = rememberImagePickerLauncher())
         }

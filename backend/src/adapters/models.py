@@ -1,5 +1,6 @@
-from sqlalchemy import Table, Column, Integer, String, ForeignKey, Date, Index
+from sqlalchemy import Table, Column, Integer, String, ForeignKey, Date, Index, Boolean, LargeBinary, Text, DateTime
 from sqlalchemy.orm import declarative_base, relationship
+from datetime import datetime
 
 Base = declarative_base()
 
@@ -58,6 +59,7 @@ class DBProduct(Base):
     barcode = Column(String(50), unique=True, index=True, nullable=False)
     category = Column(String(100), nullable=True)
     source = Column(String(50), nullable=False)  # "local" | "open_food_facts"
+    published = Column(Boolean, nullable=False, default=True)  # False = hidden from search/scan
     
     ingredients = relationship("DBProductIngredient", back_populates="product", cascade="all, delete-orphan")
 
@@ -76,3 +78,43 @@ class DBProductIngredient(Base):
 Index("idx_ingredient_names_name_lower", DBIngredientName.name)
 Index("idx_ingredients_name_lower", DBIngredient.name)
 Index("idx_products_name_lower", DBProduct.name)
+
+
+class DBProductRequest(Base):
+    """Community-submitted product requests pending admin review."""
+    __tablename__ = "product_requests"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+    status = Column(String(20), nullable=False, default="pending")  # pending | approved | rejected
+
+    # Product details from the user
+    product_name = Column(String(255), nullable=False)
+    brand = Column(String(255), nullable=True)
+    barcode = Column(String(50), nullable=True)
+    category = Column(String(100), nullable=True)
+    country_code = Column(String(5), ForeignKey("countries.code"), nullable=False)
+    ingredients_text = Column(Text, nullable=True)  # free-text, comma or newline separated
+    requester_notes = Column(Text, nullable=True)
+
+    # Up to 3 product images stored as raw bytes (MVP; migrate to object storage later)
+    image_1 = Column(LargeBinary, nullable=True)
+    image_2 = Column(LargeBinary, nullable=True)
+    image_3 = Column(LargeBinary, nullable=True)
+
+    country = relationship("DBCountry")
+
+
+class DBIngredientRequest(Base):
+    """Community-submitted ingredient check requests pending admin review."""
+    __tablename__ = "ingredient_requests"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+    status = Column(String(20), nullable=False, default="pending")  # pending | approved | rejected
+
+    # Ingredient details from the user
+    ingredient_name = Column(String(255), nullable=False)
+    e_number = Column(String(20), nullable=True)
+    category = Column(String(100), nullable=True)
+    requester_notes = Column(Text, nullable=True)

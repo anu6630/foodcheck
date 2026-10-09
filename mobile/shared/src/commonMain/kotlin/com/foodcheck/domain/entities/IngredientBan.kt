@@ -8,5 +8,6 @@ data class IngredientBan(
     val status: String,
     val condition: String? = null,
     val regulationRef: String? = null,
-    val effectiveDate: String? = null
+    val effectiveDate: String? = null,
+    val countryLabel: String? = null
 )

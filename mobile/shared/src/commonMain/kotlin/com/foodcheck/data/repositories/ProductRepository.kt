@@ -94,11 +94,57 @@ class ProductRepository(
 
     private fun ScanResponse.toDomain(): ScanOutcome = when (matchType) {
         "confident" -> ScanOutcome.Confident(
-            product ?: error("Backend returned match_type=confident with no product")
+            product ?: error("Backend returned match_type=confident with no product"),
+            ingredients
         )
         "suggestions" -> ScanOutcome.Suggestions(
-            candidates.map { ScanCandidate(it.product, it.matchScore) }
+            candidates.map { ScanCandidate(it.product, it.matchScore) },
+            ingredients
         )
         else -> ScanOutcome.IngredientsOnly(ingredients)
+    }
+
+    /** Flow 1: Submit a product addition request to the community staging queue. */
+    suspend fun submitProductRequest(
+        productName: String,
+        countryCode: String,
+        brand: String? = null,
+        barcode: String? = null,
+        category: String? = null,
+        ingredientsText: String? = null,
+        requesterNotes: String? = null,
+        images: List<ByteArray> = emptyList(),
+    ): Result<Pair<Int, String>> = try {
+        val response = networkDataSource.submitProductRequest(
+            productName = productName,
+            countryCode = countryCode,
+            brand = brand,
+            barcode = barcode,
+            category = category,
+            ingredientsText = ingredientsText,
+            requesterNotes = requesterNotes,
+            images = images,
+        )
+        Result.success(Pair(response.requestId, response.status))
+    } catch (e: Exception) {
+        Result.failure(Exception("Failed to submit product request. Please check your connection.", e))
+    }
+
+    /** Flow 2: Submit an ingredient check request to the community staging queue. */
+    suspend fun submitIngredientRequest(
+        ingredientName: String,
+        eNumber: String? = null,
+        category: String? = null,
+        requesterNotes: String? = null,
+    ): Result<Pair<Int, String>> = try {
+        val response = networkDataSource.submitIngredientRequest(
+            ingredientName = ingredientName,
+            eNumber = eNumber,
+            category = category,
+            requesterNotes = requesterNotes,
+        )
+        Result.success(Pair(response.requestId, response.status))
+    } catch (e: Exception) {
+        Result.failure(Exception("Failed to submit ingredient request. Please check your connection.", e))
     }
 }

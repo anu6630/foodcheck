@@ -4,6 +4,7 @@ import com.foodcheck.presentation.state.IngredientDetailViewModel
 import com.foodcheck.presentation.state.ProductDetailViewModel
 import com.foodcheck.presentation.state.ScanViewModel
 import com.foodcheck.presentation.state.SearchViewModel
+import com.foodcheck.presentation.state.SubmitRequestViewModel
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
@@ -12,4 +13,11 @@ val appModule = module {
     viewModel { ProductDetailViewModel(get()) }
     viewModel { IngredientDetailViewModel(get()) }
     viewModel { ScanViewModel(get()) }
+    viewModel {
+        SubmitRequestViewModel(
+            submitProductRequestUseCase = get(),
+            submitIngredientRequestUseCase = get(),
+            unifiedSearchUseCase = get(),
+        )
+    }
 }

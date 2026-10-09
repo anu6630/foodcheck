@@ -13,7 +13,13 @@ data class ScanCandidate(
  * [IngredientsOnly] means no product could be matched but ingredients were still extracted.
  */
 sealed class ScanOutcome {
-    data class Confident(val product: SearchProductResult) : ScanOutcome()
-    data class Suggestions(val candidates: List<ScanCandidate>) : ScanOutcome()
+    data class Confident(
+        val product: SearchProductResult,
+        val ingredients: List<AnnotatedIngredient> = emptyList()
+    ) : ScanOutcome()
+    data class Suggestions(
+        val candidates: List<ScanCandidate>,
+        val ingredients: List<AnnotatedIngredient> = emptyList()
+    ) : ScanOutcome()
     data class IngredientsOnly(val ingredients: List<AnnotatedIngredient>) : ScanOutcome()
 }

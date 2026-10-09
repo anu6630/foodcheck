@@ -147,10 +147,11 @@ fun ProductDetailScreen(
 
                     val banned = details.ingredients.filter { it.severity.lowercase() == "red" }
                     val restricted = details.ingredients.filter { it.severity.lowercase() == "amber" }
-                    val safeAndUnknown = details.ingredients.filter { it.severity.lowercase() != "red" && it.severity.lowercase() != "amber" }
+                    val permitted = details.ingredients.filter { it.severity.lowercase() == "green" }
+                    val unknown = details.ingredients.filter { it.severity.lowercase() != "red" && it.severity.lowercase() != "amber" && it.severity.lowercase() != "green" }
 
                     if (banned.isNotEmpty()) {
-                        item { IngredientSectionHeader("🚨 Banned Additives (${banned.size})", AppColors.Red) }
+                        item { IngredientSectionHeader("Banned additives (${banned.size})", AppColors.Red) }
                         item {
                             FlowRow(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                                 banned.forEach { ingredient -> IngredientChip(ingredient) { onIngredientClick(ingredient) } }
@@ -158,18 +159,26 @@ fun ProductDetailScreen(
                         }
                     }
                     if (restricted.isNotEmpty()) {
-                        item { IngredientSectionHeader("⚠️ Restricted/Warning Additives (${restricted.size})", AppColors.Amber) }
+                        item { IngredientSectionHeader("Restricted additives (${restricted.size})", AppColors.Amber) }
                         item {
                             FlowRow(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                                 restricted.forEach { ingredient -> IngredientChip(ingredient) { onIngredientClick(ingredient) } }
                             }
                         }
                     }
-                    if (safeAndUnknown.isNotEmpty()) {
-                        item { IngredientSectionHeader("🔍 General Ingredients & Safe Additives", AppColors.TextMuted) }
+                    if (permitted.isNotEmpty()) {
+                        item { IngredientSectionHeader("Authorised additives (${permitted.size})", AppColors.Green) }
                         item {
                             FlowRow(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                                safeAndUnknown.forEach { ingredient -> IngredientChip(ingredient) { onIngredientClick(ingredient) } }
+                                permitted.forEach { ingredient -> IngredientChip(ingredient) { onIngredientClick(ingredient) } }
+                            }
+                        }
+                    }
+                    if (unknown.isNotEmpty()) {
+                        item { IngredientSectionHeader("No regulation data (${unknown.size})", AppColors.TextMuted) }
+                        item {
+                            FlowRow(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                unknown.forEach { ingredient -> IngredientChip(ingredient) { onIngredientClick(ingredient) } }
                             }
                         }
                     }

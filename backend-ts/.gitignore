@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.env
+.env.local
+.neon/
+*.log
+.DS_Store
+data/*.csv
+data/*.txt
+data/fssai/
+dist-fn/

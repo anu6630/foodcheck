@@ -49,6 +49,8 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun SearchResultsScreen(
     initialQuery: String,
+    onQueryChange: (Boolean) -> Unit = {},
+    clearQueryTrigger: Int = 0,
     onProductClick: (SearchProductResult) -> Unit,
     onIngredientClick: (AnnotatedIngredient) -> Unit,
     viewModel: SearchViewModel = koinViewModel()
@@ -60,6 +62,16 @@ fun SearchResultsScreen(
 
     LaunchedEffect(initialQuery) {
         if (initialQuery.isNotBlank()) viewModel.search(initialQuery)
+    }
+
+    LaunchedEffect(query) {
+        onQueryChange(query.isNotEmpty())
+    }
+
+    LaunchedEffect(clearQueryTrigger) {
+        if (clearQueryTrigger > 0) {
+            viewModel.search("")
+        }
     }
 
     Column(

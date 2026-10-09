@@ -221,7 +221,7 @@ def clean_and_split_ingredients(text: str) -> List[str]:
 def annotate_ingredient(ingredient: Ingredient) -> Dict[str, Any]:
     # Find every country that bans or restricts this ingredient, not just one
     matched_bans = []
-    severity = "green"  # Default is green
+    severity = "gray"  # No country row means unknown, not verified-safe
 
     for ban in ingredient.bans:
         if ban.status == "banned":
@@ -231,6 +231,9 @@ def annotate_ingredient(ingredient: Ingredient) -> Dict[str, Any]:
             if severity != "red":
                 severity = "amber"
             matched_bans.append(ban)
+        elif ban.status == "permitted":
+            if severity == "gray":
+                severity = "green"
 
     return {
         "id": ingredient.id,
@@ -267,7 +270,9 @@ def determine_product_severity(annotated_ingredients: List[Dict[str, Any]]) -> s
         return "red"
     if "amber" in severities:
         return "amber"
-    return "green"
+    if "green" in severities:
+        return "green"
+    return "gray"
 
 def _build_annotated_product(product: Product) -> Dict[str, Any]:
     """Shapes a Product the same way GetProductDetailsUseCase/SearchProductUseCase do."""

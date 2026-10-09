@@ -1,0 +1,47 @@
+{
+  "name": "foodcheck-backend-ts",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch functions/devServer.ts",
+    "build": "tsc",
+    "test": "vitest run",
+    "seed": "tsx scripts/seed.ts",
+    "ingest": "tsx scripts/ingestCatalog.ts",
+    "ingest:fssai": "python3 scripts/parseFssaiAppendix.py && tsx scripts/ingestFssai.ts",
+    "ingest:codes": "tsx scripts/backfillIngredientCodes.ts",
+    "ingest:ux": "tsx scripts/uxCatalogFix.ts && tsx scripts/ingestPermissionLimits.ts && tsx scripts/ingestIndicAliases.ts && tsx scripts/ingestOffIndia.ts",
+    "ingest:indic": "tsx scripts/ingestIndicAliases.ts",
+    "ingest:limits": "tsx scripts/ingestPermissionLimits.ts",
+    "ingest:off-india": "tsx scripts/ingestOffIndia.ts",
+    "ingest:sources": "tsx scripts/recordCatalogSources.ts",
+    "ingest:archive": "tsx scripts/archiveCatalogSources.ts",
+    "bundle:foodcheck": "rm -rf dist-fn && mkdir -p dist-fn && esbuild functions/api.ts --bundle --platform=node --format=esm --outfile=dist-fn/index.mjs",
+    "deploy:foodcheck": "npm run bundle:foodcheck && neon functions deploy foodcheck --project-id fragrant-sound-87733195 --branch production --src dist-fn --no-bundle --wait"
+  },
+  "dependencies": {
+    "@google/genai": "^2.27.0",
+    "@hono/node-server": "^1.13.8",
+    "@neon/config": "^1.8.3",
+    "@neon/functions": "^0.11.0",
+    "@neondatabase/serverless": "^1.2.0",
+    "aws4fetch": "^1.0.20",
+    "csv-parse": "^7.0.3",
+    "dotenv": "^16.4.7",
+    "hono": "^4.7.4",
+    "pg": "^8.13.3",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.10",
+    "@types/pg": "^8.11.11",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.2",
+    "vitest": "^3.0.8"
+  },
+  "allowScripts": {
+    "esbuild@0.28.2": true,
+    "protobufjs@7.6.6": true,
+    "@google/genai@2.28.0": true
+  }
+}

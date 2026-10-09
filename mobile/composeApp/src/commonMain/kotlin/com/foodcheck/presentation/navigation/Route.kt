@@ -13,4 +13,5 @@ sealed interface Route {
 
     @Serializable data class ProductDetail(val barcode: String) : Route
     @Serializable data class IngredientDetail(val ingredientId: String) : Route
+    @Serializable data object SubmitRequest : Route
 }

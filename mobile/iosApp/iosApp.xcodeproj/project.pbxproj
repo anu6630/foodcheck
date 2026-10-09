@@ -11,6 +11,7 @@
 		182025D08B87193AC4AFA3C3 /* SearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7BE4AACAB34743ADF91B179 /* SearchView.swift */; };
 		56B0305B5D3847FC6B326502 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE8509E5A49E4A5CAAEB3ADB /* ContentView.swift */; };
 		953FCC0AC721E2A4D9BDCAB1 /* LandingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DFC141E5300C0F6766407C4 /* LandingView.swift */; };
+		BEF4072A448BF359C076832E /* SubmitRequestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1863F35EDB0E367E99ECE815 /* SubmitRequestView.swift */; };
 		B187B9898404A6BCC3C5245E /* ScanView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F635E8312D9ED765E1BF2556 /* ScanView.swift */; };
 		D40BDC70D7048A0AF7EBC5E5 /* ObservableModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D98B165D0E0BEEB48C1027A /* ObservableModel.swift */; };
 		D7952BFA90D4EBD0F83B8F7A /* KotlinByteArray+Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B863E0E5FECE1BDBDABFEC1 /* KotlinByteArray+Data.swift */; };
@@ -27,6 +28,7 @@
 		72B0BF81A7E62C9DB148500C /* IngredientDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IngredientDetailView.swift; sourceTree = "<group>"; };
 		86038AE1032E284E79B32AD6 /* iosApp.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = iosApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8DFC141E5300C0F6766407C4 /* LandingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LandingView.swift; sourceTree = "<group>"; };
+		1863F35EDB0E367E99ECE815 /* SubmitRequestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubmitRequestView.swift; sourceTree = "<group>"; };
 		C117AD187833E2513BD2F553 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		CE8509E5A49E4A5CAAEB3ADB /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		DD24A79E3E224BDA865DDF3E /* ProductDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductDetailView.swift; sourceTree = "<group>"; };
@@ -48,6 +50,7 @@
 				404608725152C3067E7030FA /* iosAppApp.swift */,
 				5B863E0E5FECE1BDBDABFEC1 /* KotlinByteArray+Data.swift */,
 				8DFC141E5300C0F6766407C4 /* LandingView.swift */,
+				1863F35EDB0E367E99ECE815 /* SubmitRequestView.swift */,
 				0D98B165D0E0BEEB48C1027A /* ObservableModel.swift */,
 				DD24A79E3E224BDA865DDF3E /* ProductDetailView.swift */,
 				F635E8312D9ED765E1BF2556 /* ScanView.swift */,
@@ -103,7 +106,7 @@
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
 					78B53CC79860CBFC2F5543C6 = {
-						DevelopmentTeam = ZS8RM3C38M;
+						DevelopmentTeam = KRQW92M2Q4;
 					};
 				};
 			};
@@ -160,6 +163,7 @@
 				F9C881D94E614BDB532C1DEE /* IngredientDetailView.swift in Sources */,
 				D7952BFA90D4EBD0F83B8F7A /* KotlinByteArray+Data.swift in Sources */,
 				953FCC0AC721E2A4D9BDCAB1 /* LandingView.swift in Sources */,
+				BEF4072A448BF359C076832E /* SubmitRequestView.swift in Sources */,
 				D40BDC70D7048A0AF7EBC5E5 /* ObservableModel.swift in Sources */,
 				F353B468C9204817BBD6634B /* ProductDetailView.swift in Sources */,
 				B187B9898404A6BCC3C5245E /* ScanView.swift in Sources */,
@@ -295,7 +299,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				DEVELOPMENT_TEAM = ZS8RM3C38M;
+				DEVELOPMENT_TEAM = KRQW92M2Q4;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -323,7 +327,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				DEVELOPMENT_TEAM = ZS8RM3C38M;
+				DEVELOPMENT_TEAM = KRQW92M2Q4;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",

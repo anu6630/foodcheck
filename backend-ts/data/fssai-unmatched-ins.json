@@ -1,0 +1,206 @@
+{
+  "source_id": "fssai-appendix-a",
+  "appendix_version": "2",
+  "appendix_date": "2024-11-04",
+  "documented_at": "2026-10-08",
+  "status": "deferred",
+  "fixable": true,
+  "summary": "Appendix A provisions are keyed by INS. A row is stored only when that INS maps to an ingredient already in the catalog. On the 2024-11-04 PDF this left 24 unmatched INS strings (108 of 6692 rows, ~1.6%). Most are PDF parse debris. A few are real Codex INS whose exact roman-numeral form is missing from the identity catalog. This is a matching gap, not a hole in FSSAI’s positive list. Left unfixed on purpose: the catalog is usable without it; fix later if packs name these salts.",
+  "deferred": {
+    "decided_at": "2026-10-09",
+    "reason": "Not blocking scans. Other 450 phosphate salts already carry the group caps. Parse junk should not become fake ingredients.",
+    "fix_when": "A pack/OCR names INS 450(iii), papain 1101(ii), distarch glycerol, or a sibling roman-numeral salt and India shows no cap."
+  },
+  "how_to_fix": {
+    "complete": true,
+    "no_new_pdf_required": true,
+    "steps": [
+      "Real salts (missing_catalog_code): add the INS to ingredient_codes on the sibling ingredient (450(iii) → tetrasodium / diphosphate next to 450(i)/450(ii); 1432 → new distarch glycerol row), then npm run ingest:fssai.",
+      "Parent roman numerals (parent_code_exists): in ingestFssai lookupIds, if 1101(ii) misses, retry 1101 and 1101(i). Same for 351(ii), 515(ii), 482(ii), 100(ii). Re-ingest. No new ingredients needed.",
+      "Parse junk: ignore, or tighten parseFssaiAppendix.py so page numbers/dates/broken cells never become an INS. Do not insert 000, 2016, 2000, 348-from-version-date as additives.",
+      "After ingest, this file should shrink. leftover parse_junk is fine. leftover missing_catalog_code means the identity catalog still lacks that INS."
+    ]
+  },
+  "totals": {
+    "provisions": 6508,
+    "gmp": 184,
+    "unmatched_unique_ins": 24,
+    "unmatched_rows": 108
+  },
+  "misses": [
+    {
+      "ins": "450(iii)",
+      "kind": "missing_catalog_code",
+      "rows": 75,
+      "pdf_name": "PHOSPHATES",
+      "what": "Diphosphate salt (iii). Catalog has INS 450(i) and 450(ii), not 450(iii).",
+      "impact": "The only material miss: 75 India per-food phosphate caps for this salt were not stored. Other 450 salts still have caps."
+    },
+    {
+      "ins": "1101(ii)",
+      "kind": "parent_code_exists",
+      "rows": 1,
+      "pdf_name": "Papain",
+      "what": "Papain. Catalog has protease E1101, 1101(i), 1101(iii) — not 1101(ii). Lookup does not fall back to the parent code.",
+      "impact": "One GMP row dropped. Packs that say papain / INS 1101(ii) may miss the India GMP line."
+    },
+    {
+      "ins": "351(ii)",
+      "kind": "parent_code_exists",
+      "rows": 1,
+      "pdf_name": "Potassium malate",
+      "what": "Catalog has INS/E 351 (potassium malate) without a (ii) suffix.",
+      "impact": "One GMP row dropped."
+    },
+    {
+      "ins": "515(ii)",
+      "kind": "parent_code_exists",
+      "rows": 1,
+      "pdf_name": "Potassium hydrogen sulfate",
+      "what": "Catalog has 515 / 515(i) (potassium sulphates), not 515(ii).",
+      "impact": "One GMP row dropped."
+    },
+    {
+      "ins": "482(ii)",
+      "kind": "parent_code_exists",
+      "rows": 1,
+      "pdf_name": null,
+      "what": "Catalog has 482 / 482(i) (calcium stearoyl-2-lactylate), not 482(ii).",
+      "impact": "One numeric-cap row dropped (category 7.1, 5,000 mg/kg)."
+    },
+    {
+      "ins": "1432",
+      "kind": "missing_catalog_code",
+      "rows": 1,
+      "pdf_name": "Distarch glycerol",
+      "what": "Modified starch INS 1432 is not in the identity catalog at all.",
+      "impact": "One GMP row dropped. A pack that lists distarch glycerol has no India cap row."
+    },
+    {
+      "ins": "000",
+      "kind": "parse_junk",
+      "rows": 5,
+      "pdf_name": "Microcrystalline 460 (i) 10,",
+      "what": "Broken cell; likely INS 460(i) microcrystalline cellulose split so the parser stored 000."
+    },
+    {
+      "ins": "188",
+      "kind": "parse_junk",
+      "rows": 3,
+      "pdf_name": "potassium",
+      "what": "Not a standard Codex INS. Fragment near a potassium salt in category 4.1.2.7."
+    },
+    {
+      "ins": "277",
+      "kind": "parse_junk",
+      "rows": 2,
+      "pdf_name": null,
+      "what": "No usable additive name in the parsed cell (category 1.8.2). Treat as table debris until a PDF re-parse proves otherwise."
+    },
+    {
+      "ins": "360",
+      "kind": "parse_junk",
+      "rows": 2,
+      "pdf_name": "oligoesters,",
+      "what": "Name fragment from a sucrose oligoester row, not a clean INS 360 identity."
+    },
+    {
+      "ins": "137",
+      "kind": "parse_junk",
+      "rows": 2,
+      "pdf_name": "136,",
+      "what": "Adjacent INS 136 leaked; 137 is not the additive in that cell."
+    },
+    {
+      "ins": "248",
+      "kind": "parse_junk",
+      "rows": 2,
+      "pdf_name": null,
+      "what": "Empty additive name (category 7.1.5). Not matched to nitrite/nitrate salts."
+    },
+    {
+      "ins": "291",
+      "kind": "parse_junk",
+      "rows": 1,
+      "pdf_name": "DS",
+      "what": "Two-letter fragment in category 2.2.1, not a Codex INS."
+    },
+    {
+      "ins": "197",
+      "kind": "parse_junk",
+      "rows": 1,
+      "pdf_name": "hydroxytoluen",
+      "what": "Broken BHT/BHA cell (hydroxytoluene). Real INS is 320/321, which did match."
+    },
+    {
+      "ins": "158",
+      "kind": "parse_junk",
+      "rows": 1,
+      "pdf_name": null,
+      "what": "Empty name in category 5.2."
+    },
+    {
+      "ins": "2000",
+      "kind": "parse_junk",
+      "rows": 1,
+      "pdf_name": "405",
+      "what": "Page or table number, not an INS. Nearby 405 (propylene glycol alginate) is in the catalog."
+    },
+    {
+      "ins": "191",
+      "kind": "parse_junk",
+      "rows": 1,
+      "pdf_name": null,
+      "what": "Empty name in category 11.4."
+    },
+    {
+      "ins": "750",
+      "kind": "parse_junk",
+      "rows": 1,
+      "pdf_name": null,
+      "what": "Not a food-additive INS. Empty name in category 12.9.2."
+    },
+    {
+      "ins": "2016",
+      "kind": "parse_junk",
+      "rows": 1,
+      "pdf_name": "Novel Food) Regulations,",
+      "what": "Year / regulation title scraped as an INS."
+    },
+    {
+      "ins": "1500",
+      "kind": "parse_junk",
+      "rows": 1,
+      "pdf_name": null,
+      "what": "Likely a mg/kg figure or page number in category 14.1.2.4, not an INS."
+    },
+    {
+      "ins": "800",
+      "kind": "parse_junk",
+      "rows": 1,
+      "pdf_name": "82[TARTRATE",
+      "what": "Broken tartrate cell in category 14.1.4."
+    },
+    {
+      "ins": "100(ii)",
+      "kind": "parse_junk",
+      "rows": 1,
+      "pdf_name": null,
+      "what": "Empty name in category 15.1. Curcumin is INS 100(i) and did match; this (ii) cell did not."
+    },
+    {
+      "ins": "780",
+      "kind": "parse_junk",
+      "rows": 1,
+      "pdf_name": "perilla in brine at",
+      "what": "Food-description fragment in category 15.3, not an INS."
+    },
+    {
+      "ins": "348",
+      "kind": "parse_junk",
+      "rows": 1,
+      "pdf_name": "on 2 (0 4.11.2024 )",
+      "what": "PDF version date (04.11.2024) scraped as INS 348 on the GMP table."
+    }
+  ]
+}

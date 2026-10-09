@@ -7,7 +7,10 @@ from sqlalchemy.orm import selectinload
 
 from src.domain.entities import Product, Ingredient, ProductIngredient, IngredientBan, IngredientName
 from src.domain.interfaces import IProductRepository, IIngredientRepository
-from src.adapters.models import DBProduct, DBProductIngredient, DBIngredient, DBIngredientName, DBIngredientBan
+from src.adapters.models import (
+    DBProduct, DBProductIngredient, DBIngredient, DBIngredientName, DBIngredientBan,
+    DBProductRequest, DBIngredientRequest,
+)
 
 def to_domain_ban(db_ban: DBIngredientBan) -> IngredientBan:
     return IngredientBan(
@@ -375,3 +378,171 @@ class SQLAlchemyIngredientRepository(IIngredientRepository):
 
         await self.session.commit()
         return await self.get_by_id(ingredient.id)
+
+
+class SQLAlchemyRequestRepository:
+    """Handles persistence for community-submitted product and ingredient requests."""
+
+    def __init__(self, session: AsyncSession):
+        self.session = session
+
+    # ------------------------------------------------------------------ #
+    #  Product requests
+    # ------------------------------------------------------------------ #
+
+    async def create_product_request(
+        self,
+        product_name: str,
+        country_code: str,
+        brand: Optional[str] = None,
+        barcode: Optional[str] = None,
+        category: Optional[str] = None,
+        ingredients_text: Optional[str] = None,
+        requester_notes: Optional[str] = None,
+        image_1: Optional[bytes] = None,
+        image_2: Optional[bytes] = None,
+        image_3: Optional[bytes] = None,
+    ) -> DBProductRequest:
+        db_req = DBProductRequest(
+            product_name=product_name,
+            country_code=country_code,
+            brand=brand,
+            barcode=barcode,
+            category=category,
+            ingredients_text=ingredients_text,
+            requester_notes=requester_notes,
+            image_1=image_1,
+            image_2=image_2,
+            image_3=image_3,
+        )
+        self.session.add(db_req)
+        await self.session.commit()
+        await self.session.refresh(db_req)
+        return db_req
+
+    async def list_product_requests(self, status: Optional[str] = None) -> List[DBProductRequest]:
+        stmt = select(DBProductRequest)
+        if status:
+            stmt = stmt.where(DBProductRequest.status == status)
+        stmt = stmt.order_by(DBProductRequest.created_at.desc())
+        result = await self.session.execute(stmt)
+        return list(result.scalars().all())
+
+    async def get_product_request(self, request_id: int) -> Optional[DBProductRequest]:
+        result = await self.session.execute(
+            select(DBProductRequest).where(DBProductRequest.id == request_id)
+        )
+        return result.scalar_one_or_none()
+
+    async def update_product_request_status(self, request_id: int, status: str) -> Optional[DBProductRequest]:
+        req = await self.get_product_request(request_id)
+        if not req:
+            return None
+        req.status = status
+        await self.session.commit()
+        await self.session.refresh(req)
+        return req
+
+    # ------------------------------------------------------------------ #
+    #  Ingredient requests
+    # ------------------------------------------------------------------ #
+
+    async def create_ingredient_request(
+        self,
+        ingredient_name: str,
+        e_number: Optional[str] = None,
+        category: Optional[str] = None,
+        requester_notes: Optional[str] = None,
+    ) -> DBIngredientRequest:
+        db_req = DBIngredientRequest(
+            ingredient_name=ingredient_name,
+            e_number=e_number,
+            category=category,
+            requester_notes=requester_notes,
+        )
+        self.session.add(db_req)
+        await self.session.commit()
+        await self.session.refresh(db_req)
+        return db_req
+
+    async def list_ingredient_requests(self, status: Optional[str] = None) -> List[DBIngredientRequest]:
+        stmt = select(DBIngredientRequest)
+        if status:
+            stmt = stmt.where(DBIngredientRequest.status == status)
+        stmt = stmt.order_by(DBIngredientRequest.created_at.desc())
+        result = await self.session.execute(stmt)
+        return list(result.scalars().all())
+
+    async def get_ingredient_request(self, request_id: int) -> Optional[DBIngredientRequest]:
+        result = await self.session.execute(
+            select(DBIngredientRequest).where(DBIngredientRequest.id == request_id)
+        )
+        return result.scalar_one_or_none()
+
+    async def update_ingredient_request_status(self, request_id: int, status: str) -> Optional[DBIngredientRequest]:
+        req = await self.get_ingredient_request(request_id)
+        if not req:
+            return None
+        req.status = status
+        await self.session.commit()
+        await self.session.refresh(req)
+        return req
+
+    # ------------------------------------------------------------------ #
+    #  Admin product catalog operations
+    # ------------------------------------------------------------------ #
+
+    async def publish_product(self, product_id: int) -> Optional[DBProduct]:
+        result = await self.session.execute(
+            select(DBProduct).where(DBProduct.id == product_id)
+        )
+        product = result.scalar_one_or_none()
+        if not product:
+            return None
+        product.published = True
+        await self.session.commit()
+        await self.session.refresh(product)
+        return product
+
+    async def create_product_direct(
+        self,
+        name: str,
+        barcode: str,
+        source: str = "local",
+        brand: Optional[str] = None,
+        category: Optional[str] = None,
+        published: bool = True,
+    ) -> DBProduct:
+        db_product = DBProduct(
+            name=name,
+            barcode=barcode,
+            source=source,
+            brand=brand,
+            category=category,
+            published=published,
+        )
+        self.session.add(db_product)
+        await self.session.commit()
+        await self.session.refresh(db_product)
+        return db_product
+
+    async def create_ban_direct(
+        self,
+        ingredient_id: str,
+        country_code: str,
+        status: str,
+        condition: Optional[str] = None,
+        regulation_ref: Optional[str] = None,
+    ) -> DBIngredientBan:
+        db_ban = DBIngredientBan(
+            ingredient_id=ingredient_id,
+            country_code=country_code,
+            status=status,
+            condition=condition,
+            regulation_ref=regulation_ref,
+        )
+        self.session.add(db_ban)
+        await self.session.commit()
+        await self.session.refresh(db_ban)
+        return db_ban
+

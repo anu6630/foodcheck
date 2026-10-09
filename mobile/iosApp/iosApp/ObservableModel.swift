@@ -135,8 +135,12 @@ class ObservableScanModel: ObservableObject {
     }
     
     func scan(image: Data) {
-        let kotlinBytes = image.toKotlinByteArray()
-        viewModel.scan(images: [kotlinBytes])
+        DispatchQueue.global(qos: .userInitiated).async {
+            let kotlinBytes = image.toKotlinByteArray()
+            DispatchQueue.main.async {
+                self.viewModel.scan(images: [kotlinBytes])
+            }
+        }
     }
     
     func clear() {

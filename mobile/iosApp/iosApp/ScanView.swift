@@ -74,12 +74,33 @@ struct ScanView: View {
                         .buttonStyle(ScaleButtonStyle())
                     } else if let suggestions = outcome as? ScanOutcome.Suggestions {
                         VStack(alignment: .leading, spacing: 14) {
-                            Text("Disambiguation Needed")
+                            Text("Scan result")
                                 .font(.headline)
                                 .foregroundColor(.white)
-                            Text("Multiple matching candidates were found. Select the correct one:")
+                            if !suggestions.ingredients.isEmpty {
+                                Text("From the label")
+                                    .font(.subheadline)
+                                    .foregroundColor(.white.opacity(0.7))
+                                ScrollView {
+                                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 140))], alignment: .leading, spacing: 8) {
+                                        ForEach(suggestions.ingredients, id: \.self) { annotated in
+                                            Button(action: {
+                                                onIngredientClick(annotated.id!)
+                                                dismiss()
+                                            }) {
+                                                IngredientChipView(ing: annotated)
+                                            }
+                                        }
+                                    }
+                                }
+                                .frame(maxHeight: 160)
+                            }
+                            Text("Possible catalog matches")
                                 .font(.subheadline)
-                                .foregroundColor(.white.opacity(0.6))
+                                .foregroundColor(.white.opacity(0.7))
+                            Text("These are similar packs — not a confirmed match.")
+                                .font(.caption)
+                                .foregroundColor(.white.opacity(0.5))
                             
                             ScrollView {
                                 LazyVStack(spacing: 10) {

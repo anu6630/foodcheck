@@ -16,6 +16,8 @@ import com.foodcheck.domain.usecases.GetProductDetailsUseCase
 import com.foodcheck.domain.usecases.ScanUseCase
 import com.foodcheck.domain.usecases.UnifiedSearchUseCase
 import com.foodcheck.domain.usecases.GetIngredientDetailsUseCase
+import com.foodcheck.domain.usecases.SubmitIngredientRequestUseCase
+import com.foodcheck.domain.usecases.SubmitProductRequestUseCase
 
 val sharedModule = module {
     // HttpClient
@@ -37,8 +39,10 @@ val sharedModule = module {
     // Proactively steers the active backend tier back to primary once healthy again.
     single { ApiHealthMonitor() }
 
-    // Repositories
-    single<IProductRepository> { ProductRepository(get(), get()) }
+    // Repositories — concrete type registered so submit use cases can resolve it;
+    // interface binding reuses the same instance.
+    single { ProductRepository(get(), get()) }
+    single<IProductRepository> { get<ProductRepository>() }
 
     // Use cases
     single { SearchProductsUseCase(get()) }
@@ -46,4 +50,6 @@ val sharedModule = module {
     single { ScanUseCase(get()) }
     single { UnifiedSearchUseCase(get()) }
     single { GetIngredientDetailsUseCase(get()) }
+    single { SubmitProductRequestUseCase(get()) }
+    single { SubmitIngredientRequestUseCase(get()) }
 }

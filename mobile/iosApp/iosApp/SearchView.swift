@@ -3,6 +3,7 @@ import composeApp
 
 struct SearchView: View {
     @StateObject private var model = ObservableSearchModel()
+    @Binding var isSearching: Bool
     
     // Callbacks to notify parent view when item clicked
     var onConfidentMatch: (String) -> Void
@@ -18,26 +19,27 @@ struct SearchView: View {
                 TextField("Search products or ingredients...", text: $model.query)
                     .foregroundColor(.white)
                     .autocorrectionDisabled()
-                    .textInputAutocapitalization(.never)
-                    .onChange(of: model.query) { newValue in
-                        model.search(text: newValue)
-                    }
                 
                 if !model.query.isEmpty {
-                    Button(action: { model.search(text: "") }) {
+                    Button(action: { model.query = "" }) {
                         Image(systemName: "xmark.circle.fill")
                             .foregroundColor(.white.opacity(0.4))
                     }
                 }
             }
-            .padding(12)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
             .background(Color.white.opacity(0.06))
-            .cornerRadius(10)
+            .cornerRadius(12)
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(Color.white.opacity(0.12), lineWidth: 0.5)
+            )
             .padding(.horizontal, 20)
-            .padding(.top, 20)
+            .padding(.top, 10)
             .padding(.bottom, 16)
             
-            // Search Results
+            // Search States
             if model.loading {
                 Spacer()
                 ProgressView()
@@ -45,7 +47,7 @@ struct SearchView: View {
                 Spacer()
             } else if let error = model.error {
                 Spacer()
-                Text(error)
+                Text("Error: \(error)")
                     .foregroundColor(.red)
                 Spacer()
             } else if model.results.products.isEmpty && model.results.ingredients.isEmpty {
@@ -109,6 +111,22 @@ struct SearchView: View {
                 }
             }
         }
+        .onChange(of: model.query) { newValue in
+            let active = !newValue.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            if isSearching != active {
+                withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
+                    isSearching = active
+                }
+            }
+            model.search(text: newValue)
+        }
+        .onChange(of: isSearching) { newValue in
+            if !newValue {
+                model.query = ""
+                // Dismiss keyboard
+                UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+            }
+        }
     }
 }
 
@@ -126,11 +144,19 @@ struct IngredientChipView: View {
     
     var body: some View {
         HStack(spacing: 6) {
-            Image(systemName: ing.severity.lowercased() == "green" ? "checkmark.circle.fill" : (ing.severity.lowercased() == "red" ? "xmark.circle.fill" : "exclamationmark.triangle.fill"))
+            Image(systemName: {
+                switch ing.severity.lowercased() {
+                case "green": return "checkmark.circle.fill"
+                case "red": return "xmark.circle.fill"
+                case "amber": return "exclamationmark.triangle.fill"
+                default: return "questionmark.circle.fill"
+                }
+            }())
                 .font(.system(size: 12))
                 .foregroundColor(color)
             
-            let label = ing.eNumber != nil ? "\(ing.name) (\(ing.eNumber!))" : ing.name
+            let code = ing.codesText() ?? ing.eNumber
+            let label = code != nil ? "\(ing.name) (\(code!))" : ing.name
             Text(label)
                 .font(.system(size: 12, weight: .semibold))
                 .foregroundColor(.white)
@@ -193,7 +219,14 @@ struct SeverityBadgeView: View {
     }
     
     var body: some View {
-        Text(severity.uppercased())
+        Text({
+            switch severity.lowercased() {
+            case "red": return "BANNED"
+            case "amber": return "RESTRICTED"
+            case "green", "permitted": return "AUTHORISED"
+            default: return "NO DATA"
+            }
+        }())
             .font(.system(size: 10, weight: .bold))
             .foregroundColor(color)
             .padding(.horizontal, 10)

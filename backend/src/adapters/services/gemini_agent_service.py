@@ -142,7 +142,13 @@ class GeminiScanAgentService(IScanAgentService):
 
     @staticmethod
     def _parse_final_json(content: Any) -> Dict[str, Any]:
-        text = content if isinstance(content, str) else str(content)
+        if isinstance(content, str):
+            text = content
+        elif isinstance(content, list):
+            text = "".join([part.get("text", "") if isinstance(part, dict) else str(part) for part in content])
+        else:
+            text = str(content)
+            
         text = text.strip()
         # Strip markdown fences if the model added them despite instructions
         if text.startswith("```"):

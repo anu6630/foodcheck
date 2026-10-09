@@ -1,5 +1,7 @@
 import os
 import logging
+from dotenv import load_dotenv
+load_dotenv()
 from urllib.parse import urlparse, urlunparse, unquote
 import psycopg2
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
@@ -8,8 +10,7 @@ from sqlalchemy.orm import sessionmaker
 
 logger = logging.getLogger(__name__)
 
-# Default URL pointing to the postgres database to check and create foodcheck
-DEFAULT_RAW_URL = os.getenv("DATABASE_URL", "postgresql://postgres.mhnreqfbohczronjprzs:Plmokn%40123%24%24@aws-1-ap-northeast-2.pooler.supabase.com:5432/postgres")
+DEFAULT_RAW_URL = os.getenv("DATABASE_URL", "postgresql://anuraj@localhost:5432/postgres")
 
 def get_connection_urls():
     """

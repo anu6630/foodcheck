@@ -4,6 +4,7 @@ import composeApp
 enum LandingTab {
     case scan
     case search
+    case submit
 }
 
 struct LandingView: View {
@@ -13,6 +14,8 @@ struct LandingView: View {
     
     @State private var activeBarcode: String? = nil
     @State private var activeIngredientId: String? = nil
+    @State private var isSearching = false
+    @State private var showSubmitSheet = false
     
     var body: some View {
         NavigationStack {
@@ -20,12 +23,34 @@ struct LandingView: View {
                 // Main Content
                 VStack(spacing: 0) {
                     // Header Bar
-                    HStack {
+                    HStack(spacing: 12) {
+                        if isSearching && selectedTab == .search {
+                            Button(action: {
+                                withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
+                                    isSearching = false
+                                }
+                            }) {
+                                Image(systemName: "chevron.left")
+                                    .font(.system(size: 16, weight: .bold))
+                                    .foregroundColor(.white)
+                                    .frame(width: 36, height: 36)
+                                    .background(.ultraThinMaterial.opacity(0.85))
+                                    .clipShape(Circle())
+                                    .overlay(
+                                        Circle().stroke(Color.white.opacity(0.15), lineWidth: 0.5)
+                                    )
+                            }
+                            .transition(.asymmetric(
+                                insertion: .scale.combined(with: .opacity),
+                                removal: .scale.combined(with: .opacity)
+                            ))
+                        }
+                        
                         HStack(alignment: .lastTextBaseline, spacing: 1) {
-                            Text("life")
+                            Text("Life")
                                 .font(.system(size: 16, weight: .semibold))
                                 .foregroundColor(.white.opacity(0.9))
-                            Text("Ex")
+                            Text("X")
                                 .font(.system(size: 16, weight: .black))
                                 .foregroundColor(Color(red: 0.06, green: 0.73, blue: 0.51))
                             Text(" Food")
@@ -55,6 +80,16 @@ struct LandingView: View {
                         )
                     case .search:
                         SearchView(
+                            isSearching: $isSearching,
+                            onConfidentMatch: { barcode in
+                                self.activeBarcode = barcode
+                            },
+                            onIngredientClick: { ingId in
+                                self.activeIngredientId = ingId
+                            }
+                        )
+                    case .submit:
+                        ScanView(
                             onConfidentMatch: { barcode in
                                 self.activeBarcode = barcode
                             },
@@ -69,40 +104,51 @@ struct LandingView: View {
                 }
                 
                 // Floating Tab Bar overlay
-                VStack {
-                    Spacer()
-                    
-                    HStack(spacing: 64) {
-                        TabButton(
-                            icon: "doc.text.viewfinder",
-                            title: "Scan",
-                            isActive: selectedTab == .scan
-                        ) {
-                            withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                                selectedTab = .scan
-                            }
-                        }
+                if !isSearching || selectedTab != .search {
+                    VStack {
+                        Spacer()
                         
-                        TabButton(
-                            icon: "magnifyingglass",
-                            title: "Search",
-                            isActive: selectedTab == .search
-                        ) {
-                            withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                                selectedTab = .search
+                        HStack(spacing: 48) {
+                            TabButton(
+                                icon: "doc.text.viewfinder",
+                                title: "Scan",
+                                isActive: selectedTab == .scan
+                            ) {
+                                withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                                    selectedTab = .scan
+                                }
+                            }
+                            
+                            TabButton(
+                                icon: "magnifyingglass",
+                                title: "Search",
+                                isActive: selectedTab == .search
+                            ) {
+                                withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                                    selectedTab = .search
+                                }
+                            }
+
+                            TabButton(
+                                icon: "plus.circle",
+                                title: "Submit",
+                                isActive: false
+                            ) {
+                                showSubmitSheet = true
                             }
                         }
+                        .padding(.horizontal, 40)
+                        .padding(.vertical, 12)
+                        .background(.ultraThinMaterial.opacity(0.85))
+                        .clipShape(Capsule())
+                        .overlay(
+                            Capsule()
+                                .stroke(Color.white.opacity(0.15), lineWidth: 0.5)
+                        )
+                        .shadow(color: Color.black.opacity(0.35), radius: 15, x: 0, y: 8)
+                        .padding(.bottom, 20)
                     }
-                    .padding(.horizontal, 40)
-                    .padding(.vertical, 12)
-                    .background(.ultraThinMaterial.opacity(0.85))
-                    .clipShape(Capsule())
-                    .overlay(
-                        Capsule()
-                            .stroke(Color.white.opacity(0.15), lineWidth: 0.5)
-                    )
-                    .shadow(color: Color.black.opacity(0.35), radius: 15, x: 0, y: 8)
-                    .padding(.bottom, 20)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -142,6 +188,9 @@ struct LandingView: View {
                 set: { activeIngredientId = $0?.id }
             )) { wrapper in
                 IngredientDetailView(ingredientId: wrapper.id)
+            }
+            .sheet(isPresented: $showSubmitSheet) {
+                SubmitRequestView()
             }
             .onAppear {
                 withAnimation(.easeInOut(duration: 25).repeatForever(autoreverses: true)) {

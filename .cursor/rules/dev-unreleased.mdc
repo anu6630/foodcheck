@@ -1,0 +1,12 @@
+---
+description: FoodCheck is unreleased; do not keep legacy client/API shims.
+alwaysApply: true
+---
+
+# Unreleased app — no old-bundle compatibility
+
+The FoodCheck mobile app is in development and has **not been released**.
+
+- Do not preserve old app bundles, deprecated DTO fields, or dual API shapes “for existing clients.”
+- Prefer the current correct model. Example: `ingredient_codes` (INS, E, CAS, future schemes) on one ingredient; drop `e_number`-only shims when they get in the way.
+- Breaking API/UI changes are acceptable until a production release.

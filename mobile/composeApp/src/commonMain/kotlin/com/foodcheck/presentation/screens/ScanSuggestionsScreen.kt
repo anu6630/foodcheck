@@ -44,12 +44,49 @@ fun ScanSuggestionsScreen(
     val outcome by viewModel.outcome.collectAsState()
 
     Column(modifier = Modifier.fillMaxSize().padding(horizontal = 20.dp, vertical = 12.dp)) {
-        Text("Which one did you scan?", fontWeight = FontWeight.ExtraBold, fontSize = 18.sp, color = Color.White)
+        Text("Scan result", fontWeight = FontWeight.ExtraBold, fontSize = 18.sp, color = Color.White)
         Spacer(modifier = Modifier.height(12.dp))
 
         when (val result = outcome) {
             is ScanOutcome.Suggestions -> {
                 LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    if (result.ingredients.isNotEmpty()) {
+                        item {
+                            Text(
+                                "From the label",
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White,
+                                fontSize = 14.sp
+                            )
+                        }
+                        item {
+                            FlowRow(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                result.ingredients.forEach { ingredient ->
+                                    IngredientChip(ingredient) { onIngredientClick(ingredient) }
+                                }
+                            }
+                        }
+                        item { Spacer(modifier = Modifier.height(8.dp)) }
+                    }
+                    item {
+                        Text(
+                            if (result.ingredients.isNotEmpty()) "Possible catalog matches" else "Which one did you scan?",
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White,
+                            fontSize = 14.sp
+                        )
+                    }
+                    item {
+                        Text(
+                            "These are similar packs in the catalog — not a confirmed match.",
+                            color = AppColors.TextMuted,
+                            fontSize = 12.sp
+                        )
+                    }
                     items(result.candidates) { candidate ->
                         Surface(
                             modifier = Modifier

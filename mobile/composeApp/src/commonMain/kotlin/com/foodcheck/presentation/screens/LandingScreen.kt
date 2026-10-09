@@ -91,10 +91,10 @@ fun LandingScreen(
             Text(
                 text = buildAnnotatedString {
                     withStyle(SpanStyle(fontWeight = FontWeight.SemiBold, fontSize = 20.sp, color = Color.White.copy(alpha = 0.9f))) {
-                        append("life")
+                        append("Life")
                     }
                     withStyle(SpanStyle(fontWeight = FontWeight.Black, fontSize = 20.sp, color = AppColors.Primary)) {
-                        append("Ex")
+                        append("X")
                     }
                     withStyle(SpanStyle(fontFamily = FontFamily.Serif, fontWeight = FontWeight.Bold, fontStyle = FontStyle.Italic, fontSize = 30.sp, color = Color.White)) {
                         append(" Food")

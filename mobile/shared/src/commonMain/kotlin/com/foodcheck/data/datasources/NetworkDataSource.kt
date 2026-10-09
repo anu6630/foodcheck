@@ -9,8 +9,13 @@ import io.ktor.client.request.forms.submitFormWithBinaryData
 import io.ktor.client.request.forms.formData
 import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
 import com.foodcheck.data.newClientRequestId
 import com.foodcheck.data.dto.ScanResponse
+import com.foodcheck.data.dto.RequestSubmitResponse
 import com.foodcheck.data.network.BackendConfig
 import com.foodcheck.domain.entities.IngredientDetail
 import com.foodcheck.domain.entities.SearchProductResult
@@ -91,5 +96,74 @@ class NetworkDataSource(
         }
         val text = response.bodyAsText()
         return json.decodeFromString(ScanResponse.serializer(), text)
+    }
+
+    /** Flow 1: Submit a product-addition request with optional images (up to 3). */
+    suspend fun submitProductRequest(
+        productName: String,
+        countryCode: String,
+        brand: String? = null,
+        barcode: String? = null,
+        category: String? = null,
+        ingredientsText: String? = null,
+        requesterNotes: String? = null,
+        images: List<ByteArray> = emptyList(),
+    ): RequestSubmitResponse {
+        val response = client.submitFormWithBinaryData(
+            url = "${BackendConfig.baseUrl}/api/requests/product",
+            formData = formData {
+                append("product_name", productName)
+                append("country_code", countryCode)
+                brand?.let { append("brand", it) }
+                barcode?.let { append("barcode", it) }
+                category?.let { append("category", it) }
+                ingredientsText?.let { append("ingredients_text", it) }
+                requesterNotes?.let { append("requester_notes", it) }
+                images.getOrNull(0)?.let { bytes ->
+                    append("image_1", bytes, Headers.build {
+                        append(HttpHeaders.ContentType, "image/jpeg")
+                        append(HttpHeaders.ContentDisposition, "filename=\"image_1.jpg\"")
+                    })
+                }
+                images.getOrNull(1)?.let { bytes ->
+                    append("image_2", bytes, Headers.build {
+                        append(HttpHeaders.ContentType, "image/jpeg")
+                        append(HttpHeaders.ContentDisposition, "filename=\"image_2.jpg\"")
+                    })
+                }
+                images.getOrNull(2)?.let { bytes ->
+                    append("image_3", bytes, Headers.build {
+                        append(HttpHeaders.ContentType, "image/jpeg")
+                        append(HttpHeaders.ContentDisposition, "filename=\"image_3.jpg\"")
+                    })
+                }
+            }
+        )
+        val text = response.bodyAsText()
+        return json.decodeFromString(RequestSubmitResponse.serializer(), text)
+    }
+
+    /** Flow 2: Submit an ingredient check request (JSON body). */
+    suspend fun submitIngredientRequest(
+        ingredientName: String,
+        eNumber: String? = null,
+        category: String? = null,
+        requesterNotes: String? = null,
+    ): RequestSubmitResponse {
+        val response = client.post("${BackendConfig.baseUrl}/api/requests/ingredient") {
+            contentType(ContentType.Application.Json)
+            setBody(
+                buildString {
+                    append("{")
+                    append("\"ingredient_name\":\"${ingredientName}\"")
+                    eNumber?.let { append(",\"e_number\":\"$it\"") }
+                    category?.let { append(",\"category\":\"$it\"") }
+                    requesterNotes?.let { append(",\"requester_notes\":\"$it\"") }
+                    append("}")
+                }
+            )
+        }
+        val text = response.bodyAsText()
+        return json.decodeFromString(RequestSubmitResponse.serializer(), text)
     }
 }

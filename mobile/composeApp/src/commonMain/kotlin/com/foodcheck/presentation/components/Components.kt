@@ -114,7 +114,12 @@ fun SeverityBadge(severity: String) {
             .padding(horizontal = 10.dp, vertical = 5.dp)
     ) {
         Text(
-            text = severity.uppercase(),
+            text = when (severity.lowercase()) {
+                "red" -> "BANNED"
+                "amber" -> "RESTRICTED"
+                "green", "permitted" -> "AUTHORISED"
+                else -> "NO DATA"
+            },
             color = color,
             fontWeight = FontWeight.ExtraBold,
             fontSize = 10.sp,
@@ -151,7 +156,8 @@ fun IngredientChip(ingredient: AnnotatedIngredient, onClick: () -> Unit) {
                 modifier = Modifier.size(13.dp)
             )
             Spacer(modifier = Modifier.width(5.dp))
-            val label = if (ingredient.eNumber != null) "${ingredient.name} (${ingredient.eNumber})" else ingredient.name
+            val code = ingredient.codesText()
+            val label = if (code != null) "${ingredient.name} ($code)" else ingredient.name
             Text(
                 text = label,
                 color = Color.White,

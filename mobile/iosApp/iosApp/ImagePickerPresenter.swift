@@ -48,7 +48,8 @@ final class ImagePickerPresenter: NSObject, PHPickerViewControllerDelegate, UIIm
             return
         }
         provider.loadObject(ofClass: UIImage.self) { [weak self] image, _ in
-            let data = (image as? UIImage)?.jpegData(compressionQuality: 0.9)
+            let resized = (image as? UIImage)?.resized(toMaxDimension: 1024)
+            let data = resized?.jpegData(compressionQuality: 0.7)
             DispatchQueue.main.async {
                 self?.finish(data)
             }
@@ -58,7 +59,8 @@ final class ImagePickerPresenter: NSObject, PHPickerViewControllerDelegate, UIIm
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
         picker.dismiss(animated: true)
         let image = info[.originalImage] as? UIImage
-        finish(image?.jpegData(compressionQuality: 0.9))
+        let resized = image?.resized(toMaxDimension: 1024)
+        finish(resized?.jpegData(compressionQuality: 0.7))
     }
 
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
@@ -70,6 +72,26 @@ final class ImagePickerPresenter: NSObject, PHPickerViewControllerDelegate, UIIm
         completion?(data)
         completion = nil
         ImagePickerPresenter.active = nil
+    }
+}
+
+extension UIImage {
+    func resized(toMaxDimension maxDimension: CGFloat) -> UIImage {
+        if size.width <= maxDimension && size.height <= maxDimension {
+            return self
+        }
+        let aspectRatio = size.width / size.height
+        var newSize: CGSize
+        if aspectRatio > 1 {
+            newSize = CGSize(width: maxDimension, height: maxDimension / aspectRatio)
+        } else {
+            newSize = CGSize(width: maxDimension * aspectRatio, height: maxDimension)
+        }
+        
+        let renderer = UIGraphicsImageRenderer(size: newSize)
+        return renderer.image { _ in
+            self.draw(in: CGRect(origin: .zero, size: newSize))
+        }
     }
 }
 

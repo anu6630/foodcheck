@@ -16,7 +16,7 @@ fi
 
 # 2. Setup mock environment variable so Gemini Vision API runs in mock mode for deterministic tests
 export MOCK_GEMINI="true"
-export DATABASE_URL="postgresql://postgres.mhnreqfbohczronjprzs:Plmokn%40123%24%24@aws-1-ap-northeast-2.pooler.supabase.com:5432/foodcheck"
+export DATABASE_URL="postgresql://anuraj@localhost:5432/foodcheck"
 export PYTHONPATH="."
 
 # 3. Start FastAPI server in background
@@ -51,7 +51,13 @@ echo "Backend server is healthy!"
 echo "Executing Karate integration tests..."
 TEST_STATUS=0
 cd tests/karate
-java -jar karate.jar features/ || TEST_STATUS=$?
+# Accept an optional feature path relative to the backend root, translated to relative to tests/karate/
+if [ -n "$1" ]; then
+    FEATURE_ARG="../../$1"
+else
+    FEATURE_ARG="features/"
+fi
+java -jar karate.jar "$FEATURE_ARG" || TEST_STATUS=$?
 cd ../..
 
 

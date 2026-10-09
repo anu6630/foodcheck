@@ -8,13 +8,15 @@ package com.foodcheck.data.network
  * periodic /health poll). [customBaseUrl], when set, overrides both and disables fallback.
  */
 object BackendConfig {
-    const val PRIMARY_URL = "https://foodcheck-aws-api.lifex.biz"
+    const val PRIMARY_URL =
+        "https://br-hidden-waterfall-b5gh3ebj-foodcheck.compute.c-7.us-east-2.aws.neon.tech"
     const val SECONDARY_URL = "https://foodcheck-k3-api.anuraj.net"
 
     var activeBaseUrl: String = PRIMARY_URL
         internal set
 
-    var customBaseUrl: String? = "http://192.168.1.5:8999"
+    /** Set to a LAN URL for local dev; null uses [activeBaseUrl] (Neon by default). */
+    var customBaseUrl: String? = null
 
     /** Effective base URL requests should use: manual override wins, else the active tier. */
     val baseUrl: String
