@@ -71,3 +71,9 @@ export const FAI_SOURCE_BY_COUNTRY: Record<string, string> = {
 export const FSSAI_APPENDIX_SOURCE_ID = "fssai-appendix-a";
 export const FSSAI_BROMATE_SOURCE_ID = "fssai-gazette-bromate-2016";
 export const FSSAI_CYCLAMATE_SOURCE_ID = "fssai-cyclamates-2016";
+
+export const IARC_SOURCE_ID = "iarc-classifications";
+export const OPENFOODTOX_SOURCE_ID = "efsa-openfoodtox";
+export const JECFA_SOURCE_ID = "who-jecfa";
+export const EU_ADDITIVES_HEALTH_SOURCE_ID = "eu-additives-health";
+export const OFF_ADDITIVES_SOURCE_ID = "off-additives-taxonomy";

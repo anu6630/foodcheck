@@ -69,6 +69,31 @@ CREATE UNIQUE INDEX IF NOT EXISTS uq_ingredient_use_limits_ing_cc_cat_lvl
 CREATE INDEX IF NOT EXISTS idx_ingredient_use_limits_ing
   ON ingredient_use_limits (ingredient_id);
 
+-- Multi-source health claims (IARC, OpenFoodTox ADI/genotox, JECFA, EU withdrawn, …).
+-- Do not unique on kind alone — same topic from two publishers stays two rows.
+CREATE TABLE IF NOT EXISTS ingredient_health_reports (
+  id SERIAL PRIMARY KEY,
+  ingredient_id VARCHAR(160) NOT NULL REFERENCES ingredients(id) ON DELETE CASCADE,
+  source_id VARCHAR(80) NOT NULL,
+  kind VARCHAR(40) NOT NULL,
+  summary TEXT NOT NULL,
+  value TEXT,
+  unit TEXT,
+  evaluation_year VARCHAR(20),
+  citation TEXT,
+  citation_url TEXT,
+  payload JSONB,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_ingredient_health_reports_ing
+  ON ingredient_health_reports (ingredient_id);
+CREATE INDEX IF NOT EXISTS idx_ingredient_health_reports_source
+  ON ingredient_health_reports (source_id);
+CREATE UNIQUE INDEX IF NOT EXISTS uq_ingredient_health_reports_claim
+  ON ingredient_health_reports (
+    ingredient_id, source_id, kind, COALESCE(value, ''), COALESCE(citation_url, '')
+  );
+
 -- Captured datasets (PDF/CSV/API). Current pointer in data_sources; every ingest
 -- also appends data_source_snapshots so a newer FSSAI PDF cannot erase 04.11.2024.
 CREATE TABLE IF NOT EXISTS data_sources (
@@ -194,14 +219,34 @@ CREATE TABLE IF NOT EXISTS scans (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+CREATE TABLE IF NOT EXISTS companies (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS brand_names (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  company_id INTEGER REFERENCES companies(id) ON DELETE SET NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
 CREATE TABLE IF NOT EXISTS shelf_items (
   id SERIAL PRIMARY KEY,
   user_id UUID NOT NULL REFERENCES app_users(id) ON DELETE CASCADE,
   scan_id INTEGER NOT NULL REFERENCES scans(id) ON DELETE CASCADE,
   display_name VARCHAR(255) NOT NULL,
   brand VARCHAR(255),
+  brand_id INTEGER REFERENCES brand_names(id) ON DELETE SET NULL,
   barcode VARCHAR(50),
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS shelf_item_companies (
+  shelf_item_id INTEGER NOT NULL REFERENCES shelf_items(id) ON DELETE CASCADE,
+  company_id INTEGER NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
+  PRIMARY KEY (shelf_item_id, company_id)
 );
 
 CREATE TABLE IF NOT EXISTS stories (

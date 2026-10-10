@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -78,7 +79,10 @@ import androidx.compose.ui.unit.sp
 import com.foodcheck.domain.entities.AnnotatedIngredient
 import com.foodcheck.presentation.state.SubmitRequestState
 import com.foodcheck.presentation.state.SubmitRequestViewModel
+import com.foodcheck.presentation.components.AttachedImageThumb
 import com.foodcheck.presentation.theme.AppColors
+import com.foodcheck.presentation.theme.Platform
+import com.foodcheck.presentation.theme.currentPlatform
 import com.foodcheck.util.ImagePickerLauncher
 import com.foodcheck.util.ImagePickerSource
 import kotlinx.coroutines.launch
@@ -162,8 +166,7 @@ fun SubmitRequestScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(AppColors.Background)
-        // No statusBarsPadding here: Scaffold already applies status-bar insets via
-        // content padding when the global topBar is hidden on this route.
+            .then(if (currentPlatform == Platform.IOS) Modifier.statusBarsPadding() else Modifier)
     ) {
         // ── Merged brand + screen header (global App topBar is hidden here) ──
         Row(
@@ -454,8 +457,11 @@ private fun ProductForm(
                 },
             ) {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    images.forEachIndexed { idx, _ ->
-                        ImageSlot(hasImage = true, onRemove = { onRemoveImage(idx) }, onAdd = {})
+                    images.forEachIndexed { idx, bytes ->
+                        AttachedImageThumb(
+                            bytes = bytes,
+                            onRemove = { onRemoveImage(idx) }
+                        )
                     }
                 }
                 if (images.size < 3 && imagePickerLauncher != null) {
@@ -751,7 +757,7 @@ private fun StatusBadge(severity: String) {
     val (label, bg, fg) = when (severity.lowercase()) {
         "red" -> Triple("Banned", AppColors.Red.copy(alpha = 0.2f), AppColors.Red)
         "amber" -> Triple("Restricted", AppColors.Amber.copy(alpha = 0.2f), AppColors.Amber)
-        "green", "permitted" -> Triple("Authorised", AppColors.Green.copy(alpha = 0.2f), AppColors.Green)
+        "green", "permitted" -> Triple("Permitted", AppColors.Green.copy(alpha = 0.2f), AppColors.Green)
         "gray" -> Triple("No data", AppColors.TextMuted.copy(alpha = 0.2f), AppColors.TextMuted)
         else -> Triple("No data", AppColors.TextMuted.copy(alpha = 0.2f), Color.White)
     }
@@ -968,34 +974,6 @@ private fun FormField(
                 unfocusedContainerColor = AppColors.Surface.copy(alpha = 0.15f),
             )
         )
-    }
-}
-
-@Composable
-private fun ImageSlot(hasImage: Boolean, onRemove: () -> Unit, onAdd: () -> Unit) {
-    Box(
-        modifier = Modifier
-            .size(72.dp)
-            .clip(RoundedCornerShape(10.dp))
-            .background(if (hasImage) AppColors.Primary.copy(alpha = 0.15f) else AppColors.Surface.copy(alpha = 0.3f))
-            .border(1.dp, if (hasImage) AppColors.Primary.copy(alpha = 0.4f) else AppColors.Border.copy(alpha = 0.3f), RoundedCornerShape(10.dp)),
-        contentAlignment = Alignment.Center
-    ) {
-        if (hasImage) {
-            Icon(Icons.Default.Check, contentDescription = "Image added", tint = AppColors.Primary, modifier = Modifier.size(28.dp))
-            Box(modifier = Modifier.align(Alignment.TopEnd).padding(4.dp)) {
-                Box(
-                    modifier = Modifier
-                        .size(18.dp)
-                        .clip(CircleShape)
-                        .background(AppColors.Red)
-                        .clickable(onClick = onRemove),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(Icons.Default.Close, contentDescription = "Remove", tint = Color.White, modifier = Modifier.size(12.dp))
-                }
-            }
-        }
     }
 }
 

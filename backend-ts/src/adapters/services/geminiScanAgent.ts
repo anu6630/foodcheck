@@ -1,4 +1,8 @@
-import type { Product, ScanAgentResult } from "../../domain/entities.js";
+import type {
+  ExtractedIngredientItem,
+  Product,
+  ScanAgentResult,
+} from "../../domain/entities.js";
 import type {
   IIngredientRepository,
   IProductRepository,
@@ -14,9 +18,24 @@ Extract whatever you can see and reply with ONLY a single JSON object (no markdo
   "product_name": "<string or null>",
   "brand": "<string or null>",
   "country_hint": "<string or null>",
-  "ingredients_text": "<string or null>",
-  "ingredient_names": ["<parsed ingredient tokens if visible>"]
-}`;
+  "ingredients_text": "<full ingredients paragraph as printed, or null>",
+  "ingredient_items": [
+    { "kind": "item", "name": "<single ingredient name as on pack>" },
+    {
+      "kind": "group",
+      "role": "<word before brackets, e.g. Colours or Emulsifiers or Raising Agent>",
+      "codes": ["171", "102", "500(ii)"],
+      "label_text": "<exact pack phrase, e.g. Colours (171, 102, 133)>"
+    }
+  ]
+}
+
+Rules for ingredient_items:
+- Prefer splitting additive groups like "Colours (171, 102, 133)" or "Emulsifiers (322, 471)"
+  into kind=group with one code string per member (keep suffixes like 150c or 500(ii)).
+- Plain names (sugar, milk solids) are kind=item.
+- Do NOT invent ingredients that are not on the label.
+- Do NOT put category headers ("Panned Confectionery", "Allergen Information") as items.`;
 
 function sequenceRatio(a: string, b: string): number {
   if (!a && !b) return 1;
@@ -137,9 +156,7 @@ export class GeminiScanAgentService implements IScanAgentService {
     const brand = (extracted.brand as string | null) ?? null;
     const countryHint = (extracted.country_hint as string | null) ?? null;
     const ingredientsText = (extracted.ingredients_text as string | null) ?? null;
-    const ingredientNames = Array.isArray(extracted.ingredient_names)
-      ? (extracted.ingredient_names as string[])
-      : [];
+    const ingredientItems = parseIngredientItems(extracted.ingredient_items);
 
     const collected: Array<[Product, number]> = [];
 
@@ -154,10 +171,6 @@ export class GeminiScanAgentService implements IScanAgentService {
         collected.push([p, Math.round(nameMatch * 100)]);
       }
     }
-
-    // Ingredient-overlap SKU matching is too noisy (sugar hits every demo product).
-    // Label tokens are matched in ScanWithAgentUseCase instead.
-    void ingredientNames;
 
     // Informational country lookup (does not add candidates) — kept for parity / logging
     if (countryHint) {
@@ -176,6 +189,7 @@ export class GeminiScanAgentService implements IScanAgentService {
       brand,
       country_hint: countryHint,
       ingredients_text: ingredientsText,
+      ingredient_items: ingredientItems,
       candidates: [...bestByKey.values()].sort((a, b) => b[1] - a[1]),
     };
   }
@@ -216,10 +230,71 @@ export class GeminiScanAgentService implements IScanAgentService {
         brand: null,
         country_hint: "IN",
         ingredients_text: "potassium bromate, E171, tartrazine, water, wheat flour, sugar",
+        ingredient_items: [
+          { kind: "item", name: "potassium bromate" },
+          { kind: "item", name: "E171" },
+          { kind: "item", name: "tartrazine" },
+          { kind: "item", name: "water" },
+          { kind: "item", name: "wheat flour" },
+          { kind: "item", name: "sugar" },
+        ],
+        candidates: [],
+      };
+    }
+
+    if (mType === "colours_group") {
+      return {
+        product_name: "Gems",
+        brand: "Cadbury",
+        country_hint: "IN",
+        ingredients_text:
+          "Sugar, Colours (171, 102, 133, 124, 127, 122, 132, 110), Emulsifiers (414, 442, 476)",
+        ingredient_items: [
+          { kind: "item", name: "Sugar" },
+          {
+            kind: "group",
+            role: "Colours",
+            codes: ["171", "102", "133", "124", "127", "122", "132", "110"],
+            label_text: "Colours (171, 102, 133, 124, 127, 122, 132, 110)",
+          },
+          {
+            kind: "group",
+            role: "Emulsifiers",
+            codes: ["414", "442", "476"],
+            label_text: "Emulsifiers (414, 442, 476)",
+          },
+        ],
         candidates: [],
       };
     }
 
     return { candidates: [] };
   }
+}
+
+function parseIngredientItems(raw: unknown): ExtractedIngredientItem[] {
+  if (!Array.isArray(raw)) return [];
+  const out: ExtractedIngredientItem[] = [];
+  for (const entry of raw) {
+    if (typeof entry === "string" && entry.trim()) {
+      out.push({ kind: "item", name: entry.trim() });
+      continue;
+    }
+    if (!entry || typeof entry !== "object") continue;
+    const o = entry as Record<string, unknown>;
+    if (o.kind === "group" && typeof o.role === "string" && Array.isArray(o.codes)) {
+      const codes = o.codes.map((c) => String(c).trim()).filter(Boolean);
+      if (!codes.length) continue;
+      out.push({
+        kind: "group",
+        role: o.role.trim(),
+        codes,
+        label_text: typeof o.label_text === "string" ? o.label_text : undefined,
+      });
+      continue;
+    }
+    const name = typeof o.name === "string" ? o.name.trim() : "";
+    if (name) out.push({ kind: "item", name });
+  }
+  return out;
 }

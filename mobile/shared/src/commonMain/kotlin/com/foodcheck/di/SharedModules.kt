@@ -2,6 +2,7 @@ package com.foodcheck.di
 
 import org.koin.dsl.module
 import io.ktor.client.HttpClient
+import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
@@ -28,6 +29,11 @@ val sharedModule = module {
                     ignoreUnknownKeys = true
                     coerceInputValues = true
                 })
+            }
+            install(HttpTimeout) {
+                requestTimeoutMillis = 120_000
+                connectTimeoutMillis = 30_000
+                socketTimeoutMillis = 120_000
             }
         }.apply { installFallbackInterceptor() }
     }

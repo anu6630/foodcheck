@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Matches AppColors.Surface so the system status bar isn't pure black. -->
+    <color name="lifex_chrome">#1E293B</color>
+    <color name="lifex_background">#020617</color>
+
+    <style name="Theme.LifeXFood" parent="android:Theme.Material.NoActionBar">
+        <item name="android:statusBarColor">@color/lifex_chrome</item>
+        <item name="android:navigationBarColor">@color/lifex_background</item>
+        <item name="android:windowBackground">@color/lifex_background</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:colorPrimary">@color/lifex_chrome</item>
+    </style>
+</resources>

@@ -3,9 +3,12 @@ package com.foodcheck.presentation.state
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.foodcheck.data.datasources.NetworkDataSource
+import com.foodcheck.data.dto.CatalogBrandDto
+import com.foodcheck.data.dto.CatalogCompanyDto
 import com.foodcheck.domain.entities.AnnotatedIngredient
 import com.foodcheck.domain.entities.ScanOutcome
 import com.foodcheck.domain.usecases.ScanUseCase
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -39,7 +42,15 @@ class ScanViewModel(
     private val _actionMessage = MutableStateFlow<String?>(null)
     val actionMessage: StateFlow<String?> = _actionMessage.asStateFlow()
 
+    private val _brandSuggestions = MutableStateFlow<List<CatalogBrandDto>>(emptyList())
+    val brandSuggestions: StateFlow<List<CatalogBrandDto>> = _brandSuggestions.asStateFlow()
+
+    private val _companySuggestions = MutableStateFlow<List<CatalogCompanyDto>>(emptyList())
+    val companySuggestions: StateFlow<List<CatalogCompanyDto>> = _companySuggestions.asStateFlow()
+
     private var lastImages: List<ByteArray> = emptyList()
+    private var brandSearchJob: Job? = null
+    private var companySearchJob: Job? = null
 
     fun scan(images: List<ByteArray>) {
         lastImages = images
@@ -67,13 +78,44 @@ class ScanViewModel(
         }
     }
 
-    fun saveToShelf(displayName: String, brand: String?) {
+    fun searchBrands(query: String) {
+        brandSearchJob?.cancel()
+        brandSearchJob = viewModelScope.launch {
+            delay(180)
+            try {
+                _brandSuggestions.value = network.listBrands(query.trim()).brands
+            } catch (_: Exception) {
+                _brandSuggestions.value = emptyList()
+            }
+        }
+    }
+
+    fun searchCompanies(query: String) {
+        companySearchJob?.cancel()
+        companySearchJob = viewModelScope.launch {
+            delay(180)
+            try {
+                _companySuggestions.value = network.listCompanies(query.trim()).companies
+            } catch (_: Exception) {
+                _companySuggestions.value = emptyList()
+            }
+        }
+    }
+
+    fun saveToShelf(
+        displayName: String,
+        brand: String?,
+        brandId: Int? = null,
+        companyIds: List<Int> = emptyList(),
+    ) {
         viewModelScope.launch {
             try {
                 val ings = _outcome.value?.labelIngredients().orEmpty()
                 network.saveToShelf(
                     displayName = displayName.trim().ifBlank { "My scan" },
                     brand = brand?.trim()?.ifBlank { null },
+                    brandId = brandId,
+                    companyIds = companyIds.distinct(),
                     ingredientsText = ings.joinToString(", ") { it.name },
                     snapshotJson = snapshotJson(ings),
                     image = lastImages.firstOrNull(),
@@ -110,10 +152,13 @@ class ScanViewModel(
         _outcome.value = null
         _error.value = null
         lastImages = emptyList()
+        _brandSuggestions.value = emptyList()
+        _companySuggestions.value = emptyList()
     }
 
     private fun snapshotJson(ings: List<AnnotatedIngredient>): String {
-        val parts = ings.joinToString(",") { ing ->
+        val flat = ings.flatMap { it.forSnapshot() }
+        val parts = flat.joinToString(",") { ing ->
             val id = ing.id?.replace("\"", "")
             val name = ing.name.replace("\\", "\\\\").replace("\"", "\\\"")
             if (id != null) """{"id":"$id","name":"$name"}""" else """{"id":null,"name":"$name"}"""

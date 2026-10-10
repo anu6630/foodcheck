@@ -13,7 +13,12 @@ struct ScanView: View {
     @State private var showShare = false
     @State private var saveName = ""
     @State private var saveBrand = ""
+    @State private var saveBrandId: Int? = nil
+    @State private var showCompany = false
+    @State private var companyQuery = ""
+    @State private var selectedCompanies: [CatalogCompanyDto] = []
     @State private var caption = ""
+    @State private var expandedGroups: Set<String> = []
     
     var body: some View {
         VStack(spacing: 24) {
@@ -49,10 +54,31 @@ struct ScanView: View {
                     let ingredients = outcome.labelIngredients()
                     let similar = (outcome as? ScanOutcome.Suggestions)?.candidates ?? []
                     VStack(alignment: .leading, spacing: 14) {
-                        Text("From this label")
-                            .font(.headline)
-                            .foregroundColor(.white)
-                        Text("Status is for these names under published rules. Not a certificate for a brand.")
+                        HStack(alignment: .top, spacing: 10) {
+                            Button(action: {
+                                model.clear()
+                                dismiss()
+                            }) {
+                                Image(systemName: "chevron.left")
+                                    .font(.system(size: 18, weight: .semibold))
+                                    .foregroundColor(.white)
+                                    .frame(width: 36, height: 36)
+                            }
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("From this label")
+                                    .font(.system(size: 20, weight: .heavy))
+                                    .foregroundColor(.white)
+                                Text(
+                                    ingredients.isEmpty
+                                        ? "No substances read"
+                                        : "Market IN · \(ingredients.count) substance\(ingredients.count == 1 ? "" : "s")"
+                                )
+                                .font(.system(size: 12, weight: .semibold))
+                                .foregroundColor(.white.opacity(0.5))
+                            }
+                            Spacer()
+                        }
+                        Text("Watch tags are health signals — not the same as banned.")
                             .font(.caption)
                             .foregroundColor(.white.opacity(0.5))
                         if ingredients.isEmpty {
@@ -60,27 +86,53 @@ struct ScanView: View {
                                 .foregroundColor(.white.opacity(0.5))
                         } else {
                             ScrollView {
-                                LazyVGrid(columns: [GridItem(.adaptive(minimum: 140))], alignment: .leading, spacing: 8) {
-                                    ForEach(ingredients, id: \.self) { annotated in
-                                        Button(action: {
-                                            if let id = annotated.id {
-                                                onIngredientClick(id)
+                                VStack(alignment: .leading, spacing: 10) {
+                                    ForEach(Array(ingredients.enumerated()), id: \.offset) { index, annotated in
+                                        if annotated.isGroup {
+                                            let key = "\(annotated.role ?? annotated.name)-\(index)"
+                                            let open = expandedGroups.contains(key)
+                                            Button(action: {
+                                                if open { expandedGroups.remove(key) } else { expandedGroups.insert(key) }
+                                            }) {
+                                                GroupIngredientChipView(ing: annotated, expanded: open)
                                             }
-                                        }) {
-                                            IngredientChipView(ing: annotated)
+                                            if open {
+                                                FlowLayout(spacing: 8) {
+                                                    ForEach(annotated.members, id: \.self) { member in
+                                                        Button(action: {
+                                                            if let id = member.id { onIngredientClick(id) }
+                                                        }) {
+                                                            IngredientChipView(ing: member)
+                                                        }
+                                                    }
+                                                }
+                                                if let label = annotated.labelText, !label.isEmpty {
+                                                    Text("as on label: \(label)")
+                                                        .font(.caption2)
+                                                        .foregroundColor(.white.opacity(0.45))
+                                                }
+                                            }
+                                        } else {
+                                            Button(action: {
+                                                if let id = annotated.id { onIngredientClick(id) }
+                                            }) {
+                                                IngredientChipView(ing: annotated)
+                                            }
                                         }
                                     }
                                 }
                             }
-                            .frame(maxHeight: 180)
+                            .frame(maxHeight: 280)
                         }
                         HStack {
                             Button("Save to my list") { showSave = true }
                                 .font(.system(size: 14, weight: .bold))
                                 .foregroundColor(Color(red: 0.06, green: 0.73, blue: 0.51))
-                            Button("Share as story") { showShare = true }
-                                .font(.system(size: 14, weight: .bold))
-                                .foregroundColor(Color(red: 0.06, green: 0.73, blue: 0.51))
+                            if FeatureFlags.shared.socialFeedEnabled {
+                                Button("Share as story") { showShare = true }
+                                    .font(.system(size: 14, weight: .bold))
+                                    .foregroundColor(Color(red: 0.06, green: 0.73, blue: 0.51))
+                            }
                         }
                         if !similar.isEmpty {
                             Text("Similar packs")
@@ -119,18 +171,148 @@ struct ScanView: View {
                         }
                     }
                     .padding(.horizontal, 20)
-                    .alert("Save to my list", isPresented: $showSave) {
-                        TextField("Name this pack", text: $saveName)
-                        TextField("Brand (optional)", text: $saveBrand)
-                        Button("Save") {
-                            model.saveToShelf(name: saveName, brand: saveBrand)
+                    .sheet(isPresented: $showSave) {
+                        NavigationStack {
+                            Form {
+                                Section("Pack") {
+                                    TextField("Name this pack", text: $saveName)
+                                    TextField("Brand", text: $saveBrand)
+                                        .onChange(of: saveBrand) { _, newValue in
+                                            saveBrandId = nil
+                                            model.searchBrands(query: newValue)
+                                        }
+                                    if !model.brandSuggestions.isEmpty {
+                                        ScrollView(.horizontal, showsIndicators: false) {
+                                            HStack(spacing: 8) {
+                                                ForEach(model.brandSuggestions.prefix(6), id: \.id) { brand in
+                                                    Button(brand.name) {
+                                                        saveBrand = brand.name
+                                                        saveBrandId = Int(brand.id)
+                                                        if let cidObj = brand.companyId,
+                                                           let cname = brand.companyName {
+                                                            let cid = cidObj.intValue
+                                                            if !selectedCompanies.contains(where: { Int($0.id) == cid }) {
+                                                                selectedCompanies.append(
+                                                                    CatalogCompanyDto(id: Int32(cid), name: cname)
+                                                                )
+                                                                showCompany = true
+                                                            }
+                                                        }
+                                                        model.searchBrands(query: brand.name)
+                                                    }
+                                                    .font(.system(size: 12, weight: .medium))
+                                                    .padding(.horizontal, 10)
+                                                    .padding(.vertical, 6)
+                                                    .background(Color.white.opacity(0.08))
+                                                    .clipShape(Capsule())
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                if !showCompany {
+                                    Section {
+                                        Button {
+                                            showCompany = true
+                                            model.searchCompanies(query: "")
+                                        } label: {
+                                            Label("Company", systemImage: "plus")
+                                        }
+                                    }
+                                } else {
+                                    Section("Related companies (optional)") {
+                                        TextField("Search companies", text: $companyQuery)
+                                            .onChange(of: companyQuery) { _, newValue in
+                                                model.searchCompanies(query: newValue)
+                                            }
+                                        ForEach(
+                                            model.companySuggestions.filter { c in
+                                                !selectedCompanies.contains(where: { $0.id == c.id })
+                                            }.prefix(8),
+                                            id: \.id
+                                        ) { company in
+                                            Button(company.name) {
+                                                selectedCompanies.append(company)
+                                            }
+                                        }
+                                        ForEach(selectedCompanies, id: \.id) { company in
+                                            HStack {
+                                                Text(company.name)
+                                                Spacer()
+                                                Button(role: .destructive) {
+                                                    selectedCompanies.removeAll { $0.id == company.id }
+                                                } label: {
+                                                    Image(systemName: "xmark.circle.fill")
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            .scrollContentBackground(.hidden)
+                            .background(Color(red: 0.06, green: 0.08, blue: 0.14))
+                            .navigationTitle("Save to my list")
+                            .navigationBarTitleDisplayMode(.inline)
+                            .toolbar {
+                                ToolbarItem(placement: .cancellationAction) {
+                                    Button("Close") { showSave = false }
+                                }
+                                ToolbarItem(placement: .confirmationAction) {
+                                    Button("Save") {
+                                        model.saveToShelf(
+                                            name: saveName,
+                                            brand: saveBrand,
+                                            brandId: saveBrandId,
+                                            companyIds: selectedCompanies.map { Int($0.id) }
+                                        )
+                                        showSave = false
+                                        saveName = ""
+                                        saveBrand = ""
+                                        saveBrandId = nil
+                                        selectedCompanies = []
+                                        showCompany = false
+                                        companyQuery = ""
+                                    }
+                                    .disabled(saveName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                                }
+                            }
+                            .onAppear {
+                                model.searchBrands(query: saveBrand)
+                            }
                         }
-                        Button("Cancel", role: .cancel) {}
+                        .presentationDetents([.medium, .large])
+                        .presentationDragIndicator(.visible)
                     }
-                    .alert("Share as story", isPresented: $showShare) {
-                        TextField("Caption (optional)", text: $caption)
-                        Button("Publish story") { model.publishStory(caption: caption) }
-                        Button("Cancel", role: .cancel) {}
+                    .sheet(isPresented: $showShare) {
+                        NavigationStack {
+                            Form {
+                                Section {
+                                    Text("Posts this label in the app. Not an official product entry.")
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                    TextField("Caption (optional)", text: $caption, axis: .vertical)
+                                        .lineLimit(2...4)
+                                }
+                            }
+                            .scrollContentBackground(.hidden)
+                            .background(Color(red: 0.06, green: 0.08, blue: 0.14))
+                            .navigationTitle("Share as story")
+                            .navigationBarTitleDisplayMode(.inline)
+                            .toolbar {
+                                ToolbarItem(placement: .cancellationAction) {
+                                    Button("Close") { showShare = false }
+                                }
+                                ToolbarItem(placement: .confirmationAction) {
+                                    Button("Publish") {
+                                        model.publishStory(caption: caption)
+                                        showShare = false
+                                        caption = ""
+                                    }
+                                }
+                            }
+                        }
+                        .presentationDetents([.medium])
+                        .presentationDragIndicator(.visible)
                     }
                     .alert("Done", isPresented: Binding(
                         get: { model.actionMessage != nil },

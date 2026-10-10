@@ -2,9 +2,10 @@ package com.foodcheck.app
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.SystemBarStyle
+import androidx.core.view.WindowCompat
 import com.foodcheck.data.network.ApiHealthMonitor
 import com.foodcheck.data.network.BackendConfig
 import com.foodcheck.di.sharedModule
@@ -33,10 +34,22 @@ class MainActivity : ComponentActivity() {
         // ApiHealthMonitor.start() is idempotent, so re-running it on activity recreation is safe.
         GlobalContext.get().get<ApiHealthMonitor>().start()
 
+        // AppColors.Surface — status bar matches header; header content pads via platformStatusBarsPadding().
+        val chrome = android.graphics.Color.parseColor("#1E293B")
+        val background = android.graphics.Color.parseColor("#020617")
         enableEdgeToEdge(
-            statusBarStyle = SystemBarStyle.dark(android.graphics.Color.TRANSPARENT),
-            navigationBarStyle = SystemBarStyle.dark(android.graphics.Color.TRANSPARENT)
+            statusBarStyle = SystemBarStyle.dark(chrome),
+            navigationBarStyle = SystemBarStyle.dark(background),
         )
+        @Suppress("DEPRECATION")
+        run {
+            window.statusBarColor = chrome
+            window.navigationBarColor = background
+        }
+        WindowCompat.getInsetsController(window, window.decorView).apply {
+            isAppearanceLightStatusBars = false
+            isAppearanceLightNavigationBars = false
+        }
         setContent {
             App(imagePickerLauncher = rememberImagePickerLauncher())
         }

@@ -83,12 +83,9 @@ class ProductRepository(
             localCacheDataSource.cacheScan(outcome)
             Result.success(outcome)
         } catch (e: Exception) {
-            val cached = localCacheDataSource.getLastScan()
-            if (cached != null) {
-                Result.success(cached)
-            } else {
-                Result.failure(Exception("Failed to upload image. Please check your internet connection.", e))
-            }
+            // Never return a stale cached scan — that hides real upload/API failures.
+            val detail = e.message?.takeIf { it.isNotBlank() } ?: e::class.simpleName
+            Result.failure(Exception("Scan failed: $detail", e))
         }
     }
 

@@ -5,6 +5,7 @@ enum LandingTab {
     case scan
     case search
     case feed
+    case myList
 }
 
 struct LandingView: View {
@@ -16,7 +17,6 @@ struct LandingView: View {
     @State private var activeIngredientId: String? = nil
     @State private var isSearching = false
     @State private var showSubmitSheet = false
-    @State private var showMyList = false
     
     var body: some View {
         NavigationStack {
@@ -47,22 +47,36 @@ struct LandingView: View {
                             ))
                         }
                         
-                        HStack(alignment: .lastTextBaseline, spacing: 1) {
-                            Text("Life")
-                                .font(.system(size: 16, weight: .semibold))
-                                .foregroundColor(.white.opacity(0.9))
-                            Text("X")
-                                .font(.system(size: 16, weight: .black))
-                                .foregroundColor(Color(red: 0.06, green: 0.73, blue: 0.51))
-                            Text(" Food")
-                                .font(.custom("Georgia-BoldItalic", size: 25))
-                                .foregroundColor(.white)
+                        VStack(alignment: .leading, spacing: 2) {
+                            HStack(alignment: .lastTextBaseline, spacing: 1) {
+                                Text("Life")
+                                    .font(.system(size: 16, weight: .semibold))
+                                    .foregroundColor(.white.opacity(0.9))
+                                Text("X")
+                                    .font(.system(size: 16, weight: .black))
+                                    .foregroundColor(Color(red: 0.06, green: 0.73, blue: 0.51))
+                                Text(" Food")
+                                    .font(.custom("Georgia-BoldItalic", size: 25))
+                                    .foregroundColor(.white)
+                            }
+                            Text(selectedTab == .myList ? "My list" : selectedTab == .feed ? "Community" : "Know what's banned, anywhere.")
+                                .font(.system(size: 11))
+                                .foregroundColor(.white.opacity(0.45))
                         }
                         Spacer()
                         
-                        Circle()
-                            .fill(Color(red: 0.06, green: 0.73, blue: 0.51))
-                            .frame(width: 8, height: 8)
+                        Button(action: { showSubmitSheet = true }) {
+                            Image(systemName: "square.and.pencil")
+                                .font(.system(size: 16, weight: .semibold))
+                                .foregroundColor(Color(red: 0.06, green: 0.73, blue: 0.51))
+                                .frame(width: 36, height: 36)
+                                .background(.ultraThinMaterial.opacity(0.85))
+                                .clipShape(Circle())
+                                .overlay(
+                                    Circle().stroke(Color.white.opacity(0.15), lineWidth: 0.5)
+                                )
+                        }
+                        .accessibilityLabel("Submit request")
                     }
                     .padding(.horizontal, 24)
                     .padding(.top, 16)
@@ -78,7 +92,11 @@ struct LandingView: View {
                             onIngredientClick: { ingId in
                                 self.activeIngredientId = ingId
                             },
-                            onSavedToList: { showMyList = true }
+                            onSavedToList: {
+                                withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                                    selectedTab = .myList
+                                }
+                            }
                         )
                     case .search:
                         SearchView(
@@ -88,11 +106,18 @@ struct LandingView: View {
                             },
                             onIngredientClick: { ingId in
                                 self.activeIngredientId = ingId
-                            },
-                            onMyListClick: { showMyList = true }
+                            }
                         )
                     case .feed:
-                        FeedView(onIngredientClick: { ingId in
+                        if FeatureFlags.shared.socialFeedEnabled {
+                            FeedView(onIngredientClick: { ingId in
+                                self.activeIngredientId = ingId
+                            })
+                        } else {
+                            EmptyView()
+                        }
+                    case .myList:
+                        ShelfListView(onIngredientClick: { ingId in
                             self.activeIngredientId = ingId
                         })
                     }
@@ -127,22 +152,26 @@ struct LandingView: View {
                                 }
                             }
 
-                            TabButton(
-                                icon: "bubble.left.and.bubble.right",
-                                title: "Feed",
-                                isActive: selectedTab == .feed
-                            ) {
-                                withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                                    selectedTab = .feed
+                            if FeatureFlags.shared.socialFeedEnabled {
+                                TabButton(
+                                    icon: "bubble.left.and.bubble.right",
+                                    title: "Feed",
+                                    isActive: selectedTab == .feed
+                                ) {
+                                    withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                                        selectedTab = .feed
+                                    }
                                 }
                             }
 
                             TabButton(
-                                icon: "plus.circle",
-                                title: "Submit",
-                                isActive: false
+                                icon: "bookmark",
+                                title: "My list",
+                                isActive: selectedTab == .myList
                             ) {
-                                showSubmitSheet = true
+                                withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                                    selectedTab = .myList
+                                }
                             }
                         }
                         .padding(.horizontal, 40)
@@ -199,12 +228,6 @@ struct LandingView: View {
             }
             .sheet(isPresented: $showSubmitSheet) {
                 SubmitRequestView()
-            }
-            .sheet(isPresented: $showMyList) {
-                ShelfListView(onIngredientClick: { ingId in
-                    showMyList = false
-                    self.activeIngredientId = ingId
-                })
             }
             .onAppear {
                 withAnimation(.easeInOut(duration: 25).repeatForever(autoreverses: true)) {

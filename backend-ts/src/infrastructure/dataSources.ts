@@ -126,6 +126,9 @@ export async function listSourcesForIngredient(ingredientId: string): Promise<Da
        UNION
        SELECT source_id FROM ingredient_use_limits
          WHERE ingredient_id = $1 AND source_id IS NOT NULL
+       UNION
+       SELECT source_id FROM ingredient_health_reports
+         WHERE ingredient_id = $1 AND source_id IS NOT NULL
      )
      ORDER BY CASE s.country_code WHEN 'IN' THEN 0 ELSE 1 END, s.id`,
     [ingredientId]

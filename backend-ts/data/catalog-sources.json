@@ -205,5 +205,79 @@
     "url": null,
     "citation_url": null,
     "notes": "Authored in-repo (चीनी, maida, palmolein, INS numbers). No external collection URL."
+  },
+  {
+    "id": "iarc-classifications",
+    "publisher": "IARC / WHO",
+    "country_code": null,
+    "title": "IARC Monographs — List of Classifications",
+    "version": "Volumes 1–142",
+    "version_date": "2026-07-23",
+    "citation": "Agents Classified by the IARC Monographs, Volumes 1–142",
+    "file_path": "../research/iarc/iarc_classifications.csv",
+    "url": "https://monographs.iarc.who.int/list-of-classifications/",
+    "citation_url": "https://monographs.iarc.who.int/list-of-classifications/",
+    "retrieved_at": "2026-10-09",
+    "notes": "Carcinogen hazard groups (1 / 2A / 2B / 3). Hazard identification, not dietary risk."
+  },
+  {
+    "id": "efsa-openfoodtox",
+    "publisher": "EFSA",
+    "country_code": "EU",
+    "title": "OpenFoodTox — chemical hazards database",
+    "version": "3.0",
+    "version_date": "2026-04-30",
+    "citation": "EFSA OpenFoodTox 3.0 export repository",
+    "file_path": "../research/openfoodtox/OFT3.0_export_repository.xlsx",
+    "url": "https://zenodo.org/records/19388272",
+    "urls": [
+      "https://zenodo.org/records/19388272",
+      "https://www.efsa.europa.eu/en/data-report/chemical-hazards-database-openfoodtox"
+    ],
+    "citation_url": "https://www.efsa.europa.eu/en/data-report/chemical-hazards-database-openfoodtox",
+    "retrieved_at": "2026-10-09",
+    "notes": "ADI/TDI, genotoxicity, reference points. Joined via CAS."
+  },
+  {
+    "id": "who-jecfa",
+    "publisher": "FAO/WHO JECFA",
+    "country_code": null,
+    "title": "JECFA evaluations portal (bulk scrape)",
+    "version": "May 2024 scrape",
+    "version_date": "2024-05-01",
+    "citation": "Ocagli et al. Scientific Data 2024; Figshare 26877211",
+    "file_path": "../research/jecfa/JECFA.csv",
+    "url": "https://apps.who.int/food-additives-contaminants-jecfa-database/",
+    "citation_url": "https://doi.org/10.6084/m9.figshare.26877211",
+    "retrieved_at": "2026-10-09",
+    "notes": "Identifiers + WHO deep links. ADI text is on each chemical page, not in this CSV."
+  },
+  {
+    "id": "eu-additives-health",
+    "publisher": "European Commission / EUR-Lex",
+    "country_code": "EU",
+    "title": "EU additive health actions (withdrawals, warning labels)",
+    "version": "seed",
+    "version_date": "2026-10-09",
+    "citation": "Reg (EC) 1333/2008; Reg (EU) 2022/63; Southampton colour warnings",
+    "file_path": "../research/concerns/seed_health_concerns.csv",
+    "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:02008R1333",
+    "citation_url": "https://eur-lex.europa.eu/eli/reg/2022/63/oj",
+    "retrieved_at": "2026-10-09",
+    "notes": "Curated seed: authorisation withdrawn, hyperactivity warning colours, etc."
+  },
+  {
+    "id": "off-additives-taxonomy",
+    "publisher": "Open Food Facts",
+    "country_code": null,
+    "title": "Additives taxonomy (ANSES of interest, EFSA overexposure tags)",
+    "version": null,
+    "version_date": null,
+    "citation": "Open Food Facts additives taxonomy",
+    "file_path": "../research/openfoodfacts/additives_hazard_signals.csv",
+    "url": "https://static.openfoodfacts.org/data/taxonomies/additives.json",
+    "citation_url": "https://world.openfoodfacts.org",
+    "retrieved_at": "2026-10-09",
+    "notes": "Secondary signals pointing at ANSES/EFSA — not primary toxicology."
   }
 ]

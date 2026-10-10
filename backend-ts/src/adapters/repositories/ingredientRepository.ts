@@ -1,5 +1,5 @@
 import type { DataSource } from "../../domain/dataSource.js";
-import type { Ingredient, IngredientUseLimit } from "../../domain/entities.js";
+import type { Ingredient, IngredientHealthReport, IngredientUseLimit } from "../../domain/entities.js";
 import type { IIngredientRepository } from "../../domain/interfaces.js";
 import { listSourcesForIngredient } from "../../infrastructure/dataSources.js";
 import { query } from "../../infrastructure/db.js";
@@ -35,8 +35,9 @@ export class PgIngredientRepository implements IIngredientRepository {
     const cleaned = name.trim().toLowerCase();
     const eMatch = cleaned.match(/\be[- ]?(\d{3,4}(?:[a-z]{1,2}|\([ivx]+\))?)\b/i);
     const insMatch = cleaned.match(/\bins[- ]?(\d{3,4}(?:[a-z]{1,2}|\([ivx]+\))?)\b/i);
-    const code = (eMatch?.[1] || insMatch?.[1] || "").toUpperCase();
-    const eNumber = code ? `E${code}` : null;
+    const bareMatch = cleaned.match(/^(\d{3,4}(?:[a-z]{1,2}|\([ivx]+\))?)$/i);
+    const code = (eMatch?.[1] || insMatch?.[1] || bareMatch?.[1] || "").toUpperCase();
+    const eNumber = code && !bareMatch ? `E${code}` : code ? `E${normalizeCodeValue(code)}` : null;
     const wanted = code ? normalizeCodeValue(code) : "";
 
     const { rows } = await query<IngredientRow>(
@@ -44,7 +45,7 @@ export class PgIngredientRepository implements IIngredientRepository {
        FROM ingredients
        WHERE id = $1
           OR LOWER(name) = $1
-          OR ($2::text IS NOT NULL AND e_number = $2)
+          OR ($2::text IS NOT NULL AND UPPER(REPLACE(e_number, ' ', '')) = UPPER(REPLACE($2, ' ', '')))
        LIMIT 1`,
       [cleaned, eNumber]
     );
@@ -53,9 +54,9 @@ export class PgIngredientRepository implements IIngredientRepository {
     if (wanted) {
       const byCode = await query<{ ingredient_id: string }>(
         `SELECT ingredient_id FROM ingredient_codes
-         WHERE UPPER(REPLACE(code, ' ', '')) = $1
+         WHERE UPPER(REPLACE(REPLACE(code, ' ', ''), '-', '')) = $1
          LIMIT 1`,
-        [wanted]
+        [wanted.replace(/-/g, "")]
       );
       if (byCode.rows[0]) return this.getById(byCode.rows[0].ingredient_id);
     }
@@ -171,6 +172,70 @@ export class PgIngredientRepository implements IIngredientRepository {
     );
     const out: Record<string, number> = {};
     for (const r of rows) out[r.country_code] = Number(r.n);
+    return out;
+  }
+
+  async getHealthReports(ingredientId: string): Promise<IngredientHealthReport[]> {
+    const { rows } = await query<{
+      id: number;
+      kind: string;
+      summary: string;
+      value: string | null;
+      unit: string | null;
+      evaluation_year: string | null;
+      citation: string | null;
+      citation_url: string | null;
+      source_id: string;
+      source_title: string | null;
+      source_publisher: string | null;
+    }>(
+      `SELECT h.id, h.kind, h.summary, h.value, h.unit, h.evaluation_year,
+              h.citation, h.citation_url, h.source_id,
+              s.title AS source_title, s.publisher AS source_publisher
+       FROM ingredient_health_reports h
+       LEFT JOIN data_sources s ON s.id = h.source_id
+       WHERE h.ingredient_id = $1
+       ORDER BY h.kind, s.publisher NULLS LAST, h.id`,
+      [ingredientId]
+    );
+    return rows.map((r) => ({
+      id: Number(r.id),
+      kind: r.kind,
+      summary: r.summary,
+      value: r.value,
+      unit: r.unit,
+      evaluation_year: r.evaluation_year,
+      citation: r.citation,
+      citation_url: r.citation_url,
+      source_id: r.source_id,
+      source_title: r.source_title,
+      source_publisher: r.source_publisher,
+    }));
+  }
+
+  async getHealthFlagsByIngredientIds(
+    ingredientIds: string[]
+  ): Promise<Record<string, Array<{ kind: string; value: string | null; summary: string }>>> {
+    const ids = [...new Set(ingredientIds.filter(Boolean))];
+    const out: Record<string, Array<{ kind: string; value: string | null; summary: string }>> = {};
+    if (!ids.length) return out;
+    const { rows } = await query<{
+      ingredient_id: string;
+      kind: string;
+      value: string | null;
+      summary: string;
+    }>(
+      `SELECT ingredient_id, kind, value, summary
+       FROM ingredient_health_reports
+       WHERE ingredient_id = ANY($1)
+       ORDER BY ingredient_id, kind, id`,
+      [ids]
+    );
+    for (const r of rows) {
+      const list = out[r.ingredient_id] ?? (out[r.ingredient_id] = []);
+      if (list.some((x) => x.kind === r.kind && x.value === r.value)) continue;
+      list.push({ kind: r.kind, value: r.value, summary: r.summary });
+    }
     return out;
   }
 

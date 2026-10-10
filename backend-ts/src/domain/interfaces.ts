@@ -1,5 +1,11 @@
 import type { DataSource } from "./dataSource.js";
-import type { Ingredient, IngredientUseLimit, Product, ScanAgentResult } from "./entities.js";
+import type {
+  Ingredient,
+  IngredientHealthReport,
+  IngredientUseLimit,
+  Product,
+  ScanAgentResult,
+} from "./entities.js";
 
 export interface IProductRepository {
   getByBarcode(barcode: string): Promise<Product | null>;
@@ -14,6 +20,11 @@ export interface IIngredientRepository {
   searchIngredients(query: string, limit?: number): Promise<Ingredient[]>;
   getUseLimits(ingredientId: string, perCountry?: number): Promise<IngredientUseLimit[]>;
   getUseLimitCounts(ingredientId: string): Promise<Record<string, number>>;
+  getHealthReports(ingredientId: string): Promise<IngredientHealthReport[]>;
+  /** Batch: distinct health kinds per ingredient for list chips. */
+  getHealthFlagsByIngredientIds(
+    ingredientIds: string[]
+  ): Promise<Record<string, Array<{ kind: string; value: string | null; summary: string }>>>;
   listSources(ingredientId: string): Promise<DataSource[]>;
   save(ingredient: Ingredient): Promise<Ingredient>;
 }

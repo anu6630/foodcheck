@@ -16,6 +16,7 @@
     "ingest:off-india": "tsx scripts/ingestOffIndia.ts",
     "ingest:sources": "tsx scripts/recordCatalogSources.ts",
     "ingest:archive": "tsx scripts/archiveCatalogSources.ts",
+    "ingest:health": "tsx scripts/ingestHealthReports.ts",
     "bundle:foodcheck": "rm -rf dist-fn && mkdir -p dist-fn && esbuild functions/api.ts --bundle --platform=node --format=esm --outfile=dist-fn/index.mjs",
     "deploy:foodcheck": "npm run bundle:foodcheck && neon functions deploy foodcheck --project-id fragrant-sound-87733195 --branch production --src dist-fn --no-bundle --wait"
   },

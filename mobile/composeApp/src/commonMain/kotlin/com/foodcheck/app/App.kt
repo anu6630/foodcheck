@@ -48,6 +48,7 @@ import androidx.compose.ui.unit.sp
 import com.foodcheck.presentation.theme.Platform
 import com.foodcheck.presentation.theme.currentPlatform
 import com.foodcheck.presentation.theme.PlatformBackground
+import com.foodcheck.presentation.theme.platformStatusBarsPadding
 
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -62,12 +63,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.ui.draw.scale
 import androidx.compose.material.icons.filled.DocumentScanner
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Cancel
-import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.PhotoLibrary
-import androidx.compose.material.icons.filled.Add
+import com.foodcheck.presentation.components.AttachedImageThumb
+import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Forum
+import androidx.compose.material.icons.filled.PostAdd
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Icon
@@ -93,7 +94,9 @@ import com.foodcheck.presentation.screens.SearchResultsScreen
 import com.foodcheck.presentation.screens.SubmitRequestScreen
 import com.foodcheck.presentation.screens.FeedScreen
 import com.foodcheck.presentation.screens.ShelfListScreen
+import com.foodcheck.presentation.state.FeedViewModel
 import com.foodcheck.presentation.state.ScanViewModel
+import com.foodcheck.FeatureFlags
 import com.foodcheck.presentation.theme.AppColors
 import com.foodcheck.util.ImagePickerLauncher
 import org.koin.compose.viewmodel.koinViewModel
@@ -114,6 +117,8 @@ fun App(imagePickerLauncher: ImagePickerLauncher) {
     var clearQueryTrigger by remember { mutableStateOf(0) }
     var showScanSheet by remember { mutableStateOf(false) }
     val scanViewModel: ScanViewModel = koinViewModel()
+    val feedViewModel: FeedViewModel = koinViewModel()
+    val selectedStory by feedViewModel.selected.collectAsState()
 
     var activeProductBarcode by remember { mutableStateOf<String?>(null) }
     var activeIngredientId by remember { mutableStateOf<String?>(null) }
@@ -138,25 +143,35 @@ fun App(imagePickerLauncher: ImagePickerLauncher) {
         )
     ) {
         val isIos = currentPlatform == Platform.IOS
-        // Screens that own a merged header (screen title + LifeX) — skip global brand bar.
+        // Screens that own their chrome — skip global LifeX brand bar.
         val hideGlobalTopBar = currentRoute?.let { route ->
-            route.contains("SubmitRequest") || route.contains("IngredientDetail")
+            route.contains("SubmitRequest") ||
+                route.contains("IngredientDetail") ||
+                route.contains("ScanSuggestions")
         } == true
         Scaffold(
             topBar = {
                 if (!hideGlobalTopBar) {
                     Surface(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .statusBarsPadding(),
-                        color = if (isIos) Color.White.copy(alpha = 0.03f) else AppColors.Surface.copy(alpha = 0.85f),
+                        modifier = Modifier.fillMaxWidth(),
+                        color = if (isIos) Color.White.copy(alpha = 0.03f) else AppColors.Surface,
                         border = if (isIos) BorderStroke(0.5.dp, Color.White.copy(alpha = 0.08f)) else null
                     ) {
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
+                                .platformStatusBarsPadding()
                                 .padding(horizontal = 20.dp, vertical = 14.dp)
                         ) {
+                            val isOnLanding = currentRoute == null || currentRoute.endsWith("Route.Landing")
+                            val isOnFeed = currentRoute?.contains("Feed") == true
+                            val isOnMyList = currentRoute?.contains("MyList") == true
+                            val topSubtitle = when {
+                                isOnFeed && selectedStory != null -> "Story"
+                                isOnFeed -> "Community"
+                                isOnMyList -> "My list"
+                                else -> "Know what's banned, anywhere."
+                            }
                             if (isIos) {
                                 Column(
                                     modifier = Modifier.align(Alignment.Center),
@@ -176,10 +191,16 @@ fun App(imagePickerLauncher: ImagePickerLauncher) {
                                         }
                                     )
                                     Spacer(modifier = Modifier.height(2.dp))
-                                    Text(
-                                        text = "Know what's banned, anywhere.",
-                                        color = AppColors.TextMuted,
-                                        fontSize = 10.sp
+                                    Text(topSubtitle, color = AppColors.TextMuted, fontSize = 10.sp)
+                                }
+                                IconButton(
+                                    onClick = { navController.navigate(Route.SubmitRequest) },
+                                    modifier = Modifier.align(Alignment.CenterEnd)
+                                ) {
+                                    Icon(
+                                        Icons.Default.PostAdd,
+                                        contentDescription = "Submit request",
+                                        tint = AppColors.Primary
                                     )
                                 }
                             } else {
@@ -187,23 +208,25 @@ fun App(imagePickerLauncher: ImagePickerLauncher) {
                                     modifier = Modifier.fillMaxWidth(),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    val isOnLanding = currentRoute == null || currentRoute.endsWith("Route.Landing")
                                     // Screens that already render their own back control — avoid a second
                                     // back arrow next to the LifeX brand header.
                                     val hasOwnBack = currentRoute?.let { route ->
                                         route.contains("ProductDetail") ||
-                                            route.contains("ScanSuggestions")
+                                            route.contains("IngredientDetail") ||
+                                            route.contains("SubmitRequest")
                                     } == true
                                     val canNavigateBack =
-                                        (!isOnLanding && !hasOwnBack) ||
+                                        selectedStory != null ||
+                                            (!isOnLanding && !hasOwnBack) ||
                                             (selectedTab == ScreenTab.SEARCH && isSearching)
                                     if (canNavigateBack) {
                                         IconButton(
                                             onClick = {
-                                                if (isOnLanding) {
-                                                    clearQueryTrigger++
-                                                } else {
-                                                    navController.popBackStack()
+                                                when {
+                                                    // Story detail is in-memory state, not a nav destination.
+                                                    selectedStory != null -> feedViewModel.close()
+                                                    isOnLanding -> clearQueryTrigger++
+                                                    else -> navController.popBackStack()
                                                 }
                                             },
                                             modifier = Modifier.padding(end = 4.dp)
@@ -222,7 +245,10 @@ fun App(imagePickerLauncher: ImagePickerLauncher) {
                                         )
                                         Spacer(modifier = Modifier.width(8.dp))
                                     }
-                                    Column(verticalArrangement = Arrangement.Center) {
+                                    Column(
+                                        modifier = Modifier.weight(1f),
+                                        verticalArrangement = Arrangement.Center
+                                    ) {
                                         Text(
                                             text = buildAnnotatedString {
                                                 withStyle(SpanStyle(fontWeight = FontWeight.SemiBold, fontSize = 15.sp, color = Color.White.copy(alpha = 0.9f))) {
@@ -237,10 +263,13 @@ fun App(imagePickerLauncher: ImagePickerLauncher) {
                                             }
                                         )
                                         Spacer(modifier = Modifier.height(2.dp))
-                                        Text(
-                                            text = "Know what's banned, anywhere.",
-                                            color = AppColors.TextMuted,
-                                            fontSize = 11.sp
+                                        Text(topSubtitle, color = AppColors.TextMuted, fontSize = 11.sp)
+                                    }
+                                    IconButton(onClick = { navController.navigate(Route.SubmitRequest) }) {
+                                        Icon(
+                                            Icons.Default.PostAdd,
+                                            contentDescription = "Submit request",
+                                            tint = AppColors.Primary
                                         )
                                     }
                                 }
@@ -265,7 +294,6 @@ fun App(imagePickerLauncher: ImagePickerLauncher) {
                                 clearQueryTrigger = clearQueryTrigger,
                                 onProductClick = { result -> onProductClick(result.product.barcode) },
                                 onIngredientClick = { ing -> ing.id?.let { onIngredientClick(it) } },
-                                onMyListClick = { navController.navigate(Route.MyList) }
                             )
 
                             // Floating Bottom Tab Bar overlay
@@ -300,17 +328,19 @@ fun App(imagePickerLauncher: ImagePickerLauncher) {
                                             isActive = false,
                                             onClick = { showScanSheet = true }
                                         )
+                                        if (FeatureFlags.socialFeedEnabled) {
+                                            TabButtonCompose(
+                                                icon = Icons.Default.Forum,
+                                                title = "Feed",
+                                                isActive = false,
+                                                onClick = { navController.navigate(Route.Feed) }
+                                            )
+                                        }
                                         TabButtonCompose(
-                                            icon = Icons.Default.Forum,
-                                            title = "Feed",
+                                            icon = Icons.Default.Bookmark,
+                                            title = "My list",
                                             isActive = false,
-                                            onClick = { navController.navigate(Route.Feed) }
-                                        )
-                                        TabButtonCompose(
-                                            icon = Icons.Default.Add,
-                                            title = "Submit",
-                                            isActive = false,
-                                            onClick = { navController.navigate(Route.SubmitRequest) }
+                                            onClick = { navController.navigate(Route.MyList) }
                                         )
                                     }
                                 }
@@ -332,6 +362,10 @@ fun App(imagePickerLauncher: ImagePickerLauncher) {
                     composable<Route.ScanSuggestions> {
                         ScanSuggestionsScreen(
                             viewModel = scanViewModel,
+                            onBack = {
+                                scanViewModel.clear()
+                                navController.popBackStack()
+                            },
                             onCandidateClick = { candidate ->
                                 navController.navigate(Route.ProductDetail(candidate.product.barcode)) {
                                     popUpTo(Route.Landing)
@@ -340,15 +374,16 @@ fun App(imagePickerLauncher: ImagePickerLauncher) {
                             onIngredientClick = { ing -> ing.id?.let { onIngredientClick(it) } }
                         )
                     }
-                    composable<Route.Feed> {
-                        FeedScreen(
-                            onBack = { navController.popBackStack() },
-                            onIngredientClick = { ing -> ing.id?.let { onIngredientClick(it) } }
-                        )
+                    if (FeatureFlags.socialFeedEnabled) {
+                        composable<Route.Feed> {
+                            FeedScreen(
+                                viewModel = feedViewModel,
+                                onIngredientClick = { ing -> ing.id?.let { onIngredientClick(it) } }
+                            )
+                        }
                     }
                     composable<Route.MyList> {
                         ShelfListScreen(
-                            onBack = { navController.popBackStack() },
                             onIngredientClick = { ing -> ing.id?.let { onIngredientClick(it) } }
                         )
                     }
@@ -508,48 +543,18 @@ fun ScanBottomSheet(
                     Spacer(modifier = Modifier.height(10.dp))
                 }
 
-                // Picked Images Previews
                 if (pickedImages.isNotEmpty()) {
                     Row(
                         modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
                         horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally)
                     ) {
                         pickedImages.forEachIndexed { index, bytes ->
-                            Box(
-                                modifier = Modifier
-                                    .size(72.dp)
-                                    .background(Color.White.copy(alpha = 0.05f), RoundedCornerShape(12.dp))
-                                    .border(1.dp, Color.White.copy(alpha = 0.15f), RoundedCornerShape(12.dp)),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                    Icon(
-                                        imageVector = Icons.Default.CheckCircle,
-                                        contentDescription = null,
-                                        tint = AppColors.Primary,
-                                        modifier = Modifier.size(20.dp)
-                                    )
-                                    Spacer(modifier = Modifier.height(4.dp))
-                                    Text(
-                                        text = "Photo ${index + 1}",
-                                        fontSize = 10.sp,
-                                        color = Color.White.copy(alpha = 0.6f)
-                                    )
+                            AttachedImageThumb(
+                                bytes = bytes,
+                                onRemove = {
+                                    pickedImages = pickedImages.filterIndexed { i, _ -> i != index }
                                 }
-                                Box(
-                                    modifier = Modifier
-                                        .align(Alignment.TopEnd)
-                                        .clickable { pickedImages = pickedImages.filterIndexed { i, _ -> i != index } }
-                                        .padding(4.dp)
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.Cancel,
-                                        contentDescription = "Remove",
-                                        tint = Color.Red.copy(alpha = 0.7f),
-                                        modifier = Modifier.size(16.dp)
-                                    )
-                                }
-                            }
+                            )
                         }
                     }
                 }

@@ -1,21 +1,15 @@
 package com.foodcheck.data.network
 
 /**
- * Single source of truth for which backend host the app talks to.
+ * Backend host for the app. Neon Functions only — no secondary / k3 fallback.
  *
- * [activeBaseUrl] is the tier currently believed to be healthy (updated both reactively,
- * by [installFallbackInterceptor] on request failure, and proactively, by [ApiHealthMonitor]'s
- * periodic /health poll). [customBaseUrl], when set, overrides both and disables fallback.
+ * [customBaseUrl], when set (e.g. LAN for local dev), overrides [NEON_URL].
  */
 object BackendConfig {
-    const val PRIMARY_URL =
+    const val NEON_URL =
         "https://br-hidden-waterfall-b5gh3ebj-foodcheck.compute.c-7.us-east-2.aws.neon.tech"
-    const val SECONDARY_URL = "https://foodcheck-k3-api.anuraj.net"
 
-    var activeBaseUrl: String = PRIMARY_URL
-        internal set
-
-    /** Set to a LAN URL for local dev; null uses [activeBaseUrl] (Neon by default). */
+    /** Set to a LAN URL for local dev; null uses Neon. */
     var customBaseUrl: String? = null
 
     /** Anonymous device identity for shelf/stories. Persist on the platform; do not log. */
@@ -29,9 +23,6 @@ object BackendConfig {
         return deviceKey
     }
 
-    /** Effective base URL requests should use: manual override wins, else the active tier. */
     val baseUrl: String
-        get() = customBaseUrl ?: activeBaseUrl
-
-    fun alternateOf(url: String): String = if (url == PRIMARY_URL) SECONDARY_URL else PRIMARY_URL
+        get() = customBaseUrl ?: NEON_URL
 }

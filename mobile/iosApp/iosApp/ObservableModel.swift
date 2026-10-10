@@ -115,12 +115,16 @@ class ObservableScanModel: ObservableObject {
     @Published var statusText: String = "Reading label..."
     @Published var error: String? = nil
     @Published var actionMessage: String? = nil
+    @Published var brandSuggestions: [CatalogBrandDto] = []
+    @Published var companySuggestions: [CatalogCompanyDto] = []
     
     private var outcomeWatcher: FlowWatcher<ScanOutcome>?
     private var loadingWatcher: FlowWatcher<KotlinBoolean>?
     private var statusTextWatcher: FlowWatcher<NSString>?
     private var errorWatcher: FlowWatcher<NSString>?
     private var actionWatcher: FlowWatcher<NSString>?
+    private var brandWatcher: FlowWatcher<NSArray>?
+    private var companyWatcher: FlowWatcher<NSArray>?
     
     init() {
         self.outcomeWatcher = FlowWatcher(flow: viewModel.outcome) { [weak self] val in
@@ -138,6 +142,20 @@ class ObservableScanModel: ObservableObject {
         self.actionWatcher = FlowWatcher(flow: viewModel.actionMessage) { [weak self] val in
             DispatchQueue.main.async { self?.actionMessage = val as String? }
         }
+        self.brandWatcher = FlowWatcher(flow: viewModel.brandSuggestions) { [weak self] val in
+            DispatchQueue.main.async {
+                self?.brandSuggestions =
+                    (val as? [CatalogBrandDto]) ??
+                    (val as? NSArray)?.compactMap { $0 as? CatalogBrandDto } ?? []
+            }
+        }
+        self.companyWatcher = FlowWatcher(flow: viewModel.companySuggestions) { [weak self] val in
+            DispatchQueue.main.async {
+                self?.companySuggestions =
+                    (val as? [CatalogCompanyDto]) ??
+                    (val as? NSArray)?.compactMap { $0 as? CatalogCompanyDto } ?? []
+            }
+        }
     }
     
     func scan(image: Data) {
@@ -153,8 +171,23 @@ class ObservableScanModel: ObservableObject {
         viewModel.clear()
     }
 
-    func saveToShelf(name: String, brand: String) {
-        viewModel.saveToShelf(displayName: name, brand: brand.isEmpty ? nil : brand)
+    func searchBrands(query: String) {
+        viewModel.searchBrands(query: query)
+    }
+
+    func searchCompanies(query: String) {
+        viewModel.searchCompanies(query: query)
+    }
+
+    func saveToShelf(name: String, brand: String, brandId: Int?, companyIds: [Int]) {
+        let kotlinBrandId: KotlinInt? = brandId.map { KotlinInt(value: Int32($0)) }
+        let kotlinCompanyIds = companyIds.map { KotlinInt(value: Int32($0)) }
+        viewModel.saveToShelf(
+            displayName: name,
+            brand: brand.isEmpty ? nil : brand,
+            brandId: kotlinBrandId,
+            companyIds: kotlinCompanyIds
+        )
     }
 
     func publishStory(caption: String) {
@@ -171,6 +204,8 @@ class ObservableScanModel: ObservableObject {
         statusTextWatcher?.close()
         errorWatcher?.close()
         actionWatcher?.close()
+        brandWatcher?.close()
+        companyWatcher?.close()
     }
 }
 
@@ -179,10 +214,14 @@ class ObservableFeedModel: ObservableObject {
     @Published var stories: [StoryDto] = []
     @Published var selected: StoryDto? = nil
     @Published var error: String? = nil
+    @Published var loadingMore: Bool = false
+    @Published var likedIds: Set<Int> = []
 
     private var storiesWatcher: FlowWatcher<NSArray>?
     private var selectedWatcher: FlowWatcher<StoryDto>?
     private var errorWatcher: FlowWatcher<NSString>?
+    private var loadingMoreWatcher: FlowWatcher<KotlinBoolean>?
+    private var likedWatcher: FlowWatcher<NSArray>?
 
     init() {
         storiesWatcher = FlowWatcher(flow: viewModel.stories) { [weak self] val in
@@ -196,18 +235,30 @@ class ObservableFeedModel: ObservableObject {
         errorWatcher = FlowWatcher(flow: viewModel.error) { [weak self] val in
             DispatchQueue.main.async { self?.error = val as String? }
         }
+        loadingMoreWatcher = FlowWatcher(flow: viewModel.loadingMore) { [weak self] val in
+            DispatchQueue.main.async { self?.loadingMore = (val as? KotlinBoolean)?.boolValue ?? false }
+        }
+        likedWatcher = FlowWatcher(flow: viewModel.likedIds) { [weak self] val in
+            DispatchQueue.main.async {
+                let arr = (val as? [Any]) ?? (val as? NSArray) as? [Any] ?? []
+                self?.likedIds = Set(arr.compactMap { ($0 as? NSNumber)?.intValue ?? ($0 as? Int) })
+            }
+        }
         viewModel.load()
     }
 
     func open(id: Int32) { viewModel.open(id: id) }
     func close() { viewModel.close() }
     func comment(_ body: String) { viewModel.comment(body: body) }
-    func like() { viewModel.like() }
+    func like(storyId: Int32) { viewModel.like(storyId: storyId) }
+    func loadMore() { viewModel.loadMore() }
 
     deinit {
         storiesWatcher?.close()
         selectedWatcher?.close()
         errorWatcher?.close()
+        loadingMoreWatcher?.close()
+        likedWatcher?.close()
     }
 }
 

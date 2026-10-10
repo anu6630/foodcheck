@@ -8,7 +8,6 @@ struct SearchView: View {
     // Callbacks to notify parent view when item clicked
     var onConfidentMatch: (String) -> Void
     var onIngredientClick: (String) -> Void
-    var onMyListClick: () -> Void = {}
     
     var body: some View {
         VStack(spacing: 0) {
@@ -38,12 +37,7 @@ struct SearchView: View {
             )
             .padding(.horizontal, 20)
             .padding(.top, 10)
-            .padding(.bottom, 8)
-
-            Button("My list") { onMyListClick() }
-                .font(.system(size: 14, weight: .bold))
-                .foregroundColor(Color(red: 0.06, green: 0.73, blue: 0.51))
-                .padding(.bottom, 8)
+            .padding(.bottom, 12)
             
             // Search States
             if model.loading {
@@ -166,6 +160,9 @@ struct IngredientChipView: View {
             Text(label)
                 .font(.system(size: 12, weight: .semibold))
                 .foregroundColor(.white)
+            if ing.showsWatch {
+                WatchTagView()
+            }
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 8)
@@ -174,6 +171,81 @@ struct IngredientChipView: View {
         .overlay(
             RoundedRectangle(cornerRadius: 20)
                 .stroke(color.opacity(0.2), lineWidth: 0.5)
+        )
+    }
+}
+
+struct WatchTagView: View {
+    var body: some View {
+        HStack(spacing: 3) {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .font(.system(size: 9, weight: .bold))
+            Text("Watch")
+                .font(.system(size: 9, weight: .heavy))
+        }
+        .foregroundColor(Color(red: 0.96, green: 0.62, blue: 0.04))
+        .padding(.horizontal, 6)
+        .padding(.vertical, 2)
+        .background(Color(red: 0.96, green: 0.62, blue: 0.04).opacity(0.18))
+        .cornerRadius(6)
+        .overlay(
+            RoundedRectangle(cornerRadius: 6)
+                .stroke(Color(red: 0.96, green: 0.62, blue: 0.04).opacity(0.55), lineWidth: 1)
+        )
+    }
+}
+
+struct GroupIngredientChipView: View {
+    let ing: AnnotatedIngredient
+    let expanded: Bool
+
+    var color: Color {
+        switch ing.severity.lowercased() {
+        case "red": return Color(red: 0.96, green: 0.25, blue: 0.37)
+        case "amber": return Color(red: 0.96, green: 0.62, blue: 0.04)
+        case "green": return Color(red: 0.20, green: 0.83, blue: 0.60)
+        default: return .white.opacity(0.6)
+        }
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack(spacing: 6) {
+                Image(systemName: {
+                    switch ing.severity.lowercased() {
+                    case "green": return "checkmark.circle.fill"
+                    case "red": return "xmark.circle.fill"
+                    case "amber": return "exclamationmark.triangle.fill"
+                    default: return "questionmark.circle.fill"
+                    }
+                }())
+                .font(.system(size: 12))
+                .foregroundColor(color)
+                let role = (ing.role?.isEmpty == false ? ing.role! : ing.name)
+                Text("\(role) (\(ing.members.count))")
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundColor(.white)
+                if ing.showsWatch {
+                    WatchTagView()
+                }
+                Image(systemName: expanded ? "chevron.up" : "chevron.down")
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundColor(color)
+            }
+            let preview = ing.memberCodePreview(limit: 8)
+            if !preview.isEmpty {
+                Text(preview)
+                    .font(.system(size: 11))
+                    .foregroundColor(.white.opacity(0.7))
+            }
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+        .background(color.opacity(0.12))
+        .cornerRadius(16)
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(color.opacity(0.45), lineWidth: 1)
         )
     }
 }
@@ -229,7 +301,7 @@ struct SeverityBadgeView: View {
             switch severity.lowercased() {
             case "red": return "BANNED"
             case "amber": return "RESTRICTED"
-            case "green", "permitted": return "AUTHORISED"
+            case "green", "permitted": return "PERMITTED"
             default: return "NO DATA"
             }
         }())

@@ -9,15 +9,19 @@ import io.ktor.client.request.forms.submitFormWithBinaryData
 import io.ktor.client.request.forms.formData
 import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
+import io.ktor.http.isSuccess
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
+import io.ktor.client.statement.HttpResponse
 import com.foodcheck.data.newClientRequestId
 import com.foodcheck.data.dto.ScanResponse
 import com.foodcheck.data.dto.RequestSubmitResponse
+import com.foodcheck.data.dto.BrandListResponse
 import com.foodcheck.data.dto.CommunityIdResponse
 import com.foodcheck.data.dto.CommentsResponse
+import com.foodcheck.data.dto.CompanyListResponse
 import com.foodcheck.data.dto.LikeResponse
 import com.foodcheck.data.dto.ShelfListResponse
 import com.foodcheck.data.dto.StoryDto
@@ -44,7 +48,7 @@ class NetworkDataSource(
     }
 
     // Retained for the manual backend-URL override UI (App.kt); delegates to BackendConfig, the
-    // single source of truth also used by the fallback interceptor and health monitor.
+    // Base URL: Neon Functions (see BackendConfig).
     var baseUrl: String
         get() = BackendConfig.baseUrl
         set(value) {
@@ -58,6 +62,8 @@ class NetworkDataSource(
     suspend fun saveToShelf(
         displayName: String,
         brand: String?,
+        brandId: Int? = null,
+        companyIds: List<Int> = emptyList(),
         ingredientsText: String,
         snapshotJson: String,
         image: ByteArray?,
@@ -67,6 +73,10 @@ class NetworkDataSource(
             formData = formData {
                 append("display_name", displayName)
                 brand?.let { append("brand", it) }
+                brandId?.let { append("brand_id", it.toString()) }
+                if (companyIds.isNotEmpty()) {
+                    append("company_ids", companyIds.joinToString(prefix = "[", postfix = "]"))
+                }
                 append("ingredients_text", ingredientsText)
                 append("snapshot", snapshotJson)
                 image?.let { bytes ->
@@ -86,6 +96,22 @@ class NetworkDataSource(
             if (query.isNotBlank()) parameter("q", query)
         }
         return decodeOrThrow(response.bodyAsText(), response.status.value, ShelfListResponse.serializer())
+    }
+
+    suspend fun listBrands(query: String = "", limit: Int = 20): BrandListResponse {
+        val response = client.get("${BackendConfig.baseUrl}/api/brands") {
+            if (query.isNotBlank()) parameter("q", query)
+            parameter("limit", limit.toString())
+        }
+        return decodeOrThrow(response.bodyAsText(), response.status.value, BrandListResponse.serializer())
+    }
+
+    suspend fun listCompanies(query: String = "", limit: Int = 20): CompanyListResponse {
+        val response = client.get("${BackendConfig.baseUrl}/api/companies") {
+            if (query.isNotBlank()) parameter("q", query)
+            parameter("limit", limit.toString())
+        }
+        return decodeOrThrow(response.bodyAsText(), response.status.value, CompanyListResponse.serializer())
     }
 
     suspend fun publishStory(
@@ -111,8 +137,11 @@ class NetworkDataSource(
         return decodeOrThrow(response.bodyAsText(), response.status.value, CommunityIdResponse.serializer())
     }
 
-    suspend fun listStories(): StoryListResponse {
-        val response = client.get("${BackendConfig.baseUrl}/api/stories")
+    suspend fun listStories(limit: Int = 10, offset: Int = 0): StoryListResponse {
+        val response = client.get("${BackendConfig.baseUrl}/api/stories") {
+            parameter("limit", limit)
+            parameter("offset", offset)
+        }
         return decodeOrThrow(response.bodyAsText(), response.status.value, StoryListResponse.serializer())
     }
 
@@ -172,9 +201,9 @@ class NetworkDataSource(
     }
 
     suspend fun scan(images: List<ByteArray>): ScanResponse {
-        // Generated once per logical call; the fallback interceptor reuses this same request
-        // (headers included) when it retries on the alternate host, so the key stays stable
-        // across the retry.
+        if (images.isEmpty()) throw Exception("No images to scan")
+        val totalBytes = images.sumOf { it.size }
+        if (totalBytes <= 0) throw Exception("Image data is empty")
         val idempotencyKey = newClientRequestId()
         val response = client.submitFormWithBinaryData(
             url = "${BackendConfig.baseUrl}/api/scan",
@@ -191,8 +220,12 @@ class NetworkDataSource(
         ) {
             header("Idempotency-Key", idempotencyKey)
         }
-        val text = response.bodyAsText()
-        return json.decodeFromString(ScanResponse.serializer(), text)
+        val text = requireSuccessBody(response, "Scan")
+        return try {
+            json.decodeFromString(ScanResponse.serializer(), text)
+        } catch (e: Exception) {
+            throw Exception("Scan response parse error: ${e.message}", e)
+        }
     }
 
     /** Flow 1: Submit a product-addition request with optional images (up to 3). */
@@ -236,7 +269,7 @@ class NetworkDataSource(
                 }
             }
         )
-        val text = response.bodyAsText()
+        val text = requireSuccessBody(response, "Product request")
         return json.decodeFromString(RequestSubmitResponse.serializer(), text)
     }
 
@@ -262,6 +295,23 @@ class NetworkDataSource(
         }
         val text = response.bodyAsText()
         return json.decodeFromString(RequestSubmitResponse.serializer(), text)
+    }
+
+    private suspend fun requireSuccessBody(response: HttpResponse, action: String): String {
+        val text = response.bodyAsText()
+        if (!response.status.isSuccess()) {
+            val detail = try {
+                json.decodeFromString(kotlinx.serialization.json.JsonObject.serializer(), text)["detail"]
+                    ?.toString()?.trim('"')
+            } catch (_: Exception) {
+                text.take(240).ifBlank { null }
+            }
+            throw Exception(
+                detail?.ifBlank { null }
+                    ?: "$action failed (HTTP ${response.status.value})"
+            )
+        }
+        return text
     }
 
     private fun <T> decodeOrThrow(

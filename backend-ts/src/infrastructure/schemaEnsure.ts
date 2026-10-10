@@ -1,3 +1,7 @@
+import {
+  flattenIndiaBrandCompanyCatalog,
+  listIndiaCompanies,
+} from "../../data/indiaBrandCompanyCatalog.js";
 import { query } from "./db.js";
 
 const DDL = `
@@ -56,6 +60,23 @@ CREATE TABLE IF NOT EXISTS ingredient_use_limits (
   note TEXT,
   regulation_ref VARCHAR(255),
   source_id VARCHAR(80)
+);
+
+-- Multi-source health claims. One row per (ingredient, source, claim) — never collapse
+-- e.g. IARC cancer + Prop 65 cancer into a single flag.
+CREATE TABLE IF NOT EXISTS ingredient_health_reports (
+  id SERIAL PRIMARY KEY,
+  ingredient_id VARCHAR(160) NOT NULL REFERENCES ingredients(id) ON DELETE CASCADE,
+  source_id VARCHAR(80) NOT NULL,
+  kind VARCHAR(40) NOT NULL,
+  summary TEXT NOT NULL,
+  value TEXT,
+  unit TEXT,
+  evaluation_year VARCHAR(20),
+  citation TEXT,
+  citation_url TEXT,
+  payload JSONB,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 CREATE TABLE IF NOT EXISTS products (
@@ -179,14 +200,34 @@ CREATE TABLE IF NOT EXISTS scans (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+CREATE TABLE IF NOT EXISTS companies (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS brand_names (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  company_id INTEGER REFERENCES companies(id) ON DELETE SET NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
 CREATE TABLE IF NOT EXISTS shelf_items (
   id SERIAL PRIMARY KEY,
   user_id UUID NOT NULL REFERENCES app_users(id) ON DELETE CASCADE,
   scan_id INTEGER NOT NULL REFERENCES scans(id) ON DELETE CASCADE,
   display_name VARCHAR(255) NOT NULL,
   brand VARCHAR(255),
+  brand_id INTEGER REFERENCES brand_names(id) ON DELETE SET NULL,
   barcode VARCHAR(50),
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS shelf_item_companies (
+  shelf_item_id INTEGER NOT NULL REFERENCES shelf_items(id) ON DELETE CASCADE,
+  company_id INTEGER NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
+  PRIMARY KEY (shelf_item_id, company_id)
 );
 
 CREATE TABLE IF NOT EXISTS stories (
@@ -294,6 +335,25 @@ export async function ensureSchema(): Promise<void> {
     `CREATE INDEX IF NOT EXISTS idx_data_source_files_source
      ON data_source_files (source_id)`
   );
+  await query(
+    `CREATE INDEX IF NOT EXISTS idx_ingredient_health_reports_ing
+     ON ingredient_health_reports (ingredient_id)`
+  );
+  await query(
+    `CREATE INDEX IF NOT EXISTS idx_ingredient_health_reports_source
+     ON ingredient_health_reports (source_id)`
+  );
+  // Idempotent re-ingest of the *same* claim from the same source; different sources stay as separate rows.
+  await query(
+    `CREATE UNIQUE INDEX IF NOT EXISTS uq_ingredient_health_reports_claim
+     ON ingredient_health_reports (
+       ingredient_id,
+       source_id,
+       kind,
+       COALESCE(value, ''),
+       COALESCE(citation_url, '')
+     )`
+  );
 
   await query(
     `INSERT INTO countries (code, name) VALUES
@@ -309,5 +369,82 @@ export async function ensureSchema(): Promise<void> {
      ON CONFLICT (code) DO NOTHING`
   );
 
+  await query(
+    `CREATE UNIQUE INDEX IF NOT EXISTS uq_companies_name_lower ON companies (LOWER(name))`
+  );
+  await query(
+    `CREATE UNIQUE INDEX IF NOT EXISTS uq_brand_names_name_lower ON brand_names (LOWER(name))`
+  );
+  await query(
+    `ALTER TABLE shelf_items ADD COLUMN IF NOT EXISTS brand_id INTEGER REFERENCES brand_names(id) ON DELETE SET NULL`
+  );
+  await query(
+    `CREATE INDEX IF NOT EXISTS idx_brand_names_company ON brand_names (company_id)`
+  );
+  await query(
+    `CREATE INDEX IF NOT EXISTS idx_shelf_item_companies_company ON shelf_item_companies (company_id)`
+  );
+
+  await seedBrandCompanyCatalog();
+
   ensured = true;
+}
+
+async function seedBrandCompanyCatalog(): Promise<void> {
+  const companies = listIndiaCompanies();
+  if (companies.length) {
+    await query(
+      `INSERT INTO companies (name)
+       SELECT DISTINCT n
+       FROM unnest($1::text[]) AS t(n)
+       WHERE NOT EXISTS (
+         SELECT 1 FROM companies c WHERE LOWER(c.name) = LOWER(n)
+       )`,
+      [companies]
+    );
+  }
+
+  const pairs = flattenIndiaBrandCompanyCatalog();
+  if (pairs.length) {
+    const brands = pairs.map((p) => p.brand);
+    const companyNames = pairs.map((p) => p.company);
+    await query(
+      `INSERT INTO brand_names (name, company_id)
+       SELECT b, c.id
+       FROM unnest($1::text[], $2::text[]) AS t(b, company_name)
+       LEFT JOIN companies c ON LOWER(c.name) = LOWER(t.company_name)
+       WHERE NOT EXISTS (
+         SELECT 1 FROM brand_names bn WHERE LOWER(bn.name) = LOWER(t.b)
+       )`,
+      [brands, companyNames]
+    );
+    // Backfill company_id when brand existed without a company link.
+    await query(
+      `UPDATE brand_names bn
+       SET company_id = c.id
+       FROM unnest($1::text[], $2::text[]) AS t(b, company_name)
+       JOIN companies c ON LOWER(c.name) = LOWER(t.company_name)
+       WHERE LOWER(bn.name) = LOWER(t.b)
+         AND bn.company_id IS NULL`,
+      [brands, companyNames]
+    );
+  }
+
+  // Also ingest distinct brands already present on catalog products.
+  try {
+    await query(
+      `INSERT INTO brand_names (name, company_id)
+       SELECT DISTINCT TRIM(p.brand), NULL
+       FROM products p
+       WHERE p.brand IS NOT NULL
+         AND TRIM(p.brand) <> ''
+         AND LOWER(TRIM(p.brand)) NOT IN ('generic', 'unknown')
+         AND NOT EXISTS (
+           SELECT 1 FROM brand_names bn
+           WHERE LOWER(bn.name) = LOWER(TRIM(p.brand))
+         )`
+    );
+  } catch {
+    // products table may be absent in some envs — curated seed is enough.
+  }
 }

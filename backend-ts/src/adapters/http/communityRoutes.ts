@@ -13,9 +13,12 @@ import {
   getShelfItem,
   getStory,
   getStoryImageKey,
+  listBrandNames,
   listComments,
+  listCompanies,
   listShelf,
   listStories,
+  parseCompanyIds,
   parseSnapshot,
   toggleLike,
 } from "../../infrastructure/community.js";
@@ -49,6 +52,26 @@ async function putScanImage(userId: string, file: { buf: Buffer; ext: string }):
   return key;
 }
 
+communityRoutes.get("/brands", async (c) => {
+  try {
+    const brands = await listBrandNames(c.req.query("q") ?? "", Number(c.req.query("limit") || 20));
+    return c.json({ brands });
+  } catch (e) {
+    const err = httpError(e);
+    return c.json({ detail: err.detail }, err.status);
+  }
+});
+
+communityRoutes.get("/companies", async (c) => {
+  try {
+    const companies = await listCompanies(c.req.query("q") ?? "", Number(c.req.query("limit") || 20));
+    return c.json({ companies });
+  } catch (e) {
+    const err = httpError(e);
+    return c.json({ detail: err.detail }, err.status);
+  }
+});
+
 communityRoutes.post("/me/shelf", async (c) => {
   try {
     const uid = await userId(c);
@@ -58,6 +81,10 @@ communityRoutes.post("/me/shelf", async (c) => {
     const snapshot = parseSnapshot(
       typeof form.snapshot === "string" ? JSON.parse(form.snapshot || "[]") : []
     );
+    const brandRaw = form.brand ? String(form.brand).trim() : "";
+    const brandIdRaw = form.brand_id ? Number(form.brand_id) : NaN;
+    const brandId = Number.isFinite(brandIdRaw) && brandIdRaw > 0 ? brandIdRaw : null;
+    const companyIds = parseCompanyIds(form.company_ids);
     const img = await readImage(form as Record<string, unknown>);
     const imageKey = img ? await putScanImage(uid, img) : null;
     const scanId = await createScan({
@@ -70,8 +97,10 @@ communityRoutes.post("/me/shelf", async (c) => {
       userId: uid,
       scanId,
       displayName,
-      brand: form.brand ? String(form.brand) : null,
+      brand: brandRaw || null,
+      brandId,
       barcode: form.barcode ? String(form.barcode) : null,
+      companyIds,
     });
     return c.json({ id, disclaimer: LABEL_DISCLAIMER }, 201);
   } catch (e) {
@@ -87,13 +116,24 @@ communityRoutes.get("/me/shelf", async (c) => {
     const rows = await listShelf(uid, c.req.query("q") ?? "");
     const items = [];
     for (const row of rows) {
+      let companies = row.companies;
+      if (typeof companies === "string") {
+        try {
+          companies = JSON.parse(companies);
+        } catch {
+          companies = [];
+        }
+      }
+      if (!Array.isArray(companies)) companies = [];
       items.push({
         id: Number(row.id),
         display_name: row.display_name,
         brand: row.brand,
+        brand_id: row.brand_id == null ? null : Number(row.brand_id),
         barcode: row.barcode,
         created_at: row.created_at,
         has_photo: Boolean(row.image_key),
+        companies,
         ingredients: await annotateSnapshot(repo, parseSnapshot(row.snapshot)),
         disclaimer: LABEL_DISCLAIMER,
       });
@@ -152,9 +192,13 @@ communityRoutes.post("/stories", async (c) => {
 
 communityRoutes.get("/stories", async (c) => {
   const repo = new PgIngredientRepository();
-  const rows = await listStories();
+  const limit = Math.min(Math.max(Number(c.req.query("limit") || 10), 1), 30);
+  const offset = Math.max(Number(c.req.query("offset") || 0), 0);
+  const rows = await listStories(limit + 1, offset);
+  const hasMore = rows.length > limit;
+  const page = hasMore ? rows.slice(0, limit) : rows;
   const stories = [];
-  for (const row of rows) {
+  for (const row of page) {
     stories.push({
       id: Number(row.id),
       caption: row.caption,
@@ -166,7 +210,7 @@ communityRoutes.get("/stories", async (c) => {
       disclaimer: LABEL_DISCLAIMER,
     });
   }
-  return c.json({ stories });
+  return c.json({ stories, has_more: hasMore });
 });
 
 communityRoutes.get("/stories/:id", async (c) => {

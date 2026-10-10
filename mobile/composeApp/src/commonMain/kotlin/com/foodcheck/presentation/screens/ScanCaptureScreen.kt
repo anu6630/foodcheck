@@ -12,6 +12,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
@@ -25,7 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.foodcheck.domain.entities.ScanOutcome
-import com.foodcheck.presentation.components.ErrorBanner
+import com.foodcheck.presentation.components.AttachedImageThumb
 import com.foodcheck.presentation.state.ScanViewModel
 import com.foodcheck.presentation.theme.AppColors
 import com.foodcheck.util.ImagePickerLauncher
@@ -43,9 +44,13 @@ fun ScanCaptureScreen(
     val error by viewModel.error.collectAsState()
     val outcome by viewModel.outcome.collectAsState()
     val scope = rememberCoroutineScope()
+    var pendingImage by remember { mutableStateOf<ByteArray?>(null) }
 
     LaunchedEffect(outcome) {
-        outcome?.let { onScanOutcome(it) }
+        outcome?.let {
+            pendingImage = null
+            onScanOutcome(it)
+        }
     }
 
     Box(
@@ -91,10 +96,57 @@ fun ScanCaptureScreen(
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
                 Button(
-                    onClick = { viewModel.clear() },
+                    onClick = {
+                        viewModel.clear()
+                        pendingImage = null
+                    },
                     shape = RoundedCornerShape(12.dp)
                 ) {
                     Text("Try Again")
+                }
+            }
+        } else if (pendingImage != null) {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = "Confirm photo",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp,
+                    color = Color.White
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Tap the thumb for a full preview",
+                    fontSize = 12.sp,
+                    color = Color.White.copy(alpha = 0.5f)
+                )
+                Spacer(modifier = Modifier.height(24.dp))
+                AttachedImageThumb(
+                    bytes = pendingImage!!,
+                    sizeDp = 160,
+                    onRemove = { pendingImage = null }
+                )
+                Spacer(modifier = Modifier.height(28.dp))
+                Button(
+                    onClick = { viewModel.scan(listOf(pendingImage!!)) },
+                    modifier = Modifier.fillMaxWidth().height(48.dp),
+                    shape = RoundedCornerShape(14.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = AppColors.Primary)
+                ) {
+                    Text("Start Scan", fontWeight = FontWeight.Bold)
+                }
+                Spacer(modifier = Modifier.height(12.dp))
+                Button(
+                    onClick = { pendingImage = null },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(14.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.White.copy(alpha = 0.08f)),
+                    border = BorderStroke(0.5.dp, Color.White.copy(alpha = 0.15f))
+                ) {
+                    Text("Choose another", color = Color.White)
                 }
             }
         } else {
@@ -122,9 +174,7 @@ fun ScanCaptureScreen(
                             .clickable {
                                 scope.launch {
                                     val image = imagePickerLauncher.pickImage(ImagePickerSource.CAMERA)
-                                    if (image != null) {
-                                        viewModel.scan(listOf(image))
-                                    }
+                                    if (image != null) pendingImage = image
                                 }
                             },
                         color = Color.White.copy(alpha = 0.04f),
@@ -171,9 +221,7 @@ fun ScanCaptureScreen(
                             .clickable {
                                 scope.launch {
                                     val image = imagePickerLauncher.pickImage(ImagePickerSource.GALLERY)
-                                    if (image != null) {
-                                        viewModel.scan(listOf(image))
-                                    }
+                                    if (image != null) pendingImage = image
                                 }
                             },
                         color = Color.White.copy(alpha = 0.04f),

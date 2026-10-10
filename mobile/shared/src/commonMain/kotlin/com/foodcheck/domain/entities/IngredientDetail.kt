@@ -61,6 +61,21 @@ data class DataSource(
 )
 
 @Serializable
+data class IngredientHealthReport(
+    val id: Int = 0,
+    val kind: String,
+    val summary: String,
+    val value: String? = null,
+    val unit: String? = null,
+    val evaluationYear: String? = null,
+    val citation: String? = null,
+    val citationUrl: String? = null,
+    val sourceId: String = "",
+    val sourceTitle: String? = null,
+    val sourcePublisher: String? = null,
+)
+
+@Serializable
 data class IngredientDetail(
     val id: String,
     val name: String,
@@ -72,6 +87,8 @@ data class IngredientDetail(
     val codesLabel: String? = null,
     val names: List<IngredientName> = emptyList(),
     val bans: List<IngredientBan> = emptyList(),
+    /** Multi-source health claims — not deduped across publishers. */
+    val healthReports: List<IngredientHealthReport> = emptyList(),
     val useLimits: List<IngredientUseLimit> = emptyList(),
     val useLimitCounts: Map<String, Int> = emptyMap(),
     val sources: List<DataSource> = emptyList(),

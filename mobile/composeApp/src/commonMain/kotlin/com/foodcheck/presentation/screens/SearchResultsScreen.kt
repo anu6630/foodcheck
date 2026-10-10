@@ -23,7 +23,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -54,7 +53,6 @@ fun SearchResultsScreen(
     clearQueryTrigger: Int = 0,
     onProductClick: (SearchProductResult) -> Unit,
     onIngredientClick: (AnnotatedIngredient) -> Unit,
-    onMyListClick: () -> Unit = {},
     viewModel: SearchViewModel = koinViewModel()
 ) {
     val query by viewModel.query.collectAsState()
@@ -111,11 +109,7 @@ fun SearchResultsScreen(
             )
         )
 
-        TextButton(onClick = onMyListClick) {
-            Text("My list", color = AppColors.Primary, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
         when {
             loading -> Box(modifier = Modifier.fillMaxWidth().height(200.dp), contentAlignment = Alignment.Center) {

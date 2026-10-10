@@ -44,6 +44,10 @@ kotlin {
             implementation(libs.kotlin.test)
         }
 
+        androidMain.dependencies {
+            implementation(libs.ktor.client.okhttp)
+        }
+
         val iosMain by creating {
             dependsOn(commonMain.get())
             dependencies {
