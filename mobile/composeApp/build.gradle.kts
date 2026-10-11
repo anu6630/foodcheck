@@ -75,6 +75,7 @@ kotlin {
             implementation(libs.ktor.client.okhttp)
             implementation(libs.play.services.ads)
             implementation("androidx.lifecycle:lifecycle-process:2.8.3")
+            implementation(project(":appupdate"))
 
             // Dependency Injection
             implementation(libs.koin.android)
@@ -139,5 +140,9 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
+    }
+
+    buildFeatures {
+        buildConfig = true
     }
 }

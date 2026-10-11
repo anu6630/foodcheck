@@ -5,20 +5,37 @@ import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.core.view.WindowCompat
+import androidx.lifecycle.lifecycleScope
+import biz.lifex.appupdate.AppUpdateClient
+import biz.lifex.appupdate.AppUpdateController
+import biz.lifex.appupdate.ForceUpdateScreen
+import biz.lifex.appupdate.UpdatePolicy
+import biz.lifex.foodcheck.BuildConfig
 import com.foodcheck.ads.AdsController
+import com.foodcheck.app.update.AppUpdateGate
 import com.foodcheck.data.local.AppFilesBootstrap
 import com.foodcheck.data.network.ApiHealthMonitor
 import com.foodcheck.data.network.BackendConfig
 import com.foodcheck.di.sharedModule
 import com.foodcheck.di.appModule
 import com.foodcheck.util.rememberImagePickerLauncher
+import kotlinx.coroutines.launch
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.GlobalContext
 import org.koin.core.context.startKoin
 import java.io.File
 
 class MainActivity : ComponentActivity() {
+
+    /** Must be created before STARTED so the Play update ActivityResult is registered. */
+    private val appUpdateController = AppUpdateController(this)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         AdsController.attach(this)
@@ -56,7 +73,36 @@ class MainActivity : ComponentActivity() {
             isAppearanceLightNavigationBars = false
         }
         setContent {
-            App(imagePickerLauncher = rememberImagePickerLauncher())
+            var forcePolicy by remember { mutableStateOf<UpdatePolicy?>(null) }
+
+            LaunchedEffect(Unit) {
+                val policy = AppUpdateClient(AppUpdateGate.BASE_URL, AppUpdateGate.APP_KEY)
+                    .fetch(BuildConfig.VERSION_CODE)
+                    .getOrNull() ?: return@LaunchedEffect // fail-open
+                appUpdateController.apply(
+                    policy = policy,
+                    onForceBlocked = { forcePolicy = it },
+                )
+            }
+
+            val blocked = forcePolicy
+            if (blocked != null) {
+                ForceUpdateScreen(
+                    policy = blocked,
+                    onUpdateClick = {
+                        AppUpdateController.openStore(this@MainActivity, blocked)
+                    },
+                )
+            } else {
+                App(imagePickerLauncher = rememberImagePickerLauncher())
+            }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        lifecycleScope.launch {
+            appUpdateController.resumeIfInProgress()
         }
     }
 }
