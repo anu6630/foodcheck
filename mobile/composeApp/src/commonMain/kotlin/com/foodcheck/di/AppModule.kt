@@ -12,9 +12,11 @@ val appModule = module {
     viewModel { SearchViewModel(get(), get()) }
     viewModel { ProductDetailViewModel(get()) }
     viewModel { IngredientDetailViewModel(get()) }
-    viewModel { ScanViewModel(get(), get()) }
+    viewModel { ScanViewModel(get(), get(), get()) }
     viewModel { com.foodcheck.presentation.state.FeedViewModel(get()) }
     viewModel { com.foodcheck.presentation.state.ShelfViewModel(get()) }
+    viewModel { com.foodcheck.presentation.state.CompareViewModel(get(), get()) }
+    viewModel { com.foodcheck.presentation.state.ComparisonsViewModel(get()) }
     viewModel {
         SubmitRequestViewModel(
             submitProductRequestUseCase = get(),

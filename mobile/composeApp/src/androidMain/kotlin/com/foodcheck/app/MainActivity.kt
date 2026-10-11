@@ -6,6 +6,8 @@ import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.core.view.WindowCompat
+import com.foodcheck.ads.AdsController
+import com.foodcheck.data.local.AppFilesBootstrap
 import com.foodcheck.data.network.ApiHealthMonitor
 import com.foodcheck.data.network.BackendConfig
 import com.foodcheck.di.sharedModule
@@ -14,15 +16,18 @@ import com.foodcheck.util.rememberImagePickerLauncher
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.GlobalContext
 import org.koin.core.context.startKoin
+import java.io.File
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        AdsController.attach(this)
 
         val prefs = getSharedPreferences("foodcheck", MODE_PRIVATE)
         val stored = prefs.getString("device_key", null)
         if (!stored.isNullOrBlank()) BackendConfig.deviceKey = stored
         prefs.edit().putString("device_key", BackendConfig.ensureDeviceKey()).apply()
+        AppFilesBootstrap.init(File(filesDir, "cache").absolutePath)
 
         if (GlobalContext.getOrNull() == null) {
             startKoin {

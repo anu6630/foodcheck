@@ -9,36 +9,92 @@ struct SearchView: View {
     var onConfidentMatch: (String) -> Void
     var onIngredientClick: (String) -> Void
     
+    @FocusState private var searchFocused: Bool
+
+    private var searchIdle: Bool {
+        model.query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !searchFocused
+    }
+
     var body: some View {
         VStack(spacing: 0) {
-            // Search Text Field
-            HStack(spacing: 10) {
-                Image(systemName: "magnifyingglass")
-                    .foregroundColor(.white.opacity(0.4))
-                
-                TextField("Search products or ingredients...", text: $model.query)
-                    .foregroundColor(.white)
-                    .autocorrectionDisabled()
-                
-                if !model.query.isEmpty {
-                    Button(action: { model.query = "" }) {
-                        Image(systemName: "xmark.circle.fill")
-                            .foregroundColor(.white.opacity(0.4))
+            VStack(alignment: .leading, spacing: searchIdle ? 18 : 14) {
+                if searchIdle {
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("Find what’s in a pack")
+                            .font(.system(size: 22, weight: .bold))
+                            .foregroundColor(.white.opacity(0.92))
+                        Text("Type a product name, brand, or additive.")
+                            .font(.system(size: 13, weight: .medium))
+                            .foregroundColor(.white.opacity(0.45))
                     }
                 }
+
+                HStack(spacing: 12) {
+                    ZStack {
+                        Circle()
+                            .fill(Color(red: 0.06, green: 0.73, blue: 0.51).opacity(searchFocused ? 0.18 : 0.10))
+                            .frame(width: 34, height: 34)
+                        Image(systemName: "magnifyingglass")
+                            .font(.system(size: 15, weight: .semibold))
+                            .foregroundColor(Color(red: 0.06, green: 0.73, blue: 0.51))
+                    }
+
+                    TextField("Search packs or additives", text: $model.query)
+                        .foregroundColor(.white)
+                        .font(.system(size: 16, weight: .medium))
+                        .autocorrectionDisabled()
+                        .focused($searchFocused)
+                        .submitLabel(.search)
+                        .onSubmit { searchFocused = false }
+
+                    if !model.query.isEmpty {
+                        Button(action: { model.query = "" }) {
+                            Image(systemName: "xmark")
+                                .font(.system(size: 13, weight: .semibold))
+                                .foregroundColor(.white.opacity(0.45))
+                                .frame(width: 28, height: 28)
+                        }
+                    }
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, searchIdle ? 16 : 14)
+                .background(
+                    RoundedRectangle(cornerRadius: 22)
+                        .fill(searchFocused
+                              ? Color(red: 0.07, green: 0.09, blue: 0.17).opacity(0.96)
+                              : Color.white.opacity(0.06))
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 22)
+                        .stroke(
+                            searchFocused
+                                ? Color(red: 0.06, green: 0.73, blue: 0.51).opacity(0.55)
+                                : Color.white.opacity(0.10),
+                            lineWidth: 1
+                        )
+                )
+
+                if searchIdle {
+                    HStack(spacing: 8) {
+                        ForEach(["Products", "Ingredients", "My list"], id: \.self) { label in
+                            HStack(spacing: 8) {
+                                Circle()
+                                    .fill(Color.white.opacity(0.28))
+                                    .frame(width: 3, height: 3)
+                                Text(label)
+                                    .font(.system(size: 12, weight: .medium))
+                                    .foregroundColor(.white.opacity(0.45))
+                            }
+                        }
+                    }
+                    .padding(.horizontal, 6)
+                }
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 12)
-            .background(Color.white.opacity(0.06))
-            .cornerRadius(12)
-            .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(Color.white.opacity(0.12), lineWidth: 0.5)
-            )
             .padding(.horizontal, 20)
-            .padding(.top, 10)
+            .padding(.top, searchIdle ? 20 : 12)
             .padding(.bottom, 12)
-            
+            .animation(.easeInOut(duration: 0.22), value: searchIdle)
+
             // Search States
             if model.loading {
                 Spacer()
@@ -56,8 +112,9 @@ struct SearchView: View {
                     Text("No matches for \"\(model.query)\".")
                         .foregroundColor(.white.opacity(0.5))
                 } else {
-                    Text("Type to start searching...")
-                        .foregroundColor(.white.opacity(0.3))
+                    Text("Results appear as you type")
+                        .font(.system(size: 13))
+                        .foregroundColor(.white.opacity(0.28))
                 }
                 Spacer()
             } else {

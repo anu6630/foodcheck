@@ -1,0 +1,73 @@
+{
+  "_policy": {
+    "india": "Title = 'LifeX Food Scanner: ' + the native word printed on pack ingredient panels. English keywords (food, scanner) stay in Latin script because Indian Play users mostly type English queries; the native word keeps the listing local. Short/full description stay native; full description opens with one English sentence carrying the core search terms.",
+    "native_search": "JP, CN, TW, KR, TH, VI, AR, RU and European/SEA Latin-script locales: users search in their own language, so the title stays native but uses the term people actually search (e.g. 'scanner alimentaire', 'escáner de alimentos', 'Проверка состава')."
+  },
+  "india_locales": ["hi-IN", "bn-BD", "te-IN", "mr-IN", "ta-IN", "gu-IN", "kn-IN", "ml-IN", "pa-IN", "or-IN", "as-IN", "ur"],
+  "india_full_lead": "LifeX Food: scan food labels and check ingredients for banned & restricted additives.",
+  "locales": {
+    "hi-IN": {"title": "LifeX Food Scanner: सामग्री"},
+    "bn-BD": {
+      "title": "LifeX Food Scanner: উপাদান",
+      "short_description": "খাদ্য লেবেল স্ক্যান করে নিষিদ্ধ ও সীমিত উপাদান চিনুন—প্যাকে কী আছে জানুন।"
+    },
+    "te-IN": {
+      "title": "LifeX Food Scanner: పదార్థాలు",
+      "short_description": "ఆహార లేబుల్ స్కాన్ చేసి నిషేధిత పదార్థాలు గుర్తించండి—ప్యాక్‌లో ఏముందో చూడండి."
+    },
+    "mr-IN": {"title": "LifeX Food Scanner: घटक"},
+    "ta-IN": {
+      "title": "LifeX Food Scanner: பொருட்கள்",
+      "short_description": "உணவு லேபிளை ஸ்கேன் செய்து தடைசெய்த பொருட்களை அறியுங்கள்—பேக்கில் என்ன உள்ளது?"
+    },
+    "gu-IN": {"title": "LifeX Food Scanner: ઘટકો"},
+    "kn-IN": {
+      "title": "LifeX Food Scanner: ಪದಾರ್ಥಗಳು",
+      "short_description": "ಆಹಾರ ಲೇಬಲ್ ಸ್ಕ್ಯಾನ್ ಮಾಡಿ, ನಿಷೇಧಿತ ಪದಾರ್ಥ ಗುರುತಿಸಿ—ಪ್ಯಾಕ್‌ನಲ್ಲಿ ಏನಿದೆ ತಿಳಿಯಿರಿ."
+    },
+    "ml-IN": {
+      "title": "LifeX Food Scanner: ചേരുവകൾ",
+      "short_description": "ഭക്ഷ്യ ലേബൽ സ്കാൻ ചെയ്ത് നിരോധിത ചേരുവകൾ കണ്ടെത്തൂ—പാക്കിൽ എന്തുണ്ടെന്ന് അറിയൂ."
+    },
+    "pa-IN": {"title": "LifeX Food Scanner: ਸਮੱਗਰੀ"},
+    "or-IN": {
+      "title": "LifeX Food Scanner: ଉପାଦାନ",
+      "short_description": "ଖାଦ୍ୟ ଲେବଲ୍ ସ୍କାନ୍ କରି ନିଷିଦ୍ଧ ଉପାଦାନ ଚିହ୍ନଟ କରନ୍ତୁ—ପ୍ୟାକରେ କ'ଣ ଅଛି ଜାଣନ୍ତୁ।"
+    },
+    "as-IN": {"title": "LifeX Food Scanner: উপাদান"},
+    "ur": {
+      "title": "LifeX Food Scanner: اجزاء",
+      "short_description": "خوراک کے لیبل اسکین کریں، ممنوعہ و محدود اجزاء پہچانیں—جانیں پیک میں کیا ہے۔"
+    },
+    "de-DE": {
+      "title": "LifeX: Zutaten-Scanner",
+      "short_description": "Lebensmittel-Etiketten scannen und verbotene & eingeschränkte Zutaten erkennen."
+    },
+    "fr-FR": {
+      "title": "LifeX: Scanner alimentaire",
+      "short_description": "Scannez les étiquettes et repérez les ingrédients interdits ou restreints."
+    },
+    "es-ES": {
+      "title": "LifeX: Escáner de alimentos",
+      "short_description": "Escanea etiquetas y detecta ingredientes prohibidos o restringidos en tu comida."
+    },
+    "es-419": {
+      "title": "LifeX: Escáner de alimentos",
+      "short_description": "Escanea etiquetas y detecta ingredientes prohibidos o restringidos en alimentos."
+    },
+    "pt-BR": {
+      "title": "LifeX: Scanner de alimentos",
+      "short_description": "Escaneie rótulos e descubra ingredientes proibidos ou restritos nos alimentos."
+    },
+    "it-IT": {
+      "title": "LifeX: Scanner ingredienti",
+      "short_description": "Scansiona le etichette e scopri ingredienti vietati o limitati negli alimenti."
+    },
+    "nl-NL": {
+      "short_description": "Scan etiketten en vind verboden & beperkte ingrediënten—weet wat erin zit."
+    },
+    "id": {
+      "short_description": "Pindai label makanan, temukan bahan terlarang & terbatas—tahu isi kemasannya."
+    }
+  }
+}

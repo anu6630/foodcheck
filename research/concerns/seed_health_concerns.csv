@@ -1,0 +1,14 @@
+e_number,name,cas,concern,jurisdiction,note,source
+171,Titanium dioxide,13463-67-7,authorisation_withdrawn,EU,Removed from Annex II food use (Reg 2022/63); genotox concern / no ADI,https://eur-lex.europa.eu/eli/reg/2022/63/oj
+102,Tartrazine,1934-21-0,label_warning_hyperactivity,EU/UK,Southampton colours — warning if used with other colours,https://www.efsa.europa.eu/en/efsajournal/pub/1331
+104,Quinoline Yellow,8004-92-0,label_warning_hyperactivity,EU/UK,Southampton six,https://www.efsa.europa.eu/en/efsajournal/pub/1329
+110,Sunset Yellow FCF,2783-94-0,label_warning_hyperactivity,EU/UK,Southampton six,https://www.efsa.europa.eu/en/efsajournal/pub/1330
+122,Azorubine / Carmoisine,3567-69-9,label_warning_hyperactivity,EU/UK,Southampton six,https://www.efsa.europa.eu/en/efsajournal/pub/1332
+124,Ponceau 4R,2611-82-7,label_warning_hyperactivity,EU/UK,Southampton six,https://www.efsa.europa.eu/en/efsajournal/pub/1328
+129,Allura Red AC,25956-17-6,label_warning_hyperactivity,EU/UK,Southampton six,https://www.efsa.europa.eu/en/efsajournal/pub/1327
+249,Potassium nitrite,7758-09-0,cancer_precursor_concern,IARC,Nitrite/nitrate under nitrosation conditions — IARC 2A,https://monographs.iarc.who.int/list-of-classifications
+250,Sodium nitrite,7632-00-0,cancer_precursor_concern,IARC,Nitrite/nitrate under nitrosation conditions — IARC 2A,https://monographs.iarc.who.int/list-of-classifications
+951,Aspartame,22839-47-0,iarc_2b,IARC,Possibly carcinogenic (Group 2B); JECFA ADI unchanged,https://www.iarc.who.int/news-events/aspartame-hazard-and-risk-assessment-results-released/
+,Acrylamide,79-06-1,process_contaminant,IARC/EFSA,IARC 2A; process contaminant in fried/baked foods,https://www.efsa.europa.eu/en/topics/topic/acrylamide
+,Potassium bromate,7758-01-2,iarc_2b_banned_many,IARC/many,IARC 2B; banned as flour treatment in EU/many countries,https://monographs.iarc.who.int/list-of-classifications
+924a,Potassium bromate,7758-01-2,not_authorised_eu,EU,Not on EU Annex II,https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:02008R1333

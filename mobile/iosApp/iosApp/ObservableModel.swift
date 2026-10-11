@@ -115,6 +115,7 @@ class ObservableScanModel: ObservableObject {
     @Published var statusText: String = "Reading label..."
     @Published var error: String? = nil
     @Published var actionMessage: String? = nil
+    @Published var saving: Bool = false
     @Published var brandSuggestions: [CatalogBrandDto] = []
     @Published var companySuggestions: [CatalogCompanyDto] = []
     
@@ -123,6 +124,7 @@ class ObservableScanModel: ObservableObject {
     private var statusTextWatcher: FlowWatcher<NSString>?
     private var errorWatcher: FlowWatcher<NSString>?
     private var actionWatcher: FlowWatcher<NSString>?
+    private var savingWatcher: FlowWatcher<KotlinBoolean>?
     private var brandWatcher: FlowWatcher<NSArray>?
     private var companyWatcher: FlowWatcher<NSArray>?
     
@@ -141,6 +143,9 @@ class ObservableScanModel: ObservableObject {
         }
         self.actionWatcher = FlowWatcher(flow: viewModel.actionMessage) { [weak self] val in
             DispatchQueue.main.async { self?.actionMessage = val as String? }
+        }
+        self.savingWatcher = FlowWatcher(flow: viewModel.saving) { [weak self] val in
+            DispatchQueue.main.async { self?.saving = val?.boolValue ?? false }
         }
         self.brandWatcher = FlowWatcher(flow: viewModel.brandSuggestions) { [weak self] val in
             DispatchQueue.main.async {
@@ -179,14 +184,16 @@ class ObservableScanModel: ObservableObject {
         viewModel.searchCompanies(query: query)
     }
 
-    func saveToShelf(name: String, brand: String, brandId: Int?, companyIds: [Int]) {
+    func saveToShelf(name: String, brand: String, brandId: Int?, companyIds: [Int], stance: String, tags: [String]) {
         let kotlinBrandId: KotlinInt? = brandId.map { KotlinInt(value: Int32($0)) }
         let kotlinCompanyIds = companyIds.map { KotlinInt(value: Int32($0)) }
         viewModel.saveToShelf(
             displayName: name,
             brand: brand.isEmpty ? nil : brand,
             brandId: kotlinBrandId,
-            companyIds: kotlinCompanyIds
+            companyIds: kotlinCompanyIds,
+            stance: stance,
+            tags: tags
         )
     }
 
@@ -204,6 +211,7 @@ class ObservableScanModel: ObservableObject {
         statusTextWatcher?.close()
         errorWatcher?.close()
         actionWatcher?.close()
+        savingWatcher?.close()
         brandWatcher?.close()
         companyWatcher?.close()
     }
@@ -288,6 +296,10 @@ class ObservableShelfModel: ObservableObject {
     }
 
     func search(_ q: String) { viewModel.load(q: q) }
+
+    func updateStance(id: Int32, stance: ShelfStance) {
+        viewModel.updateStance(id: id, stance: stance)
+    }
 
     deinit {
         itemsWatcher?.close()

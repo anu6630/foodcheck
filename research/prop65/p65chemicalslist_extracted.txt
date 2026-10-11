@@ -1,0 +1,1243 @@
+STATE OF CALIFORNIA ENVIRONMENTAL PROTECTION AGENCY OFFICE OF ENVIRONMENTAL HEALTH HAZARD ASSESSMENT SAFE DRINKING WATER AND TOXIC ENFORCEMENT ACT OF 1986
+
+PROPOSITION 65 LIST OF CARCINOGENS OR REPRODUCTIVE TOXICANTS July 31, 2026
+
+The Safe Drinking Water and Toxic Enforcement Act of 1986 (Health and Safety Code section 25249.5 et seq.), also known as Proposition 65, requires that the Governor revise and republish at least once per year the list of chemicals known to the State to cause cancer or reproductive toxicity within the meaning of the Act (Health and Safety Code section 25249.8). The list is published in Title 27, California Code of Regulations, section 27001, is provided here, and is available on the website of the Office of Environmental Health Hazard Assessment (oehha.ca.gov).
+
+The identification number indicated in the list is the Chemical Abstracts Service (CAS) Registry Number. No CAS number is given when several substances are presented as a single listing or when a CAS number is not available. The date refers to the initial appearance of the chemical on the list. For easy reference, chemicals or endpoints shown in strikeout were placed on the list on the date noted, and have subsequently been removed.
+
+| Chemical | Type of Toxicity | CAS No. | Date Listed |
+| --- | --- | --- | --- |
+| | | | |
+| A-alpha-C (2-Amino-9H-pyrido [2,3-b]indole) | Cancer | 26148-68-5 | January 1, 1990 |
+| Abiraterone acetate | developmental, female, male | 154229-18-2 | April 8, 2016 |
+| Acetaldehyde | cancer | 75-07-0 | April 1, 1988 |
+| Acetamide | cancer | 60-35-5 | January 1, 1990 |
+| Acetazolamide | developmental | 59-66-5 | August 20, 1999 |
+| Acetochlor | cancer | 34256-82-1 | January 1, 1989 |
+| Acetohydroxamic acid | developmental | 546-88-3 | April 1, 1990 |
+| 2-Acetylaminofluorene | cancer | 53-96-3 | July 1, 1987 |
+| Acifluorfen sodium | cancer | 62476-59-9 | January 1, 1990 |
+| Acrylamide | cancer | 79-06-1 | January 1, 1990 |
+| Acrylamide | developmental, male | 79-06-1 | February 25, 2011 |
+| Acrylonitrile | cancer | 107-13-1 | July 1, 1987 |
+| Actinomycin D | cancer | 50-76-0 | October 1, 1989 |
+| Actinomycin D | developmental | 50-76-0 | October 1, 1992 |
+| AF-2;[2-(2-furyl)-3-(5-nitro-2-furyl)] acrylamide | cancer | 3688-53-7 | July 1, 1987 |
+| Aflatoxins | cancer | --- | January 1, 1988 |
+| Alachlor | cancer | 15972-60-8 | January 1, 1989 |
+| Alcoholic beverages | cancer | --- | April 29, 2011 |
+| Alcoholic beverages, when associated with alcohol abuse | cancer | --- | July 1, 1988 |
+| Aldrin | cancer | 309-00-2 | July 1, 1988 |
+| All-trans retinoic acid | developmental | 302-79-4 | January 1, 1989 |
+| Allyl chloride, Delisted October 29, 1999 | cancer | 107-05-1 | January 1, 1990 |
+| Aloe vera, non-decolorized whole leaf extract | cancer | --- | December 4, 2015 |
+| Alprazolam | developmental | 28981-97-7 | July 1, 1990 |
+| Altretamine | developmental, male | 645-05-6 | August 20, 1999 |
+| Amantadine hydrochloride | developmental | 665-66-7 | February 27, 2001 |
+
+| Chemical | Type of Toxicity | CAS No. | Date Listed |
+| --- | --- | --- | --- |
+| Amikacin sulfate | developmental | 39831-55-5 | July 1, 1990 |
+| 2-Aminoanthraquinone | cancer | 117-79-3 | October 1, 1989 |
+| p-Aminoazobenzene | cancer | 60-09-3 | January 1, 1990 |
+| o-Aminoazotoluene | cancer | 97-56-3 | July 1, 1987 |
+| 4-Aminobiphenyl (4-amino diphenyl) | cancer | 92-67-1 | February 27, 1987 |
+| 2-Amino-4-chlorophenol | cancer | 95-85-2 | September 13, 2019 |
+| 1-Amino-2,4-dibromo anthraquinone | cancer | 81-49-2 | August 26, 1997 |
+| 3-Amino-9-ethylcarbazole hydrochloride | cancer | 6109-97-3 | July 1, 1989 |
+| 2-Aminofluorene | cancer | 153-78-6 | January 29, 1999 |
+| Aminoglutethimide | developmental | 125-84-8 | July 1, 1990 |
+| Aminoglycosides | developmental | --- | October 1, 1992 |
+| 1-Amino-2-methylanthraquinone | cancer | 82-28-0 | October 1, 1989 |
+| 2-Amino-5-(5-nitro-2-furyl)-1,3,4- thiadiazole | cancer | 712-68-5 | July 1, 1987 |
+| 4-Amino-2-nitrophenol | cancer | 119-34-6 | January 29, 1999 |
+| Aminopterin | developmental, female | 54-62-6 | July 1, 1987 |
+| Amiodarone hydrochloride | developmental, female, male | 19774-82-4 | August 26, 1997 |
+| Amitraz | developmental | 33089-61-1 | March 30, 1999 |
+| Amitrole | cancer | 61-82-5 | July 1, 1987 |
+| Amoxapine | developmental | 14028-44-5 | May 15, 1998 |
+
+Amitraz developmental 33089-61-1 March 30, 1999 
+Amitrole cancer 61-82-5 July 1, 1987 
+Amoxapine developmental 14028-44-5 May 15, 1998 
+Amsacrine cancer 51264-14-3 August 7, 2009 
+tert-Amyl methyl ether, Delisted 
+December 13, 2013 
+developmental 994-05-8 December 18, 2009 
+
+cancer --- February 27, 1987
+
+Anabolic steroids female, male --- April 1, 1990 
+Analgesic mixtures containing 
+phenacetin 
+Androstenedione cancer 63-05-8 May 3, 2011 
+Angiotensin converting enzyme 
+(ACE) inhibitors 
+
+developmental --- October 1, 1992 
+Aniline cancer 62-53-3 January 1, 1990 
+Aniline hydrochloride cancer 142-04-1 May 15, 1998 
+o-Anisidine cancer 90-04-0 July 1, 1987 
+o-Anisidine hydrochloride cancer 134-29-2 July 1, 1987 
+Anisindione developmental 117-37-3 October 1, 1992 
+Anthracene cancer 120-12-7 August 11, 2023 
+Anthraquinone cancer 84-65-1 September 28, 2007 
+Antimony oxide (Antimony trioxide) cancer 1309-64-4 October 1, 1990 
+Aramite cancer 140-57-8 July 1, 1987 
+Areca nut cancer --- February 3, 2006 
+Aristolochic acids cancer --- July 9, 2004 
+Arsenic (inorganic arsenic 
+compounds) 
+cancer -- February 27, 1987 
+
+developmental, female 50-78-2 July 1, 1990
+
+Arsenic (inorganic oxides) developmental --- May 1, 1997 
+Asbestos cancer 1332-21-4 February 27, 1987 
+Aspirin (NOTE: It is especially 
+important not to use aspirin during 
+the last three months of 
+pregnancy, unless specifically 
+directed to do so by a physician 
+because it may cause problems in 
+the unborn child or complications 
+during delivery.) 
+
+| Chemical | Type of Toxicity | CAS No. | Date Listed |
+| --- | --- | --- | --- |
+| Atenolol | developmental | 29122-68-7 | August 26, 1997 |
+| Atrazine | developmental, female | 1912-24-9 | July 15, 2016 |
+| Auramine | cancer | 492-80-8 | July 1, 1987 |
+| Auranofin | developmental | 34031-32-8 | January 29, 1999 |
+| Avermectin B1 (Abamectin) | developmental | 71751-41-2 | December 3, 2010 |
+| Azacitidine | cancer | 320-67-2 | January 1, 1992 |
+| Azaserine | cancer | 115-02-6 | July 1, 1987 |
+| Azathioprine | cancer | 446-86-6 | February 27, 1987 |
+| Azathioprine | developmental | 446-86-6 | September 1, 1996 |
+| Azobenzene | cancer | 103-33-3 | January 1, 1990 |
+| | | | |
+| Barbiturates | developmental | --- | October 1, 1992 |
+| Beclomethasone dipropionate | developmental | 5534-09-8 | May 15, 1998 |
+| Benomyl | developmental, male | 17804-35-2 | July 1, 1991 |
+| Benthiavalicarb-isopropyl | cancer | 177406-68-7 | July 1, 2008 |
+| Benz[a]anthracene | cancer | 56-55-3 | July 1, 1987 |
+| Benzene | cancer | 71-43-2 | February 27, 1987 |
+| Benzene | developmental, male | 71-43-2 | December 26, 1997 |
+| Benzidine [and its salts] | cancer | 92-87-5 | February 27, 1987 |
+| Benzidine-based dyes | cancer | --- | October 1, 1992 |
+| Benzodiazepines | developmental | --- | October 1, 1992 |
+| Benzo[b]fluoranthene | cancer | 205-99-2 | July 1, 1987 |
+| Benzo[j]fluoranthene | cancer | 205-82-3 | July 1, 1987 |
+| Benzo[k]fluoranthene | cancer | 207-08-9 | July 1, 1987 |
+| Benzofuran | cancer | 271-89-6 | October 1, 1990 |
+| Benzophenone | cancer | 119-61-9 | June 22, 2012 |
+| Benzo[a]pyrene | cancer | 50-32-8 | July 1, 1987 |
+| Benzotrichloride | cancer | 98-07-7 | July 1, 1987 |
+| Benzphetamine hydrochloride | developmental | 5411-22-3 | April 1, 1990 |
+| Benzyl chloride | cancer | 100-44-7 | January 1, 1990 |
+| Benzyl violet 4B | cancer | 1694-09-3 | July 1, 1987 |
+| Beryllium and beryllium compounds | cancer | --- | October 1, 1987 |
+| Betel quid with tobacco | cancer | --- | January 1, 1990 |
+| Betel quid without tobacco | cancer | --- | February 3, 2006 |
+| Bevacizumab | developmental, female | 216974-75-3 | March 8, 2019 |
+| 2,2-Bis(bromomethyl)-1,3- propanediol | cancer | 3296-90-0 | May 1, 1996 |
+| Bis(2-chloroethyl)ether | cancer | 111-44-4 | April 1, 1988 |
+| N,N-Bis(2-chloroethyl)-2- naphthylamine (Chlornapazine) | cancer | 494-03-1 | February 27, 1987 |
+| Bischloroethyl nitrosourea (BCNU) (Carmustine) | cancer | 154-93-8 | July 1, 1987 |
+| Bischloroethyl nitrosourea (BCNU) (Carmustine) | developmental | 154-93-8 | July 1, 1990 |
+| Bis(chloromethyl)ether | cancer | 542-88-1 | February 27, 1987 |
+| Bis(2-chloro-1-methylethyl)ether, technical grade | cancer | --- | October 29, 1999 |
+| Bisphenol A (BPA) | female | 80-05-7 | May 11, 2015 |
+| Bisphenol A (BPA) | developmental | 80-05-7 | December 18, 2020 |
+| Bisphenol S (BPS) | female | 80-09-1 | December 29, 2023 |
+| Bisphenol S (BPS) | male | 80-09-1 | January 3, 2025 |
+| Bisphenol S (BPS) | developmental | 80-09-1 | December 8, 2025 |
+| Bitumens, extracts of steam refined and air refined | cancer | --- | January 1, 1990 |
+| Bracken fern | cancer | --- | January 1, 1990 |
+
+| Chemical | Type of Toxicity | CAS No. | Date Listed |
+| --- | --- | --- | --- |
+| Bromacil lithium salt | developmental | 53404-19-6 | May 18, 1999 |
+| Bromacil lithium salt | male | 53404-19-6 | January 17, 2003 |
+| Bromate | cancer | 15541-45-4 | May 31, 2002 |
+| Bromochloroacetic acid | cancer | 5589-96-8 | April 6, 2010 |
+| 1-Bromo-3-chloropropane | cancer | 109-70-6 | January 27, 2023 |
+| Bromodichloroacetic acid | cancer | 71133-14-7 | July 29, 2016 |
+| Bromodichloromethane | cancer | 75-27-4 | January 1, 1990 |
+| Bromoethane | cancer | 74-96-4 | December 22, 2000 |
+| Bromoform | cancer | 75-25-2 | April 1, 1991 |
+| 1-Bromopropane (1-BP) | cancer | 106-94-5 | August 5, 2016 |
+| 1-Bromopropane (1-BP) | developmental, female, male | 106-94-5 | December 7, 2004 |
+| 2-Bromopropane (2-BP) | cancer | 75-26-3 | August 11, 2023 |
+| 2-Bromopropane (2-BP) | female, male | 75-26-3 | May 31, 2005 |
+| Bromoxynil | developmental | 1689-84-5 | October 1, 1990 |
+| Bromoxynil octanoate | developmental | 1689-99-2 | May 18, 1999 |
+| Butabarbital sodium | developmental | 143-81-7 | October 1, 1992 |
+| 1,3-Butadiene | cancer | 106-99-0 | April 1, 1988 |
+| 1,3-Butadiene | developmental, female, male | 106-99-0 | April 16, 2004 |
+| 1,4-Butanediol dimethanesulfonate (Busulfan) | cancer | 55-98-1 | February 27, 1987 |
+| 1,4-Butanediol dimethanesulfonate (Busulfan) | developmental | 55-98-1 | January 1, 1989 |
+| Butylated hydroxyanisole | cancer | 25013-16-5 | January 1, 1990 |
+| Butyl benzyl phthalate (BBP) 1-Butyl glycidyl ether | developmental cancer | 85-68-7 2426-08-6 | December 2, 2005 January 27, 2023 |
+| n-Butyl glycidyl ether, Delisted April 4, 2014 | male | 2426-08-6 | August 7, 2009 |
+| beta-Butyrolactone | cancer | 3068-88-0 | July 1, 1987 |
+| | | | |
+| Cacodylic acid | cancer | 75-60-5 | May 1, 1996 |
+| Cadmium | developmental, male | --- | May 1, 1997 |
+| Cadmium and cadmium compounds | cancer | --- | October 1, 1987 |
+| Caffeic acid | cancer | 331-39-5 | October 1, 1994 |
+| Cannabis (marijuana) smoke | developmental | --- | January 3, 2020 |
+| Captafol | cancer | 2425-06-1 | October 1, 1988 |
+| Captan | cancer | 133-06-2 | January 1, 1990 |
+| Carbamazepine | developmental | 298-46-4 | January 29, 1999 |
+| Carbaryl | cancer | 63-25-2 | February 5, 2010 |
+| Carbaryl | developmental, female, male | 63-25-2 | August 7, 2009 |
+| Carbazole | cancer | 86-74-8 | May 1, 1996 |
+| Carbon black (airborne, unbound particles of respirable size) | cancer | 1333-86-4 | February 21, 2003 |
+| Carbon-black extracts | cancer | --- | January 1, 1990 |
+| Carbon disulfide | developmental, female, male | 75-15-0 | July 1, 1989 |
+| Carbon monoxide | developmental | 630-08-0 | July 1, 1989 |
+| Carbon tetrachloride | cancer | 56-23-5 | October 1, 1987 |
+| Carboplatin | developmental | 41575-94-4 | July 1, 1990 |
+| N-Carboxymethyl-N-nitrosourea | cancer | 60391-92-6 | January 25, 2002 |
+| Catechol | cancer | 120-80-9 | July 15, 2003 |
+| Ceramic fibers (airborne particles of respirable size) | cancer | --- | July 1, 1990 |
+
+| Chemical | Type of Toxicity | CAS No. | Date Listed |
+| --- | --- | --- | --- |
+| Certain combined chemotherapy for lymphomas | cancer | --- | February 27, 1987 |
+| Chenodiol | developmental | 474-25-9 | April 1, 1990 |
+| Chloral | cancer | 75-87-6 | September 13, 2013 |
+| Chloral hydrate | cancer | 302-17-0 | September 13, 2013 |
+| Chlorambucil | cancer | 305-03-3 | February 27, 1987 |
+| Chlorambucil | developmental | 305-03-3 | January 1, 1989 |
+| Chloramphenicol, Delisted January 4, 2013 | cancer | 56-75-7 | October 1, 1989 |
+| Chloramphenicol sodium succinate | cancer | 982-57-0 | September 27, 2013 |
+| Chlorcyclizine hydrochloride | developmental | 1620-21-9 | July 1, 1987 |
+| Chlordane | cancer | 57-74-9 | July 1, 1988 |
+| Chlordecone (Kepone) | cancer | 143-50-0 | January 1, 1988 |
+| Chlordecone (Kepone) | developmental | 143-50-0 | January 1, 1989 |
+| Chlordiazepoxide | developmental | 58-25-3 | January 1, 1992 |
+| Chlordiazepoxide hydrochloride | developmental | 438-41-5 | January 1, 1992 |
+| Chlordimeform | cancer | 6164-98-3 | January 1, 1989 |
+| Chlorendic acid | cancer | 115-28-6 | July 1, 1989 |
+| Chlorinated paraffins (Average chain length, C12; approximately 60 percent chlorine by weight) | cancer | 108171-26-2 | July 1, 1989 |
+| p-Chloroaniline | cancer | 106-47-8 | October 1, 1994 |
+| p-Chloroaniline hydrochloride | cancer | 20265-96-7 | May 15, 1998 |
+| Chlorodibromomethane, Delisted October 29, 1999 | cancer | 124-48-1 | January 1, 1990 |
+| Chloroethane (Ethyl chloride) | cancer | 75-00-3 | July 1, 1990 |
+| 1-(2-Chloroethyl)-3-cyclohexyl-1- nitrosourea (CCNU) (Lomustine) | cancer | 13010-47-4 | January 1, 1988 |
+| 1-(2-Chloroethyl)-3-cyclohexyl-1- nitrosourea (CCNU) Lomustine) | developmental | 13010-47-4 | July 1, 1990 |
+| 1-(2-Chloroethyl)-3-(4-methyl cyclohexyl) -1-nitrosourea (Methyl-CCNU) | cancer | 13909-09-6 | October 1, 1988 |
+| Chloroform | cancer | 67-66-3 | October 1, 1987 |
+| Chloroform | developmental | 67-66-3 | August 7, 2009 |
+| Chloromethyl methyl ether (technical grade) | cancer | 107-30-2 | February 27, 1987 |
+| 3-Chloro-2-methylpropene | cancer | 563-47-3 | July 1, 1989 |
+| 1-Chloro-4-nitrobenzene | cancer | 100-00-5 | October 29, 1999 |
+| 2-Chloronitrobenzene | cancer | 88-73-3 | September 13, 2019 |
+| 4-Chloro-o-phenylenediamine | cancer | 95-83-0 | January 1, 1988 |
+| Chloroprene | cancer | 126-99-8 | June 2, 2000 |
+| 2-Chloropropionic acid | male | 598-78-7 | August 7, 2009 |
+| Chlorothalonil | cancer | 1897-45-6 | January 1, 1989 |
+| p-Chloro-o-toluidine | cancer | 95-69-2 | January 1, 1990 |
+| p-Chloro-o-toluidine, strong acid salts of | cancer | --- | May 15, 1998 |
+| 5-Chloro-o-toluidine and its strong acid salts | cancer | --- | October 24, 1997 |
+| Chlorotrianisene | cancer | 569-57-3 | September 1, 1996 |
+| p-chloro-α,α,α-trifluorotoluene (para-Chlorobenzotrifluoride, PCBTF) | cancer | 98-56-6 | June 28, 2019 |
+| Chlorozotocin | cancer | 54749-90-5 | January 1, 1992 |
+| Chlorpyrifos | developmental | 2921-88-2 | December 15, 2017 |
+
+| Chemical | Type of Toxicity | CAS No. | Date Listed |
+| --- | --- | --- | --- |
+| Chlorsulfuron, Delisted June 6, 2014 | developmental, female, male | 64902-72-3 | May 14, 1999 |
+| Chromium (hexavalent compounds) | cancer | --- | February 27, 1987 |
+| Chromium (hexavalent compounds) | developmental, female, male | --- | December 19, 2008 |
+| Chrysene | cancer | 218-01-9 | January 1, 1990 |
+| C.I. Acid Red 114 | cancer | 6459-94-5 | July 1, 1992 |
+| C.I. Basic Red 9 monohydrochloride | cancer | 569-61-9 | July 1, 1989 |
+| C.I. Direct Blue 15 | cancer | 2429-74-5 | August 26, 1997 |
+| C.I. Direct Blue 218 | cancer | 28407-37-6 | August 26, 1997 |
+| C.I. Disperse Yellow 3 | cancer | 2832-40-8 | February 8, 2013 |
+| C.I. Solvent Yellow 14 | cancer | 842-07-9 | May 15, 1998 |
+| Ciclosporin (Cyclosporin A; Cyclosporine) | cancer | 59865-13-3; 79217-60-0 | January 1, 1992 |
+| Cidofovir | cancer, developmental, female, male | 113852-37-2 | January 29, 1999 |
+| Cinnamyl anthranilate | cancer | 87-29-6 | July 1, 1989 |
+| Cisplatin | cancer | 15663-27-1 | October 1, 1988 |
+| Citrus Red No. 2 | cancer | 6358-53-8 | October 1, 1989 |
+| Cladribine | developmental | 4291-63-8 | September 1, 1996 |
+| Clarithromycin | developmental | 81103-11-9 | May 1, 1997 |
+| Clobetasol propionate | developmental, female | 25122-46-7 | May 15, 1998 |
+| Clofibrate | cancer | 637-07-0 | September 1, 1996 |
+| Clomiphene citrate | cancer | 50-41-9 | May 24, 2013 |
+| Clomiphene citrate | developmental | 50-41-9 | April 1, 1990 |
+| Clorazepate dipotassium | developmental | 57109-90-7 | October 1, 1992 |
+| CMNP (pyrazachlor) | cancer | 6814-58-0 | August 25, 2015 |
+| Coal-tar pitch | cancer | --- | November 17, 2023 |
+| Cobalt metal powder | cancer | 7440-48-4 | July 1, 1992 |
+| Cobalt [II] oxide | cancer | 1307-96-6 | July 1, 1992 |
+| Cobalt sulfate | cancer | 10124-43-3 | May 20, 2005 |
+| Cobalt sulfate heptahydrate | cancer | 10026-24-1 | June 2, 2000 |
+| Cocaine | developmental, female | 50-36-2 | July 1, 1989 |
+| Coconut oil diethanolamine condensate (cocamide diethanolamine) | cancer | --- | June 22, 2012 |
+| Codeine phosphate | developmental | 52-28-8 | May 15, 1998 |
+| Coke oven emissions | cancer | --- | February 27, 1987 |
+| Colchicine | developmental, male | 64-86-8 | October 1, 1992 |
+| Conjugated estrogens | cancer | --- | February 27, 1987 |
+| Conjugated estrogens | developmental | --- | April 1, 1990 |
+| Creosotes | cancer | --- | October 1, 1988 |
+| p-Cresidine | cancer | 120-71-8 | January 1, 1988 |
+| Cumene | cancer | 98-82-8 | April 6, 2010 |
+| Cupferron | cancer | 135-20-6 | January 1, 1988 |
+| Cyanazine | developmental | 21725-46-2 | April 1, 1990 |
+| Cycasin | cancer | 14901-08-7 | January 1, 1988 |
+| Cycloate | developmental | 1134-23-2 | March 19, 1999 |
+
+Cyclohexanol, Delisted January 25, 2002
+
+male 108-93-0 November 6, 1998
+
+| Cycloheximide | developmental | 66-81-9 | January 1, 1989 |
+| --- | --- | --- | --- |
+| Cyclopenta[cd]pyrene | cancer | 27208-37-3 | April 29, 2011 |
+| Cyclophosphamide (anhydrous) | cancer | 50-18-0 | February 27, 1987 |
+
+| Chemical | Type of Toxicity | CAS No. | Date Listed |
+| --- | --- | --- | --- |
+| Cyclophosphamide (anhydrous) | developmental, female, male | 50-18-0 | January 1, 1989 |
+| Cyclophosphamide (hydrated) | cancer | 6055-19-2 | February 27, 1987 |
+| Cyclophosphamide (hydrated) | developmental, female, male | 6055-19-2 | January 1, 1989 |
+| Cyhexatin | developmental | 13121-70-5 | January 1, 1989 |
+| Cytarabine | developmental | 147-94-4 | January 1, 1989 |
+| Cytembena | cancer | 21739-91-3 | May 15, 1998 |
+| | | | |
+| D&C Orange No. 17 | cancer | 3468-63-1 | July 1, 1990 |
+| D&C Red No. 8 | cancer | 2092-56-0 | October 1, 1990 |
+| D&C Red No. 9 | cancer | 5160-02-1 | July 1, 1990 |
+| D&C Red No. 19 | cancer | 81-88-9 | July 1, 1990 |
+| Dacarbazine | cancer | 4342-03-4 | January 1, 1988 |
+| Dacarbazine | developmental | 4342-03-4 | January 29, 1999 |
+| Daminozide | cancer | 1596-84-5 | January 1, 1990 |
+| Danazol | developmental | 17230-88-5 | April 1, 1990 |
+| Dantron (Chrysazin; 1,8- Dihydroxyanthraquinone) | cancer | 117-10-2 | January 1, 1992 |
+| Daunomycin | cancer | 20830-81-3 | January 1, 1988 |
+| Daunorubicin hydrochloride | developmental | 23541-50-6 | July 1, 1990 |
+| 2,4-D butyric acid | developmental, male | 94-82-6 | June 18, 1999 |
+| DDD (Dichlorodiphenyl dichloroethane) | cancer | 72-54-8 | January 1, 1989 |
+| DDE (Dichlorodi phenyldichloroethylene) | cancer | 72-55-9 | January 1, 1989 |
+| DDT (Dichlorodi phenyltrichloroethane) | cancer | 50-29-3 | October 1 , 1987 |
+| o,p’-DDT | developmental, female, male | 789-02-6 | May 15, 1998 |
+| p,p’-DDT | developmental, female, male | 50-29-3 | May 15, 1998 |
+| DDVP (Dichlorvos) | cancer | 62-73-7 | January 1, 1989 |
+| Demeclocycline hydrochloride (internal use) | developmental | 64-73-3 | January 1, 1992 |
+| Des-ethyl atrazine (DEA) | developmental, female | 6190-65-4 | July 15, 2016 |
+| Des-isopropyl atrazine (DIA) | developmental, female | 1007-28-9 | July 15, 2016 |
+| N,N’-Diacetylbenzidine | cancer | 613-35-4 | October 1, 1989 |
+| 2,4-Diaminoanisole | cancer | 615-05-4 | October 1, 1990 |
+| 2,4-Diaminoanisole sulfate | cancer | 39156-41-7 | January 1, 1988 |
+| 2,4-Diamino-6-chloro-s-triazine (DACT) | developmental, female | 3397-62-4 | July 15, 2016 |
+| 4,4’-Diaminodiphenyl ether (4,4’- Oxydianiline) | cancer | 101-80-4 | January 1, 1988 |
+| 2,4-Diaminotoluene | cancer | 95-80-7 | January 1, 1988 |
+| Diaminotoluene (mixed), Delisted November 20, 2015 | cancer | --- | January 1, 1990 |
+| Diazepam | developmental | 439-14-5 | January 1, 1992 |
+| Diazoaminobenzene | cancer | 136-35-6 | May 20, 2005 |
+| Diazoxide | developmental | 364-98-7 | February 27, 2001 |
+| Dibenz[a,h]acridine | cancer | 226-36-8 | January 1, 1988 |
+| Dibenz[a,j]acridine | cancer | 224-42-0 | January 1, 1988 |
+| Dibenzanthracenes | cancer | --- | December 26, 2014 |
+| Dibenz[a,c]anthracene | cancer | 215-58-7 | December 26, 2014 |
+| Dibenz[a,h]anthracene | cancer | 53-70-3 | January 1, 1988 |
+| Dibenz[a,j]anthracene | cancer | 224-41-9 | December 26, 2014 |
+
+| Chemical | Type of Toxicity | CAS No. | Date Listed |
+| --- | --- | --- | --- |
+| 7H-Dibenzo[c,g]carbazole | cancer | 194-59-2 | January 1, 1988 |
+| Dibenzo[a,e]pyrene | cancer | 192-65-4 | January 1, 1988 |
+| Dibenzo[a,h]pyrene | cancer | 189-64-0 | January 1, 1988 |
+| Dibenzo[a,i]pyrene | cancer | 189-55-9 | January 1, 1988 |
+| Dibenzo[a,l]pyrene | cancer | 191-30-0 | January 1, 1988 |
+| Dibromoacetic acid | cancer | 631-64-1 | June 17, 2008 |
+| Dibromoacetonitrile | cancer | 3252-43-5 | May 3, 2011 |
+| 1,2-Dibromo-3-chloropropane (DBCP) | cancer | 96-12-8 | July 1, 1987 |
+| 1,2-Dibromo-3-chloropropane (DBCP) | male | 96-12-8 | February 27, 1987 |
+| 2,3-Dibromo-1-propanol | cancer | 96-13-9 | October 1, 1994 |
+| Di-n-butyl phthalate (DBP) | developmental, female, male | 84-74-2 | December 2, 2005 |
+| Dichloroacetic acid | cancer | 79-43-6 | May 1, 1996 |
+| Dichloroacetic acid | developmental, male | 79-43-6 | August 7, 2009 |
+| p-Dichlorobenzene | cancer | 106-46-7 | January 1, 1989 |
+| 3,3’-Dichlorobenzidine | cancer | 91-94-1 | October 1, 1987 |
+| 3,3’-Dichlorobenzidine dihydrochloride | cancer | 612-83-9 | May 15, 1998 |
+| 1,1-Dichloro-2,2-bis(p chlorophenyl)ethylene (DDE) | developmental, male | 72-55-9 | March 30, 2010 |
+| 1,4-Dichloro-2-butene | cancer | 764-41-0 | January 1, 1990 |
+| 3,3’-Dichloro-4,4’-diaminodiphenyl ether | cancer | 28434-86-8 | January 1, 1988 |
+| 1,1-Dichloroethane | cancer | 75-34-3 | January 1, 1990 |
+| Dichloromethane (Methylene chloride) | cancer | 75-09-2 | April 1, 1988 |
+| 1,4-Dichloro-2-nitrobenzene | cancer | 89-61-2 | September 13, 2019 |
+| 2,4-Dichloro-1-nitrobenzene | cancer | 611-06-3 | September 13, 2019 |
+| Dichlorophene | developmental | 97-23-4 | April 27, 1999 |
+| 1,2-Dichloropropane | cancer | 78-87-5 | January 1, 1990 |
+| 1,3-Dichloro-2-propanol (1,3-DCP) | cancer | 96-23-1 | October 8, 2010 |
+| 1,3-Dichloropropene | cancer | 542-75-6 | January 1, 1989 |
+| Dichlorphenamide | developmental | 120-97-8 | February 27, 2001 |
+| Diclofop-methyl | cancer | 51338-27-3 | April 6, 2010 |
+| Diclofop methyl | developmental | 51338-27-3 | March 5, 1999 |
+| Dicumarol | developmental | 66-76-2 | October 1, 1992 |
+| Dieldrin | cancer | 60-57-1 | July 1, 1988 |
+| Dienestrol, Delisted January 4, 2013 | cancer | 84-17-3 | January 1, 1990 |
+| Diepoxybutane | cancer | 1464-53-5 | January 1, 1988 |
+| Diesel engine exhaust | cancer | --- | October 1, 1990 |
+| Diethanolamine | cancer | 111-42-2 | June 22, 2012 |
+| Di(2-ethylhexyl)phthalate (DEHP) | cancer | 117-81-7 | January 1, 1988 |
+| Di(2-ethylhexyl)phthalate (DEHP) | developmental, male | 117-81-7 | October 24, 2003 |
+| 1,2-Diethylhydrazine | cancer | 1615-80-1 | January 1, 1988 |
+| Diethylstilbestrol (DES) | cancer | 56-53-1 | February 27, 1987 |
+| Diethylstilbestrol (DES) | developmental | 56-53-1 | July 1, 1987 |
+| Diethyl sulfate | cancer | 64-67-5 | January 1, 1988 |
+| Diflunisal | developmental, female | 22494-42-4 | January 29, 1999 |
+| Diglycidyl ether, Delisted April 4, 2014 | male | 2238-07-5 | August 7, 2009 |
+| Diglycidyl resorcinol ether (DGRE) | cancer | 101-90-6 | July 1, 1989 |
+| Di-n-hexyl phthalate (DnHP) | female, male | 84-75-3 | December 2, 2005 |
+| Dihydroergotamine mesylate | developmental | 6190-39-2 | May 1, 1997 |
+
+| Chemical | Type of Toxicity | CAS No. | Date Listed |
+| --- | --- | --- | --- |
+| Dihydrosafrole | cancer | 94-58-6 | January 1, 1988 |
+| Di-isodecyl phthalate (DIDP) | developmental | 68515-49- 1/26761-40-0 | April 20, 2007 |
+| Diisononyl phthalate (DINP) | cancer | --- | December 20, 2013 |
+| Diisopropyl sulfate | cancer | 2973-10-6 | April 1, 1993 |
+| Diltiazem hydrochloride | developmental | 33286-22-5 | February 27, 2001 |
+| 3,3’-Dimethoxybenzidine (o Dianisidine) | cancer | 119-90-4 | January 1, 1988 |
+| 3,3’-Dimethoxybenzidine dihydrochloride | cancer | 20325-40-0 | October 1, 1990 |
+| 3,3’-Dimethoxybenzidine-based dyes metabolized to 3,3’- dimethoxybenzidine | cancer | --- | June 11, 2004 |
+| N,N-Dimethylacetamide | cancer | 127-19-5 | September 13, 2019 |
+| N,N-Dimethylacetamide | developmental, male | 127-19-5 | May 21, 2010 |
+| 4-Dimethylaminoazobenzene | cancer | 60-11-7 | January 1, 1988 |
+| trans-2-[(Dimethylamino)methyl imino]-5-[2-(5-nitro-2-furyl)vinyl]- 1,3,4-oxadiazole | cancer | 55738-54-0 | January 1, 1988 |
+| 7,12-Dimethylbenz(a)anthracene | cancer | 57-97-6 | January 1, 1990 |
+| 3,3’-Dimethylbenzidine (ortho Tolidine) | cancer | 119-93-7 | January 1, 1988 |
+| 3,3’-Dimethylbenzidine-based dyes metabolized to 3,3’- dimethylbenzidine | cancer | --- | June 11, 2004 |
+| 3,3’-Dimethylbenzidine dihydrochloride | cancer | 612-82-8 | April 1, 1992 |
+| Dimethylcarbamoyl chloride | cancer | 79-44-7 | January 1, 1988 |
+| N,N-Dimethylformamide | cancer | 68-12-2 | October 27, 2017 |
+| 1,1-Dimethylhydrazine (UDMH) | cancer | 57-14-7 | October 1, 1989 |
+| 1,2-Dimethylhydrazine | cancer | 540-73-8 | January 1, 1988 |
+| Dimethyl hydrogen phosphite | cancer | 868-85-9 | August 11, 2023 |
+| 2,6-Dimethyl-N-nitrosomorpholine (DMNM) | cancer | 1456-28-6 | February 8, 2013 |
+| Dimethyl sulfate | cancer | 77-78-1 | January 1, 1988 |
+| N,N-Dimethyl-p-toluidine | cancer | 99-97-8 | May 2, 2014 |
+
+| 3,7-Dinitrofluoranthene | cancer | 105735-71-5 | August 26, 1997 |
+| --- | --- | --- | --- |
+| 3,9-Dinitrofluoranthene | cancer | 22506-53-2 | August 26, 1997 |
+| 1,3-Dinitropyrene | cancer | 75321-20-9 | November 2, 2012 |
+| 1,6-Dinitropyrene | cancer | 42397-64-8 | October 1, 1990 |
+| 1,8-Dinitropyrene | cancer | 42397-65-9 | October 1, 1990 |
+| Dinitrotoluene (technical grade) | female, male | --- | August 20, 1999 |
+
+Dimethyl sulfate cancer 77-78-1 January 1, 1988 
+N,N-Dimethyl-p-toluidine cancer 99-97-8 May 2, 2014 
+Dimethylvinylchloride cancer 513-37-1 July 1, 1989 
+m-Dinitrobenzene male 99-65-0 July 1, 1990 
+o-Dinitrobenzene male 528-29-0 July 1, 1990 
+p-Dinitrobenzene male 100-25-4 July 1, 1990 
+2,4-Dinitrotoluene cancer 121-14-2 July 1, 1988 
+2,4-Dinitrotoluene male 121-14-2 August 20, 1999 
+2,6-Dinitrotoluene cancer 606-20-2 July 1, 1995 
+2,6-Dinitrotoluene male 606-20-2 August 20, 1999 
+Dinitrotoluene mixture, 2,4-/2,6- cancer --- May 1, 1996 
+Dinocap developmental 39300-45-3 April 1, 1990 
+Dinoseb developmental, male 88-85-7 January 1, 1989 
+Di-n-propyl isocinchomeronate 
+(MGK Repellent 326) 
+
+| 2,6-Dinitrotoluene | male | 606-20-2 | August 20, 1999 |
+| --- | --- | --- | --- |
+| Dinitrotoluene mixture, 2,4-/2,6- | cancer | --- | May 1, 1996 |
+| Dinocap | developmental | 39300-45-3 | April 1, 1990 |
+| Dinoseb | developmental, male | 88-85-7 | January 1, 1989 |
+| Di-n-propyl isocinchomeronate (MGK Repellent 326) | cancer | 136-45-8 | May 1, 1996 |
+| 1,4-Dioxane | cancer | 123-91-1 | January 1, 1988 |
+
+| Chemical | Type of Toxicity | CAS No. | Date Listed |
+| --- | --- | --- | --- |
+| Diphenylhydantoin (Phenytoin) | cancer | 57-41-0 | January 1, 1988 |
+| Diphenylhydantoin (Phenytoin) | developmental | 57-41-0 | July 1, 1987 |
+| Diphenylhydantoin (Phenytoin), sodium salt | cancer | 630-93-3 | January 1, 1988 |
+| Direct Black 38 (technical grade) | cancer | 1937-37-7 | January 1, 1988 |
+| Direct Blue 6 (technical grade) | cancer | 2602-46-2 | January 1, 1988 |
+| Direct Brown 95 (technical grade) | cancer | 16071-86-6 | October 1, 1988 |
+| Disodium cyanodithioimido carbonate | developmental | 138-93-2 | March 30, 1999 |
+| Disperse Blue 1 | cancer | 2475-45-8 | October 1, 1990 |
+| Diuron | cancer | 330-54-1 | May 31, 2002 |
+| Doxorubicin hydrochloride (Adriamycin) | cancer | 25316-40-9 | July 1, 1987 |
+| Doxorubicin hydrochloride (Adriamycin) | developmental, male | 25316-40-9 | January 29, 1999 |
+| Doxycycline (internal use) | developmental | 564-25-0 | July 1, 1990 |
+| Doxycycline calcium (internal use) | developmental | 94088-85-4 | January 1, 1992 |
+| Doxycycline hyclate (internal use) | developmental | 24390-14-5 | October 1, 1991 |
+| Doxycycline monohydrate (internal use) | developmental | 17086-28-1 | October 1, 1991 |
+| 2,4-DP (dichloroprop), Delisted January 25, 2002 | developmental | 120-36-5 | April 27, 1999 |
+| | | | |
+| Emissions from combustion of coal | cancer | --- | August 7, 2013 |
+| Emissions from high-temperature unrefined rapeseed oil | cancer | --- | January 3, 2014 |
+| Endrin | developmental | 72-20-8 | May 15, 1998 |
+| Environmental tobacco smoke (ETS) | developmental | --- | June 9, 2006 |
+| Epichlorohydrin | cancer | 106-89-8 | October 1, 1987 |
+| Epichlorohydrin | male | 106-89-8 | September 1, 1996 |
+| Epoxiconazole | cancer | 135319-73-2 | April 15, 2011 |
+| Ergotamine tartrate | developmental | 379-79-3 | April 1, 1990 |
+| Erionite | cancer | 12510-42- 8/66733-21-9 | October 1, 1988 |
+| Estradiol 17B | cancer | 50-28-2 | January 1, 1988 |
+| Estragole | cancer | 140-67-0 | October 29, 1999 |
+| Estrogens, steroidal | cancer | --- | August 19, 2005 |
+| Estrogen-progestogen (combined) used as menopausal therapy | cancer | --- | November 4, 2011 |
+| Estrone | cancer | 53-16-7 | January 1, 1988 |
+| Estropipate | cancer, developmental | 7280-37-7 | August 26, 1997 |
+| Ethinylestradiol | cancer | 57-63-6 | January 1, 1988 |
+| Ethionamide | developmental | 536-33-4 | August 26, 1997 |
+| Ethoprop | cancer | 13194-48-4 | February 27, 2001 |
+| Ethyl acrylate | cancer | 140-88-5 | July 1, 1989 |
+| Ethyl alcohol in alcoholic beverages | developmental | --- | October 1, 1987 |
+| Ethylbenzene | cancer | 100-41-4 | June 11, 2004 |
+| Ethyl-tert-butyl ether, Delisted December 13, 2013 | male | 637-92-3 | December 18, 2009 |
+| Ethyl dipropylthiocarbamate | developmental | 759-94-4 | April 27, 1999 |
+| Ethyl-4,4’-dichlorobenzilate | cancer | 510-15-6 | January 1, 1990 |
+| Ethylene dibromide | cancer | 106-93-4 | July 1, 1987 |
+| Ethylene dibromide | developmental, male | 106-93-4 | May 15, 1998 |
+
+| Chemical | Type of Toxicity | CAS No. | Date Listed |
+| --- | --- | --- | --- |
+| Ethylene dichloride (1,2- Dichloroethane) | cancer | 107-06-2 | October 1, 1987 |
+| Ethylene glycol (ingested) | developmental | 107-21-1 | June 19, 2015 |
+| Ethylene glycol monoethyl ether | developmental, male | 110-80-5 | January 1, 1989 |
+| Ethylene glycol monoethyl ether acetate | developmental, male | 111-15-9 | January 1, 1993 |
+| Ethylene glycol monomethyl ether | developmental, male | 109-86-4 | January 1, 1989 |
+| Ethylene glycol monomethyl ether acetate | developmental, male | 110-49-6 | January 1, 1993 |
+| Ethyleneimine (Aziridine) | cancer | 151-56-4 | January 1, 1988 |
+
+| Ethylene oxide | female | 75-21-8 | February 27, 1987 |
+| --- | --- | --- | --- |
+| Ethylene oxide | developmental, male | 75-21-8 | August 7, 2009 |
+| Ethylene thiourea | cancer | 96-45-7 | January 1, 1988 |
+| Ethylene thiourea | developmental | 96-45-7 | January 1, 1993 |
+| 2-Ethylhexanoic acid, Delisted December 13, 2013 | developmental | 149-57-5 | August 7, 2009 |
+| 2-Ethylhexyl acrylate | cancer | 103-11-7 | December 17, 2021 |
+| Ethyl methanesulfonate | cancer | 62-50-0 | January 1, 1988 |
+| Etodolac | developmental, female | 41340-25-4 | August 20, 1999 |
+| Etoposide | cancer | 33419-42-0 | November 4, 2011 |
+| Etoposide | developmental | 33419-42-0 | July 1, 1990 |
+| Etoposide in combination with cisplatin and bleomycin | cancer | --- | November 4, 2011 |
+| Etretinate | developmental | 54350-48-0 | July 1, 1987 |
+| | | | |
+| Fenoxaprop ethyl | developmental | 66441-23-4 | March 26, 1999 |
+| Fenoxycarb | cancer | 72490-01-8 | June 2, 2000 |
+| Filgrastim | developmental | 121181-53-1 | February 27, 2001 |
+| Fluazifop butyl | developmental | 69806-50-4 | November 6, 1998 |
+| Flunisolide | developmental, female | 3385-03-3 | May 15, 1998 |
+| Fluoro-edenite fibrous amphibole | cancer | --- | November 17, 2023 |
+| Fluorouracil | developmental | 51-21-8 | January 1, 1989 |
+| Fluoxymesterone | developmental | 76-43-7 | April 1, 1990 |
+| Flurazepam hydrochloride | developmental | 1172-18-5 | October 1, 1992 |
+| Flurbiprofen | developmental, female | 5104-49-4 | August 20, 1999 |
+| Flutamide | developmental | 13311-84-7 | July 1, 1990 |
+| Fluticasone propionate | developmental | 80474-14-2 | May 15, 1998 |
+| Fluvalinate | developmental | 69409-94-5 | November 6, 1998 |
+| Folpet | cancer | 133-07-3 | January 1, 1989 |
+| Formaldehyde (gas) | cancer | 50-00-0 | January 1, 1988 |
+| 2-(2-Formylhydrazino)-4-(5-nitro-2- furyl)thiazole | cancer | 3570-75-0 | January 1, 1988 |
+| Fumonisin B1 | cancer | 116355-83-0 | November 14, 2003 |
+| Furan | cancer | 110-00-9 | October 1, 1993 |
+| Furazolidone | cancer | 67-45-8 | January 1, 1990 |
+| Furfuryl alcohol | cancer | 98-00-0 | September 30, 2016 |
+| Furmecyclox | cancer | 60568-05-0 | January 1, 1990 |
+| Fusarin C | cancer | 79748-81-5 | July 1, 1995 |
+| | | | |
+| Gallium arsenide | cancer | 1303-00-0 | August 1, 2008 |
+| Ganciclovir | cancer, developmental, male | 82410-32-0 | August 26, 1997 |
+| Ganciclovir sodium | developmental, male | 107910-75-8 | August 26, 1997 |
+| Gasoline engine exhaust (condensates/extracts) | cancer | --- | October 1, 1990 |
+
+Ethyleneimine (Aziridine) cancer 151-56-4 January 1, 1988 
+Ethylene oxide cancer 75-21-8 July 1, 1987 
+
+| Gemfibrozil | female, male | 25812-30-0 | August 20, 1999 |
+| --- | --- | --- | --- |
+| Gentian violet (Crystal violet) | cancer | 548-62-9 | November 23, 2018 |
+| Glass wool fibers (inhalable and biopersistent) | cancer | --- | July 1, 1990 |
+| Glu-P-1 (2-Amino-6-methyldipyrido [1,2- a:3’,2’-d]imidazole) | cancer | 67730-11-4 | January 1, 1990 |
+| Glu-P-2 (2-Aminodipyrido [1,2- a:3’,2’-d]imidazole) | cancer | 67730-10-3 | January 1, 1990 |
+| Glycidaldehyde | cancer | 765-34-4 | January 1, 1988 |
+| Glycidol Glycidyl methacrylate | cancer cancer | 556-52-5 106-91-2 | July 1, 1990 January 27, 2023 |
+| Glyphosate | cancer | 1071-83-6 | July 7, 2017 |
+| Goldenseal root powder | cancer | --- | December 4, 2015 |
+| Goserelin acetate | developmental, female, male | 65807-02-5 | August 26, 1997 |
+| Griseofulvin | cancer | 126-07-8 | January 1, 1990 |
+| Gyromitrin (Acetaldehyde methylformylhydrazone) | cancer | 16568-02-8 | January 1, 1988 |
+| | | | |
+| Halazepam | developmental | 23092-17-3 | July 1, 1990 |
+| Halobetasol propionate | developmental | 66852-54-8 | August 20, 1999 |
+| Haloperidol | developmental, female | 52-86-8 | January 29, 1999 |
+| Halothane | developmental | 151-67-7 | September 1, 1996 |
+| HC Blue 1 | cancer | 2784-94-3 | July 1, 1989 |
+| Heptachlor | cancer | 76-44-8 | July 1, 1988 |
+| Heptachlor | developmental | 76-44-8 | August 20, 1999 |
+| Heptachlor epoxide | cancer | 1024-57-3 | July 1, 1988 |
+| Herbal remedies containing plant species of the genus | cancer Aristolochia | --- | July 9, 2004 |
+| Hexachlorobenzene | cancer | 118-74-1 | October 1, 1987 |
+| Hexachlorobenzene | developmental | 118-74-1 | January 1, 1989 |
+| Hexachlorobutadiene | cancer | 87-68-3 | May 3, 2011 |
+| Hexachlorocyclohexane (technical grade) | cancer | --- | October 1, 1987 |
+| Hexachlorodibenzodioxin | cancer | 34465-46-8 | April 1, 1988 |
+| Hexachloroethane | cancer | 67-72-1 | July 1, 1990 |
+
+Chemical Type of Toxicity CAS No. Date Listed Gemfibrozil cancer 25812-30-0 December 22, 2000
+
+Hexachlorodibenzodioxin cancer 34465-46-8 April 1, 1988 
+Hexachloroethane cancer 67-72-1 July 1, 1990 
+2,4-Hexadienal (89% trans, trans 
+isomer; 11% cis, trans isomer) 
+
+cancer --- March 4, 2005
+
+| Hexamethylphosphoramide | male | 680-31-9 | October 1, 1994 |
+| --- | --- | --- | --- |
+| n-Hexane | male | 110-54-3 | December 15, 2017 |
+| 2,5-Hexanedione | male | 110-13-4 | December 4, 2015 |
+| Histrelin acetate | developmental | --- | May 15, 1998 |
+| Hydramethylnon | developmental, male | 67485-29-4 | March 5, 1999 |
+| Hydrazine | cancer | 302-01-2 | January 1, 1988 |
+| Hydrazine sulfate | cancer | 10034-93-2 | January 1, 1988 |
+| Hydrazobenzene (1,2- Diphenylhydrazine) | cancer | 122-66-7 | January 1, 1988 |
+| Hydrochlorothiazide | cancer | 58-93-5; 125727-50-6; 8049-49-8 | July 17, 2026 |
+| Hydrogen cyanide (HCN) and cyanide salts (CN salts) | male | --- | July 5, 2013 |
+| 1-Hydroxyanthraquinone | cancer | 129-43-1 | May 27, 2005 |
+
+Hexafluoroacetone developmental, male 684-16-2 August 1, 2008 
+Hexamethylphosphoramide cancer 680-31-9 January 1, 1988 
+
+| Chemical | Type of Toxicity | CAS No. | Date Listed |
+| --- | --- | --- | --- |
+| Hydroxyurea | developmental | 127-07-1 | May 1, 1997 |
+| | | | |
+| Idarubicin hydrochloride | developmental, male | 57852-57-0 | August 20, 1999 |
+| Ifosfamide | developmental | 3778-73-2 | July 1, 1990 |
+| Iodine-131 | developmental | 10043-66-0 | January 1, 1989 |
+| Imazalil | cancer | 35554-44-0 | May 20, 2011 |
+| Indeno[1,2,3-cd]pyrene | cancer | 193-39-5 | January 1, 1988 |
+| Indium phosphide | cancer | 22398-80-7 | February 27, 2001 |
+| Indium tin oxide | cancer | 50926-11-9 | March 19, 2021 |
+| IQ (2-Amino-3-methylimidazo [4,5- f] quinoline) | cancer | 76180-96-6 | April 1, 1990 |
+| Iprodione | cancer | 36734-19-7 | May 1, 1996 |
+| Iprovalicarb | cancer | 140923-17-7/ 140923-25-7 | June 1, 2007 |
+| Iron dextran complex | cancer | 9004-66-4 | January 1, 1988 |
+| Isobutyl nitrite | cancer | 542-56-3 | May 1, 1996 |
+| Isoprene | cancer | 78-79-5 | May 1, 1996 |
+| Isopyrazam | cancer | 881685-58-1 | July 24, 2012 |
+| Isosafrole, Delisted December 8, 2006 | cancer | 120-58-1 | October 1, 1989 |
+| Isotretinoin | developmental | 4759-48-2 | July 1, 1987 |
+| Isoxaflutole | cancer | 141112-29-0 | December 22, 2000 |
+| | | | |
+| Kresoxim-methyl | cancer | 143390-89-0 | February 3, 2012 |
+| | | | |
+| Lactofen | cancer | 77501-63-4 | January 1, 1989 |
+| Lasiocarpine | cancer | 303-34-4 | April 1, 1988 |
+| Lead | developmental, female, male | --- | February 27, 1987 |
+| Lead and lead compounds | cancer | --- | October 1, 1992 |
+| Lead acetate | cancer | 301-04-2 | January 1, 1988 |
+| Lead phosphate | cancer | 7446-27-7 | April 1, 1988 |
+| Lead subacetate | cancer | 1335-32-6 | October 1, 1989 |
+| Leather dust | cancer | --- | April 29, 2011 |
+| Leucomalachite green | cancer | 129-73-7 | April 21, 2023 |
+| Leuprolide acetate | developmental, female, male | 74381-53-6 | August 26, 1997 |
+| Levodopa | developmental | 59-92-7 | January 29, 1999 |
+
+| Lindane and other hexachloro cyclohexane isomers | cancer | --- | October 1, 1989 |
+| --- | --- | --- | --- |
+| Linuron | developmental | 330-55-2 | March 19, 1999 |
+| Lithium carbonate | developmental | 554-13-2 | January 1, 1991 |
+| Lithium citrate | developmental | 919-16-4 | January 1, 1991 |
+| Lorazepam | developmental | 846-49-1 | July 1, 1990 |
+| Lovastatin | developmental | 75330-75-5 | October 1, 1992 |
+| Lynestrenol | cancer | 52-76-6 | February 27, 2001 |
+| | | | |
+| Malathion | cancer | 121-75-5 | May 20, 2016 |
+| Malonaldehyde, sodium salt | cancer | 24382-04-5 | May 3, 2011 |
+| Mancozeb | cancer | 8018-01-7 | January 1, 1990 |
+| Maneb | cancer | 12427-38-2 | January 1, 1990 |
+| Marijuana smoke | cancer | --- | June 19, 2009 |
+| Me-A-alpha-C (2-Amino-3-methyl 9H-pyrido[2,3-b]indole) | cancer | 68006-83-7 | January 1, 1990 |
+| Mebendazole | developmental | 31431-39-7 | August 20, 1999 |
+
+Levodopa developmental 59-92-7 January 29, 1999 
+Levonorgestrel implants female 797-63-7 May 15, 1998 
+
+| Chemical | Type of Toxicity | CAS No. | Date Listed |
+| --- | --- | --- | --- |
+| Medroxyprogesterone acetate | cancer | 71-58-9 | January 1, 1990 |
+| Medroxyprogesterone acetate | developmental | 71-58-9 | April 1, 1990 |
+| Megestrol acetate | cancer | 595-33-5 | March 28, 2014 |
+| Megestrol acetate | developmental | 595-33-5 | January 1, 1991 |
+| MeIQ (2-Amino-3,4-dimethyl imidazo[4,5-f]quinoline) | cancer | 77094-11-2 | October 1, 1994 |
+| MeIQx (2-Amino-3,8-dimethyl imidazo[4,5-f]quinoxaline) | cancer | 77500-04-0 | October 1, 1994 |
+| Melphalan | cancer | 148-82-3 | February 27, 1987 |
+| Melphalan | developmental | 148-82-3 | July 1, 1990 |
+| Menotropins | developmental | 9002-68-0 | April 1, 1990 |
+| Mepanipyrim | cancer | 110235-47-7 | July 1, 2008 |
+| Meprobamate | developmental | 57-53-4 | January 1, 1992 |
+| 2-Mercaptobenzothiazole Mercaptopurine | cancer developmental | 149-30-4 6112-76-1 | October 27, 2017 July 1, 1990 |
+| Mercury and mercury compounds | developmental | --- | July 1, 1990 |
+| Merphalan | cancer | 531-76-0 | April 1, 1988 |
+| Mestranol | cancer | 72-33-3 | April 1, 1988 |
+| Metam potassium | cancer | 137-41-7 | December 31, 2010 |
+| Methacycline hydrochloride | developmental | 3963-95-9 | January 1, 1991 |
+| Metham sodium | cancer | 137-42-8 | November 6, 1998 |
+| Metham sodium | developmental | 137-42-8 | May 15, 1998 |
+| Methanol | developmental | 67-56-1 | March 16, 2012 |
+| Methazole | developmental | 20354-26-1 | December 1, 1999 |
+| Methimazole | developmental | 60-56-0 | July 1, 1990 |
+| Methotrexate | developmental | 59-05-2 | January 1, 1989 |
+| Methotrexate sodium | developmental | 15475-56-6 | April 1, 1990 |
+| 5-Methoxypsoralen with ultraviolet A therapy | cancer | 484-20-8 | October 1, 1988 |
+| 8-Methoxypsoralen with ultraviolet A therapy | cancer | 298-81-7 | February 27, 1987 |
+| Methyl acrylate | cancer | 96-33-3 | December 17, 2021 |
+| 2-Methylaziridine (Propyleneimine) | cancer | 75-55-8 | January 1, 1988 |
+| Methylazoxymethanol | cancer | 590-96-5 | April 1, 1988 |
+| Methylazoxymethanol acetate | cancer | 592-62-1 | April 1, 1988 |
+| Methyl bromide, as a structural fumigant | developmental | 74-83-9 | January 1, 1993 |
+| Methyl carbamate | cancer | 598-55-0 | May 15, 1998 |
+| Methyl chloride | developmental | 74-87-3 | March 10, 2000 |
+| Methyl chloride | male | 74-87-3 | August 7, 2009 |
+| 3-Methylcholanthrene | cancer | 56-49-5 | January 1, 1990 |
+| 5-Methylchrysene | cancer | 3697-24-3 | April 1, 1988 |
+| 4,4'-Methylene bis(2-chloroaniline) | cancer | 101-14-4 | July 1, 1987 |
+| 4,4'-Methylene bis(N,N-dimethyl) benzenamine | cancer | 101-61-1 | October 1, 1989 |
+| 4,4'-Methylene bis(2-methylaniline) | cancer | 838-88-0 | April 1, 1988 |
+| 4,4'-Methylenedianiline | cancer | 101-77-9 | January 1, 1988 |
+| 4,4'-Methylenedianiline dihydrochloride | cancer | 13552-44-8 | January 1, 1988 |
+| Methyleugenol | cancer | 93-15-2 | November 16, 2001 |
+| Methylhydrazine and its salts | cancer | --- | July 1, 1992 |
+| 2-Methylimidazole | cancer | 693-98-1 | June 22, 2012 |
+| 4-Methylimidazole | cancer | 822-36-6 | January 7, 2011 |
+| Methyl iodide | cancer | 74-88-4 | April 1, 1988 |
+| Methyl isobutyl ketone | cancer | 108-10-1 | November 4, 2011 |
+| Methyl isobutyl ketone (MIBK) | developmental | 108-10-1 | March 28, 2014 |
+
+| Chemical | Type of Toxicity | CAS No. | Date Listed |
+| --- | --- | --- | --- |
+| Methyl isocyanate (MIC) | developmental, female | 624-83-9 | November 12, 2010 |
+| Methyl isopropyl ketone, Delisted April 4, 2014 | developmental | 563-80-4 | February 17, 2012 |
+| Methyl mercury | developmental | --- | July 1, 1987 |
+| Methylmercury compounds | cancer | --- | May 1, 1996 |
+| Methyl methanesulfonate | cancer | 66-27-3 | April 1, 1988 |
+| Methyl-n-butyl ketone | male | 591-78-6 | August 7, 2009 |
+| Methyl-n-butyl ketone | developmental | 591-78-6 | December 4, 2015 |
+| 2-Methyl-1-nitroanthraquinone (of uncertain purity) | cancer | 129-15-7 | April 1, 1988 |
+| N-Methyl-N-Formylhydrazine | cancer | 758-17-8 | December 8, 2025 |
+| N-Methyl-N'-nitro-N nitrosoguanidine | cancer | 70-25-7 | April 1, 1988 |
+| N-Methylolacrylamide | cancer | 924-42-5 | July 1, 1990 |
+| N-Methylpyrrolidone | developmental | 872-50-4 | June 15, 2001 |
+| α-Methyl styrene (alpha Methylstyrene) | cancer | 98-83-9 | November 2, 2012 |
+| α-Methyl styrene, 2014 | Delisted April 4, female | 98-83-9 | July 29, 2011 |
+| Methyltestosterone | developmental | 58-18-4 | April 1, 1990 |
+| Methylthiouracil | cancer | 56-04-2 | October 1, 1989 |
+| Metiram | cancer | 9006-42-2 | January 1, 1990 |
+| Metiram | developmental | 9006-42-2 | March 30, 1999 |
+| Metronidazole | cancer | 443-48-1 | January 1, 1988 |
+| Michler's ketone | cancer | 90-94-8 | January 1, 1988 |
+| Midazolam hydrochloride | developmental | 59467-96-8 | July 1, 1990 |
+| Minocycline hydrochloride (internal use) | developmental | 13614-98-7 | January 1, 1992 |
+| Mirex | cancer | 2385-85-5 | January 1, 1988 |
+| Misoprostol | developmental | 59122-46-2 | April 1, 1990 |
+| Mitomycin C | cancer | 50-07-7 | April 1, 1988 |
+| Mitoxantrone hydrochloride | cancer | 70476-82-3 | January 23, 2015 |
+| Mitoxantrone hydrochloride | developmental | 70476-82-3 | July 1, 1990 |
+| Molinate | developmental, female, male | 2212-67-1 | December 11, 2009 |
+| Molybdenum trioxide | cancer | 1313-27-5 | March 19, 2021 |
+| MON 4660 (dichloroacetyl-1- 4-azaspiro(4,5)-decane) | oxa cancer | 71526-07-3 | March 22, 2011 |
+| MON 13900 (furilazole) | cancer | 121776-33-8 | March 22, 2011 |
+| 3-Monochloropropane-1,2- MCPD) | diol (3- cancer | 96-24-2 | October 8, 2010 |
+| Monocrotaline | cancer | 315-22-0 | April 1, 1988 |
+| MOPP (vincristine-prednisone nitrogen mustard-procarbazine mixture) | cancer | 113803-47-7 | November 4, 2011 |
+| 5-(Morpholinomethyl)-3- [(5- nitrofurfuryl-idene)- oxazolidinone | cancer amino]-2- | 139-91-3 | April 1, 1988 |
+| Mustard Gas | cancer | 505-60-2 | February 27, 1987 |
+| MX (3-chloro-4-(dichloromethyl) 5-hydroxy-2(5H)-furanone) | cancer | 77439-76-0 | December 22, 2000 |
+| Myclobutanil | developmental, male | 88671-89-0 | April 16, 1999 |
+| beta-Myrcene | cancer | 123-35-3 | March 27, 2015 |
+| | | | |
+| Nabam | developmental | 142-59-6 | March 30, 1999 |
+| Nafarelin acetate | developmental | 86220-42-0 | April 1, 1990 |
+
+| Chemical | Type of Toxicity | CAS No. | Date Listed |
+| --- | --- | --- | --- |
+| Nafenopin | cancer | 3771-19-5 | April 1, 1988 |
+| Nalidixic acid | cancer | 389-08-2 | May 15, 1998 |
+| Naphthalene | cancer | 91-20-3 | April 19, 2002 |
+| 1-Naphthylamine | cancer | 134-32-7 | October 1, 1989 |
+| 2-Naphthylamine | cancer | 91-59-8 | February 27, 1987 |
+| Neomycin sulfate (internal use) | developmental | 1405-10-3 | October 1, 1992 |
+| Netilmicin sulfate | developmental | 56391-57-2 | July 1, 1990 |
+| Nickel (Metallic) | cancer | 7440-02-0 | October 1, 1989 |
+| Nickel acetate | cancer | 373-02-4 | October 1, 1989 |
+| Nickel carbonate | cancer | 3333-67-3 | October 1, 1989 |
+| Nickel carbonyl | cancer | 13463-39-3 | October 1, 1987 |
+| Nickel carbonyl | developmental | 13463-39-3 | September 1, 1996 |
+| Nickel compounds | cancer | --- | May 7, 2004 |
+| Nickel (soluble compounds) | developmental, male | --- | October 26, 2018 |
+| Nickel hydroxide | cancer | 12054-48-7; 12125-56-3 | October 1, 1989 |
+| Nickelocene | cancer | 1271-28-9 | October 1, 1989 |
+| Nickel oxide | cancer | 1313-99-1 | October 1, 1989 |
+| Nickel refinery dust from the pyrometallurgical process | cancer | --- | October 1, 1987 |
+| Nickel subsulfide | cancer | 12035-72-2 | October 1, 1987 |
+| Nicotine | developmental | 54-11-5 | April 1, 1990 |
+| Nifedipine | developmental, female, male | 21829-25-4 | January 29, 1999 |
+| Nimodipine | developmental | 66085-59-4 | April 24, 2001 |
+| Niridazole | cancer | 61-57-4 | April 1, 1988 |
+| Nitrapyrin | cancer | 1929-82-4 | October 5, 2005 |
+| Nitrapyrin | developmental | 1929-82-4 | March 30, 1999 |
+| Nitrilotriacetic acid | cancer | 139-13-9 | January 1, 1988 |
+| Nitrilotriacetic acid, trisodium salt monohydrate | cancer | 18662-53-8 | April 1, 1989 |
+| 5-Nitroacenaphthene | cancer | 602-87-9 | April 1, 1988 |
+| 5-Nitro-o-anisidine, Delisted December 8, 2006 | cancer | 99-59-2 | October 1, 1989 |
+| o-Nitroanisole | cancer | 91-23-6 | October 1, 1992 |
+| para-Nitroanisole | cancer | 100-17-4 | September 13, 2019 |
+| Nitrobenzene | cancer | 98-95-3 | August 26, 1997 |
+| Nitrobenzene | male | 98-95-3 | March 30, 2010 |
+| 4-Nitrobiphenyl | cancer | 92-93-3 | April 1, 1988 |
+| 6-Nitrochrysene | cancer | 7496-02-8 | October 1, 1990 |
+| Nitrofen (technical grade) | cancer | 1836-75-5 | January 1, 1988 |
+| 2-Nitrofluorene | cancer | 607-57-8 | October 1, 1990 |
+
+Nitrofurantoin male 67-20-9 April 1, 1991 
+Nitrofurazone cancer 59-87-0 January 1, 1990 
+1-[(5-Nitrofurfurylidene)-amino]- 2- 
+imidazolidinone 
+
+| Nitrofurazone | cancer | 59-87-0 | January 1, 1990 |
+| --- | --- | --- | --- |
+| 1-[(5-Nitrofurfurylidene)-amino]- imidazolidinone | 2- cancer | 555-84-0 | April 1, 1988 |
+| N-[4-(5-Nitro-2-furyl)-2-thiazolyl] acetamide | cancer | 531-82-8 | April 1, 1988 |
+| Nitrogen mustard (Mechlorethamine) | cancer | 51-75-2 | January 1, 1988 |
+| Nitrogen mustard (Mechlorethamine) | developmental | 51-75-2 | January 1, 1989 |
+| Nitrogen mustard hydrochloride (Mechlorethamine hydrochloride) | cancer | 55-86-7 | April 1, 1988 |
+| Nitrogen mustard hydrochloride (Mechlorethamine hydrochloride) | developmental | 55-86-7 | July 1, 1990 |
+
+| Chemical | Type of Toxicity | CAS No. | Date Listed |
+| --- | --- | --- | --- |
+| Nitrogen mustard N-oxide | cancer | 126-85-2 | April 1, 1988 |
+| Nitrogen mustard N-oxide hydrochloride | cancer | 302-70-5 | April 1, 1988 |
+| Nitromethane | cancer | 75-52-5 | May 1, 1997 |
+| 2-Nitropropane | cancer | 79-46-9 | January 1, 1988 |
+| 1-Nitropyrene | cancer | 5522-43-0 | October 1, 1990 |
+| 4-Nitropyrene | cancer | 57835-92-4 | October 1, 1990 |
+| N-Nitrosodi-n-butylamine | cancer | 924-16-3 | October 1, 1987 |
+| N-Nitrosodiethanolamine | cancer | 1116-54-7 | January 1, 1988 |
+| N-Nitrosodiethylamine | cancer | 55-18-5 | October 1, 1987 |
+| N-Nitrosodimethylamine | cancer | 62-75-9 | October 1, 1987 |
+| p-Nitrosodiphenylamine | cancer | 156-10-5 | January 1, 1988 |
+| N-Nitrosodiphenylamine | cancer | 86-30-6 | April 1, 1988 |
+| N-Nitrosodi-n-propylamine | cancer | 621-64-7 | January 1, 1988 |
+| N-Nitroso-N-ethylurea | cancer | 759-73-9 | October 1, 1987 |
+| N-Nitrosohexamethyleneimine | cancer | 932-83-2 | November 23, 2018 |
+| 3-(N-Nitrosomethylamino)- propionitrile | cancer | 60153-49-3 | April 1, 1990 |
+| 4-(N-Nitrosomethylamino)-1-(3- pyridyl)1-butanone | cancer | 64091-91-4 | April 1, 1990 |
+| N-Nitrosomethyl-n-butylamine | cancer | 7068-83-9 | December 26, 2014 |
+| N-Nitrosomethyl-n-decylamine | cancer | 75881-22-0 | December 26, 2014 |
+| N-Nitrosomethyl-n-dodecylamine | cancer | 55090-44-3 | December 26, 2014 |
+| N-Nitrosomethylethylamine | cancer | 10595-95-6 | October 1, 1989 |
+| N-Nitrosomethyl-n-heptylamine | cancer | 16338-99-1 | December 26, 2014 |
+| N-Nitrosomethyl-n-hexylamine | cancer | 28538-70-7 | December 26, 2014 |
+| N-Nitrosomethyl-n-nonylamine | cancer | 75881-19-5 | December 26, 2014 |
+| N-Nitrosomethyl-n-octylamine | cancer | 34423-54-6 | December 26, 2014 |
+| N-Nitrosomethyl-n-pentylamine | cancer | 13256-07-0 | December 26, 2014 |
+| N-Nitrosomethyl-n-propylamine | cancer | 924-46-9 | December 26, 2014 |
+| N-Nitrosomethyl-n-tetradecylamine | cancer | 75881-20-8 | December 26, 2014 |
+| N-Nitrosomethyl-n-undecylamine | cancer | 68107-26-6 | December 26, 2014 |
+| N-Nitroso-N-methylurea | cancer | 684-93-5 | October 1, 1987 |
+| N-Nitroso-N-methylurethane | cancer | 615-53-2 | April 1, 1988 |
+| N-Nitrosomethylvinylamine | cancer | 4549-40-0 | January 1, 1988 |
+| N-Nitrosomorpholine | cancer | 59-89-2 | January 1, 1988 |
+| N-Nitrosonornicotine | cancer | 16543-55-8 | January 1, 1988 |
+| N-Nitrosopiperidine | cancer | 100-75-4 | January 1, 1988 |
+| N-Nitrosopyrrolidine | cancer | 930-55-2 | October 1, 1987 |
+| N-Nitrososarcosine | cancer | 13256-22-9 | January 1, 1988 |
+| o-Nitrotoluene | cancer | 88-72-2 | May 15, 1998 |
+| Nitrous oxide | developmental, female | 10024-97-2 | August 1, 2008 |
+| Norethisterone (Norethindrone) | cancer | 68-22-4 | October 1, 1989 |
+| Norethisterone (Norethindrone) | developmental | 68-22-4 | April 1, 1990 |
+| Norethisterone acetate (Norethindrone acetate) | developmental | 51-98-9 | October 1, 1991 |
+| Norethisterone (Norethindrone) /Ethinyl estradiol | developmental | 68-22-4 / 57- 63-6 | April 1, 1990 |
+| Norethisterone(Norethindrone)/ Mestranol | developmental | 68-22-4 / 72- 33-3 | April 1, 1990 |
+| Norethynodrel | cancer | 68-23-5 | February 27, 2001 |
+| Norgestrel | developmental | 6533-00-2 | April 1, 1990 |
+| | | | |
+| Ochratoxin A | cancer | 303-47-9 | July 1, 1990 |
+| Oil Orange SS | cancer | 2646-17-5 | April 1, 1988 |
+| Oral contraceptives, combined | cancer | --- | October 1, 1989 |
+
+| Chemical | Type of Toxicity | CAS No. | Date Listed |
+| --- | --- | --- | --- |
+| Oral contraceptives, sequential | cancer | --- | October 1, 1989 |
+| Oryzalin | cancer | 19044-88-3 | September 12, 2008 |
+| Oxadiazon | cancer | 19666-30-9 | July 1, 1991 |
+| Oxadiazon | developmental | 19666-30-9 | May 15, 1998 |
+| Oxazepam | cancer | 604-75-1 | October 1, 1994 |
+
+Oxazepam developmental 604-75-1 October 1, 1992 
+p,p’-Oxybis(benzenesulfonyl 
+hydrazide), Delisted December 
+13, 2013 
+
+developmental 80-51-3 August 7, 2009
+
+| Oxymetholone | cancer | 434-07-1 | January 1, 1988 |
+| --- | --- | --- | --- |
+| Oxymetholone | developmental | 434-07-1 | May 1, 1997 |
+| Oxytetracycline (internal use) | developmental | 79-57-2 | January 1, 1991 |
+| Oxytetracycline hydrochloride (internal use) | developmental | 2058-46-0 | October 1, 1991 |
+| Oxythioquinox (Chinomethionat) | cancer | 2439-01-2 | August 20, 1999 |
+| Oxythioquinox (Chinomethionat) | developmental | 2439-01-2 | November 6, 1998 |
+| | | | |
+| Paclitaxel | developmental, female, male | 33069-62-4 | August 26, 1997 |
+
+Oxydemeton methyl female, male 301-12-2 November 6, 1998 cancer 12174-11-7 December 28, 1999
+
+Palygorskite fibers (> 5m in length)
+
+Panfuran S cancer 794-93-4 January 1, 1988 
+Paramethadione developmental 115-67-3 July 1, 1990 
+Parathion cancer 56-38-2 May 20, 2016 
+Penicillamine developmental 52-67-5 January 1, 1991 
+Pentabromodiphenyl ether mixture 
+[DE-71 (technical grade)] 
+
+cancer --- July 7, 2017 cancer --- October 21, 2016
+
+Pentachlorophenol cancer 87-86-5 January 1, 1990 
+Pentachlorophenol and by 
+products of its synthesis 
+(complex mixture) 
+Pentobarbital sodium developmental 57-33-0 July 1, 1990 
+Pentosan polysulfate sodium cancer --- April 18, 2014 
+Pentostatin developmental 53910-25-1 September 1, 1996 
+Perfluorononanoic acid (PFNA) 
+and its salts 
+
+male --- December 31, 2021 cancer --- December 24, 2021
+
+Perfluorooctane sulfonate (PFOS) developmental 1763-23-1 November 10, 2017 
+Perfluorooctane sulfonic acid 
+(PFOS) and its salts and 
+transformation and degradation 
+precursors 
+
+Perfluorooctanoic acid (PFOA) cancer 335-67-1 February 25, 2022 
+Perfluorooctanoic acid (PFOA) developmental 335-67-1 November 10, 2017 
+Pertuzumab developmental 380610-27-5 January 27, 2017 
+Phenacemide developmental 63-98-9 July 1, 1990 
+Phenacetin cancer 62-44-2 October 1, 1989 
+Phenazopyridine cancer 94-78-0 January 1, 1988 
+Phenazopyridine hydrochloride cancer 136-40-3 January 1, 1988 
+Phenesterin cancer 3546-10-9 July 1, 1989 
+Phenobarbital cancer 50-06-6 January 1, 1990 
+Phenolphthalein cancer 77-09-8 May 15, 1998 
+Phenoxybenzamine cancer 59-96-1 April 1, 1988 
+Phenoxybenzamine hydrochloride cancer 63-92-3 April 1, 1988 
+Phenprocoumon developmental 435-97-2 October 1, 1992 
+o-Phenylenediamine and its salts cancer 95-54-5 May 15, 1998 
+
+| Chemical | Type of Toxicity | CAS No. | Date Listed |
+| --- | --- | --- | --- |
+| Phenyl glycidyl ether | cancer | 122-60-1 | October 1, 1990 |
+| Phenyl glycidyl ether, Delisted April 4, 2014 | male | 122-60-1 | August 7, 2009 |
+| Phenylhydrazine and its salts | cancer | --- | July 1, 1992 |
+| o-Phenylphenate, sodium | cancer | 132-27-4 | January 1, 1990 |
+| o-Phenylphenol | cancer | 90-43-7 | August 4, 2000 |
+| Phenylphosphine | developmental | male 638-21-1 | August 7, 2009 |
+| PhiP(2-Amino-1-methyl-6- phenylimidazol[4,5-b]pyridine) | cancer | 105650-23-5 | October 1, 1994 |
+| Pimozide | developmental, female | 2062-78-4 | August 20, 1999 |
+| Pioglitazone | cancer | 111025-46-8 | April 18, 2014 |
+| Pipobroman | developmental | 54-91-1 | July 1, 1990 |
+| Pirimicarb | cancer | 23103-98-2 | July 1, 2008 |
+| Plicamycin | developmental | 18378-89-7 | April 1, 1990 |
+| Polybrominated biphenyls | cancer | --- | January 1, 1988 |
+| Polybrominated biphenyls | developmental | --- | October 1, 1994 |
+| Polychlorinated biphenyls | cancer | --- | October 1, 1989 |
+| Polychlorinated biphenyls | developmental | --- | January 1, 1991 |
+| Polychlorinated biphenyls (containing 60 or more percent chlorine by molecular weight) | cancer | --- | January 1, 1988 |
+| Polychlorinated dibenzo-p-dioxins | cancer | --- | October 1, 1992 |
+| Polychlorinated dibenzofurans | cancer | --- | October 1, 1992 |
+| Polygeenan | cancer | 53973-98-1 | January 1, 1988 |
+| Ponceau MX | cancer | 3761-53-3 | April 1, 1988 |
+| Ponceau 3R | cancer | 3564-09-8 | April 1, 1988 |
+| Potassium bromate | cancer | 7758-01-2 | January 1, 1990 |
+| Potassium dimethyldithiocarbamate | developmental | 128-03-0 | March 30 1999 |
+| Pravastatin sodium | developmental | 81131-70-6 | March 3, 2000 |
+| Prednisolone sodium phosphate | developmental | 125-02-0 | August 20, 1999 |
+| Primidone | cancer | 125-33-7 | August 20, 1999 |
+| Procarbazine | cancer | 671-16-9 | January 1, 1988 |
+| Procarbazine hydrochloride | cancer | 366-70-1 | January 1, 1988 |
+| Procarbazine hydrochloride | developmental | 366-70-1 | July 1, 1990 |
+| Procymidone | cancer | 32809-16-8 | October 1, 1994 |
+| Progesterone | cancer | 57-83-0 | January 1, 1988 |
+| Pronamide | cancer | 23950-58-5 | May 1, 1996 |
+| Propachlor | cancer | 1918-16-7 | February 27, 2001 |
+| 1,3-Propane sultone | cancer | 1120-71-4 | January 1, 1988 |
+| Propargite | cancer | 2312-35-8 | October 1, 1994 |
+| Propargite | developmental | 2312-35-8 | June 15, 1999 |
+| Propazine | developmental, female | 139-40-2 | July 15, 2016 |
+| beta-Propiolactone | cancer | 57-57-8 | January 1, 1988 |
+| Propoxur | cancer | 114-26-1 | August 11, 2006 |
+| Propylene glycol mono-t-butyl ether | cancer | 57018-52-7 | June 11, 2004 |
+| Propylene oxide | cancer | 75-56-9 | October 1, 1988 |
+| Propylthiouracil | cancer | 51-52-5 | January 1, 1988 |
+| Propylthiouracil | developmental | 51-52-5 | July 1, 1990 |
+| Pulegone | cancer | 89-82-7 | April 18, 2014 |
+| Pymetrozine | cancer | 123312-89-0 | March 22, 2011 |
+| Pyridine | cancer | 110-86-1 | May 17, 2002 |
+| Pyrimethamine | developmental | 58-14-0 | January 29, 1999 |
+| | | | |
+| Quazepam | developmental | 36735-22-5 | August 26, 1997 |
+
+-19- Proposition 65 List of Chemicals -20- Proposition 65 List of Chemicals
+
+Chemical Type of Toxicity CAS No. Date Listed Quinoline and its strong acid salts cancer --- October 24, 1997 Quizalofop-ethyl male 76578-14-8 December 24, 1999
+
+Radionuclides cancer --- July 1, 1989 
+Reserpine cancer 50-55-5 October 1, 1989 
+Residual (heavy) fuel oils cancer --- October 1, 1990 
+Resmethrin cancer 10453-86-8 July 1, 2008 
+Resmethrin developmental 10453-86-8 November 6, 1998 
+Retinol/retinyl esters, when in daily 
+dosages in excess of 10,000 IU, 
+or 3,000 retinol equivalents. 
+(NOTE: Retinol/retinyl esters are 
+required and essential for 
+maintenance of normal 
+reproductive function. The 
+recommended daily level during 
+pregnancy is 8,000 IU.) 
+
+developmental --- July 1, 1989 
+Ribavirin developmental 36791-04-5 April 1, 1990 
+Ribavirin male 36791-04-5 February 27, 2001 
+Riddelliine cancer 23246-96-0 December 3, 2004 
+Rifampin developmental, female 13292-46-1 February 27, 2001 
+
+Saccharin, Delisted April 6, 2001 cancer 81-07-2 October 1, 1989 
+Saccharin, sodium, Delisted 
+January 17, 2003 
+
+cancer 128-44-9 January 1, 1988
+
+Safrole cancer 94-59-7 January 1, 1988 
+Salted fish, Chinese-style cancer --- April 29, 2011 
+Secobarbital sodium developmental 309-43-3 October 1, 1992 
+Sedaxane cancer 874967-67-6 July 1, 2016 
+Selenium sulfide cancer 7446-34-6 October 1, 1989 
+Sermorelin acetate developmental --- August 20, 1999 
+Shale-oils cancer 68308-34-9 April 1, 1990 
+Silica, crystalline (airborne 
+particles of respirable size) 
+
+cancer --- October 1, 1988
+
+Silicon carbide whiskers cancer --- November 17, 2023 
+Simazine developmental, female 122-34-9 July 15, 2016 
+Sodium dimethyldithiocarbamate developmental 128-04-1 March 30 1999 
+Sodium fluoroacetate male 62-74-8 November 6, 1998 
+Soots, tars, and mineral 
+oils(untreated and mildly treated 
+oils and used engine oils) 
+
+cancer --- February 27, 1987
+
+Spirodiclofen cancer 148477-71-8 October 8, 2010 
+Spironolactone cancer 52-01-7 May 1, 1997 
+Stanozolol cancer 10418-03-8 May 1, 1997 
+Sterigmatocystin cancer 10048-13-2 April 1, 1988 
+Streptomycin sulfate developmental 3810-74-0 January 1, 1991 
+Streptozocin (streptozotocin) developmental, female, 
+male 
+
+18883-66-4 August 20, 1999
+
+Streptozotocin (streptozocin) cancer 18883-66-4 January 1, 1988 
+Strong inorganic acid mists 
+containing sulfuric acid 
+
+cancer --- March 14, 2003
+
+Styrene cancer 100-42-5 April 22, 2016 
+Styrene oxide cancer 96-09-3 October 1, 1988 
+Sulfallate cancer 95-06-7 January 1, 1988 
+Sulfasalazine 
+(Salicylazosulfapyridine) 
+
+cancer 599-79-1 May 15, 1998
+
+| Chemical | Type of Toxicity | CAS No. | Date Listed |
+| --- | --- | --- | --- |
+| Sulfasalazine (Salicylazosulfapyridine) | male | 599-79-1 | January 29, 1999 |
+| Sulfur dioxide | developmental | 7446-09-5 | July 29, 2011 |
+| Sulindac | developmental, female | 38194-50-2 | January 29, 1999 |
+| | | | |
+| Tacrolimus | cancer | 104987-11-3 | July 17, 2026 |
+| Talc containing asbestiform fibers | cancer | --- | April 1, 1990 |
+| Tamoxifen and its salts | cancer | 10540-29-1 | September 1, 1996 |
+| Tamoxifen citrate | developmental | 54965-24-1 | July 1, 1990 |
+| Temazepam | developmental | 846-50-4 | April 1, 1990 |
+| Teniposide | developmental | 29767-20-2 | September 1, 1996 |
+| Terbacil | developmental | 5902-51-2 | May 18, 1999 |
+| Teriparatide | cancer | 52232-67-4 | August 14, 2015 |
+| Terrazole | cancer | 2593-15-9 | October 1, 1994 |
+| Testosterone and its esters | cancer | 58-22-0 | April 1, 1988 |
+| Testosterone cypionate | developmental | 58-20-8 | October 1, 1991 |
+| Testosterone enanthate | developmental | 315-37-7 | April 1, 1990 |
+| Tetrabromobisphenol A | cancer | 79-94-7 | October 27, 2017 |
+| 3,3′,4,4′-Tetrachloroazobenzene | cancer | 14047-09-7 | July 24, 2012 |
+| 2,3,7,8-Tetrachlorodibenzo-p dioxin (TCDD) | cancer | 1746-01-6 | January 1, 1988 |
+| 2,3,7,8-Tetrachlorodibenzo-p dioxin (TCDD) | developmental | 1746-01-6 | April 1, 1991 |
+| 1,1,1,2-Tetrachloroethane | cancer | 630-20-6 | September 13, 2013 |
+| 1,1,2,2-Tetrachloroethane | cancer | 79-34-5 | July 1, 1990 |
+| Tetrachloroethylene (Perchloroethylene) | cancer | 127-18-4 | April 1, 1988 |
+| p-a,a,a-Tetrachlorotoluene | cancer | 5216-25-1 | January 1, 1990 |
+| Tetrachlorvinphos | cancer | 22248-79-9 | May 20, 2016 |
+| Tetracycline (internal use) | developmental | 60-54-8 | October 1, 1991 |
+| Tetracyclines (internal use) | developmental | --- | October 1, 1992 |
+| Tetracycline hydrochloride (internal use) | developmental | 64-75-5 | January 1, 1991 |
+| Tetrafluoroethylene | cancer | 116-14-3 | May 1, 1997 |
+| Δ 9-Tetrahydrocannabinol (Δ delta-9-THC) | 9-THC; developmental | | January 3, 2020 |
+| Tetrahydrofuran | cancer | 109-99-9 | December 17, 2021 |
+| Tetranitromethane | cancer | 509-14-8 | July 1, 1990 |
+| Thalidomide | developmental | 50-35-1 | July 1, 1987 |
+| Thioacetamide | cancer | 62-55-5 | January 1, 1988 |
+| 4,4'-Thiodianiline | cancer | 139-65-1 | April 1, 1988 |
+| Thiodicarb | cancer | 59669-26-0 | August 20, 1999 |
+| Thioguanine | developmental | 154-42-7 | July 1, 1990 |
+| Thiophanate methyl | female, male | 23564-05-8 | May 18, 1999 |
+| Thiouracil | cancer | 141-90-2 | June 11, 2004 |
+| Thiourea | cancer | 62-56-6 | January 1, 1988 |
+| Thorium dioxide | cancer | 1314-20-1 | February 27, 1987 |
+| Titanium dioxide (airborne, unbound particles of respirable size) | cancer | --- | September 2, 2011 |
+| Tobacco, oral use of smokeless products | cancer | --- | April 1, 1988 |
+| Tobacco smoke | cancer | --- | April 1, 1988 |
+| Tobacco smoke (primary) | developmental, female, male | --- | April 1, 1988 |
+| Tobramycin sulfate | developmental | 49842-07-1 | July 1, 1990 |
+
+| Chemical | Type of Toxicity | CAS No. | Date Listed |
+| --- | --- | --- | --- |
+| Toluene | developmental | 108-88-3 | January 1, 1991 |
+| | female | 108-88-3 | August 7, 2009 |
+| Toluene diisocyanate | cancer | 26471-62-5 | October 1, 1989 |
+| o-Toluidine | cancer | 95-53-4 | January 1, 1988 |
+| o-Toluidine hydrochloride | cancer | 636-21-5 | January 1, 1988 |
+| para-Toluidine, Delisted October 29, 1999 | cancer | 106-49-0 | January 1, 1990 |
+| Topiramate | developmental | 97240-79-4 | November 27, 2015 |
+| Toxaphene (Polychlorinated camphenes) | cancer | 8001-35-2 | January 1, 1988 |
+| Toxins derived from Fusarium Moniliforme (Fusarium verticillioides) | cancer | --- | August 7, 2009 |
+| Treosulfan | cancer | 299-75-2 | February 27, 1987 |
+
+Treosulfan cancer 299-75-2 February 27, 1987 
+Triadimefon developmental, female, 
+male 
+
+43121-43-3 March 30, 1999
+
+| S,S,S-Tributyl phosphorotrithioate (Tribufos, DEF) | cancer | 78-48-8 | February 25, 2011 |
+| --- | --- | --- | --- |
+| Tributyltin methacrylate | developmental | 2155-70-6 | December 1, 1999 |
+| Trichlormethine (Trimustine hydrochloride) | cancer | 817-09-4 | January 1, 1992 |
+| Trichloroacetic acid | cancer | 76-03-9 | September 13, 2013 |
+| 1,1,1-Trichloroethane | cancer | 71-55-6 | April 21, 2023 |
+| Trichloroethylene | cancer | 79-01-6 | April 1, 1988 |
+| Trichloroethylene | developmental, male | 79-01-6 | January 31, 2014 |
+| 2,4,6-Trichlorophenol | cancer | 88-06-2 | January 1, 1988 |
+| 1,2,3-Trichloropropane | cancer | 96-18-4 | October 1,1992 |
+| Trientine hydrochloride | developmental | 38260-01-4 | February 27, 2001 |
+| Triforine | developmental | 26644-46-2 | June 18, 1999 |
+
+Triamterene cancer 396-01-0 April 18, 2014 
+Triazolam developmental 28911-01-5 April 1, 1990 
+1,3,5-Triglycidyl-s-triazinetrione, 
+Delisted December 13, 2013 
+
+male 2451-62-9 August 7, 2009
+
+| 2,4,5-Trimethylaniline and its strong acid salts | cancer | --- | October 24, 1997 |
+| --- | --- | --- | --- |
+| Trimethylolpropane triacrylate, technical grade | cancer | --- | December 17, 2021 |
+| Trimethyl phosphate | cancer | 512-56-1 | May 1, 1996 |
+
+Trilostane developmental 13647-35-3 April 1, 1990 
+Trimethadione developmental 127-48-0 January 1, 1991 
+
+| 2,4,6-Trinitrotoluene (TNT) | cancer | 118-96-7 | December 19, 2008 |
+| --- | --- | --- | --- |
+| Triphenyltin hydroxide | cancer | 76-87-9 | July 1, 1992 |
+| Triphenyltin hydroxide | developmental | 76-87-9 | March 18, 2002 |
+| Tris(aziridinyl)-p-benzoquinone (Triaziquone), Delisted December 8, 2006 | cancer | 68-76-8 | October 1, 1989 |
+| Tris(1-aziridinyl)phosphine sulfide (Thiotepa) | cancer | 52-24-4 | January 1, 1988 |
+| Tris(2-chloroethyl) phosphate | cancer | 115-96-8 | April 1, 1992 |
+| Tris(2,3-dibromopropyl)phosphate | cancer | 126-72-7 | January 1, 1988 |
+| Tris(1,3-dichloro-2-propyl) phosphate (TDCPP) | cancer | 13674-87-8 | October 28, 2011 |
+| Trp-P-1 (Tryptophan-P-1) | cancer | 62450-06-0 | April 1, 1988 |
+| Trp-P-2 (Tryptophan-P-2) | cancer | 62450-07-1 | April 1, 1988 |
+
+Trimethyl phosphate cancer 512-56-1 May 1, 1996 
+Trimetrexate glucoronate developmental 82952-64-5 August 26, 1997 
+TRIM ® VX cancer --- May 25, 2018 
+
+| Chemical | Type of Toxicity | CAS No. | Date Listed |
+| --- | --- | --- | --- |
+| Trypan blue (commercial grade) | cancer | 72-57-1 | October 1, 1989 |
+| | | | |
+| Unleaded gasoline (wholly vaporized) | cancer | --- | April 1, 1988 |
+| Uracil mustard | cancer | 66-75-1 | April 1, 1988 |
+
+Uracil mustard cancer 66-75-1 April 1, 1988 
+Uracil mustard developmental, female, 
+male 
+
+66-75-1 January 1, 1992 
+Urethane (Ethyl carbamate) cancer 51-79-6 January 1, 1988 
+Urethane (Ethyl carbamate) developmental 51-79-6 October 1, 1994 
+Urofollitropin developmental 97048-13-0 April 1, 1990 
+cancer 1314-62-1 February 11, 2005 
+
+Valproate (Valproic acid) developmental 99-66-1 July 1, 1987 
+Vanadium pentoxide 
+(orthorhombic crystalline form) 
+
+| Vincristine sulfate | developmental | 2068-78-2 | July 1, 1990 |
+| --- | --- | --- | --- |
+| Vinyl acetate | cancer | 108-05-4 | January 3, 2025 |
+| Vinyl bromide | cancer | 593-60-2 | October 1, 1988 |
+| Vinyl chloride | cancer | 75-01-4 | February 27, 1987 |
+| 4-Vinylcyclohexene | cancer | 100-40-3 | May 1, 1996 |
+| 4-Vinyl-cyclohexene | female, male | 100-40-3 | August 7, 2009 |
+| 4-Vinyl-1-cyclohexene diepoxide (Vinyl cyclohexene dioxide) | cancer | 106-87-6 | July 1, 1990 |
+| Vinyl cyclohexene dioxide (4-Vinyl 1-cyclohexene diepoxide) | female, male | 106-87-6 | August 1, 2008 |
+| Vinyl fluoride | cancer | 75-02-5 | May 1, 1997 |
+| Vinylidene chloride (1,1- Dichloroethylene) | cancer | 75-35-4 | December 29, 2017 |
+| Vinyl trichloride (1,1,2- Trichloroethane) | cancer | 79-00-5 | October 1, 1990 |
+| Vismodegib | developmental, female, male | 879085-55-9 | January 27, 2017 |
+| Voriconazole | cancer | 137234-62-9: 188416-29-7; 173967-54-9 | July 17, 2026 |
+
+Vinblastine sulfate developmental 143-67-9 July 1, 1990 
+Vinclozolin cancer 50471-44-8 August 20, 1999 
+Vinclozolin developmental 50471-44-8 May 15, 1998 
+Warfarin developmental 81-81-2 July 1, 1987 
+Welding Fumes cancer --- July 17, 2026 
+Wood dust cancer --- December 18, 2009 
+2,6-Xylidine (2,6-Dimethylaniline) cancer 87-62-7 January 1, 1991 
+
+Zalcitabine cancer 7481-89-2 August 7, 2009 
+Zidovudine (AZT) cancer 30516-87-1 December 18, 2009 
+Zileuton cancer, developmental, 
+female 
+
+111406-87-2 December 22, 2000
+
+Zineb, Delisted October 29, 1999 cancer 12122-67-7 January 1, 1990
+
+Date: July 31, 2026
+

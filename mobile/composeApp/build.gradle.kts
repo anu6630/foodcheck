@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidApplication)
@@ -71,6 +73,8 @@ kotlin {
             implementation(libs.androidx.appcompat)
             implementation(libs.androidx.core.ktx)
             implementation(libs.ktor.client.okhttp)
+            implementation(libs.play.services.ads)
+            implementation("androidx.lifecycle:lifecycle-process:2.8.3")
 
             // Dependency Injection
             implementation(libs.koin.android)
@@ -88,22 +92,47 @@ kotlin {
     }
 }
 
+val keystorePropertiesFile = rootProject.file("keystore/keystore.properties")
+val keystoreProperties = Properties().apply {
+    if (keystorePropertiesFile.exists()) {
+        keystorePropertiesFile.inputStream().use { load(it) }
+    }
+}
+
 android {
-    namespace = "com.foodcheck.app"
+    namespace = "biz.lifex.foodcheck"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
     
     defaultConfig {
-        applicationId = "com.foodcheck.app"
+        applicationId = "biz.lifex.foodcheck"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = appVersionCode
         versionName = appVersionName
     }
+
+    signingConfigs {
+        create("release") {
+            val storeFileName = keystoreProperties["storeFile"] as? String
+            if (storeFileName != null) {
+                storeFile = rootProject.file("keystore/$storeFileName")
+                storePassword = keystoreProperties["storePassword"] as String
+                keyAlias = keystoreProperties["keyAlias"] as String
+                keyPassword = keystoreProperties["keyPassword"] as String
+            }
+        }
+    }
     
     buildTypes {
         debug {}
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro",
+            )
+            signingConfig = signingConfigs.getByName("release")
         }
     }
     

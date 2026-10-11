@@ -32,15 +32,25 @@ data class CompanyListResponse(val companies: List<CatalogCompanyDto> = emptyLis
 @Serializable
 data class ShelfItemDto(
     val id: Int,
+    /** Backing label read; lets a saved pack join a comparison without re-reading the photo. */
+    val scanId: Int? = null,
     val displayName: String,
     val brand: String? = null,
     val brandId: Int? = null,
     val barcode: String? = null,
+    val stance: String = "unsure",
+    val tags: List<String> = emptyList(),
     val createdAt: String? = null,
     val hasPhoto: Boolean = false,
     val companies: List<CatalogCompanyDto> = emptyList(),
     val ingredients: List<AnnotatedIngredient> = emptyList(),
     val disclaimer: String? = null
+)
+
+@Serializable
+data class ShelfStanceResponse(
+    val id: Int,
+    val stance: String,
 )
 
 @Serializable

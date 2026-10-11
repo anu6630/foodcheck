@@ -48,6 +48,10 @@ kotlin {
             implementation(libs.ktor.client.okhttp)
         }
 
+        val desktopMain by getting {
+            dependsOn(commonMain.get())
+        }
+
         val iosMain by creating {
             dependsOn(commonMain.get())
             dependencies {

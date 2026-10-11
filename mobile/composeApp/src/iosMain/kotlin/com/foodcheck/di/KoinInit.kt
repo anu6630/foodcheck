@@ -1,5 +1,6 @@
 package com.foodcheck.di
 
+import com.foodcheck.data.local.AppFilesBootstrap
 import com.foodcheck.data.network.ApiHealthMonitor
 import com.foodcheck.presentation.state.IngredientDetailViewModel
 import com.foodcheck.presentation.state.ProductDetailViewModel
@@ -10,10 +11,21 @@ import com.foodcheck.presentation.state.ShelfViewModel
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import org.koin.core.context.startKoin
+import platform.Foundation.NSDocumentDirectory
+import platform.Foundation.NSSearchPathForDirectoriesInDomains
+import platform.Foundation.NSUserDomainMask
 
 /** Called once from Swift (`iosAppApp.swift`) at process start, mirroring Android's
  * `MainActivity.onCreate` Koin bootstrap. */
 fun initKoin() {
+    val docs = NSSearchPathForDirectoriesInDomains(
+        directory = NSDocumentDirectory,
+        domainMask = NSUserDomainMask,
+        expandTilde = true,
+    ).firstOrNull() as? String
+    if (docs != null) {
+        AppFilesBootstrap.init("$docs/foodcheck-cache")
+    }
     val koinApp = startKoin {
         modules(sharedModule, appModule)
     }

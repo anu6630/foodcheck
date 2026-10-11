@@ -16,4 +16,9 @@ sealed interface Route {
     @Serializable data object SubmitRequest : Route
     @Serializable data object Feed : Route
     @Serializable data object MyList : Route
+
+    /** Compare 2–3 packs: tray → grouped result (shared CompareViewModel) → saved detail. */
+    @Serializable data object Compare : Route
+    @Serializable data object CompareResult : Route
+    @Serializable data class ComparisonDetail(val id: Int) : Route
 }

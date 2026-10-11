@@ -2,8 +2,8 @@ package com.foodcheck.presentation.state
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.foodcheck.data.datasources.NetworkDataSource
 import com.foodcheck.data.dto.ShelfItemDto
+import com.foodcheck.data.repositories.ShelfRepository
 import com.foodcheck.domain.entities.UnifiedSearchResult
 import com.foodcheck.domain.usecases.UnifiedSearchUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,7 +17,7 @@ import kotlinx.coroutines.launch
 @OptIn(FlowPreview::class)
 class SearchViewModel(
     private val unifiedSearchUseCase: UnifiedSearchUseCase,
-    private val network: NetworkDataSource
+    private val shelfRepository: ShelfRepository,
 ) : ViewModel() {
 
     private val _query = MutableStateFlow("")
@@ -54,11 +54,13 @@ class SearchViewModel(
                     unifiedSearchUseCase(q)
                         .onSuccess { _results.value = it }
                         .onFailure { _error.value = it.message ?: "Failed to search" }
-                    _shelf.value = try {
-                        network.listShelf(q).items
-                    } catch (_: Exception) {
-                        emptyList()
+                    if (shelfRepository.items.value.isEmpty()) {
+                        runCatching {
+                            shelfRepository.hydrateFromDisk()
+                            shelfRepository.refresh()
+                        }
                     }
+                    _shelf.value = shelfRepository.filtered(q)
                     _loading.value = false
                 }
         }

@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import { communityRoutes } from "./communityRoutes.js";
+import { comparisonRoutes } from "./comparisonRoutes.js";
 import { PgDataSourceRepository } from "../repositories/dataSourceRepository.js";
 import { PgIngredientRepository } from "../repositories/ingredientRepository.js";
 import { PgProductRepository } from "../repositories/productRepository.js";
@@ -19,6 +20,7 @@ import {
 
 export const publicRoutes = new Hono();
 publicRoutes.route("/", communityRoutes);
+publicRoutes.route("/", comparisonRoutes);
 
 publicRoutes.post("/scan", async (c) => {
   try {
@@ -42,7 +44,8 @@ publicRoutes.post("/scan", async (c) => {
     const result = await usecase.execute(images, mockType);
     return c.json(result);
   } catch (e) {
-    return c.json({ detail: `Image scanning failed: ${(e as Error).message}` }, 500);
+    // The scan agent already returns a user-facing reason (busy, unreadable, not configured).
+    return c.json({ detail: (e as Error).message || "Image scanning failed" }, 500);
   }
 });
 

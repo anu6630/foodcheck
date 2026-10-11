@@ -240,6 +240,8 @@ CREATE TABLE IF NOT EXISTS shelf_items (
   brand VARCHAR(255),
   brand_id INTEGER REFERENCES brand_names(id) ON DELETE SET NULL,
   barcode VARCHAR(50),
+  stance VARCHAR(20) NOT NULL DEFAULT 'unsure',
+  tags JSONB NOT NULL DEFAULT '[]',
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
@@ -272,3 +274,31 @@ CREATE TABLE IF NOT EXISTS story_likes (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   PRIMARY KEY (story_id, user_id)
 );
+
+-- Side-by-side comparison of 2–3 packs. Each item points at its own scans row
+-- (new label read, or reused from My list). Brand and name are user input.
+CREATE TABLE IF NOT EXISTS comparisons (
+  id SERIAL PRIMARY KEY,
+  user_id UUID NOT NULL REFERENCES app_users(id) ON DELETE CASCADE,
+  category VARCHAR(60),
+  tags JSONB NOT NULL DEFAULT '[]',
+  decision VARCHAR(12) NOT NULL DEFAULT 'undecided',
+  chosen_slot SMALLINT,
+  reasons JSONB NOT NULL DEFAULT '[]',
+  note TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_comparisons_user_created ON comparisons (user_id, created_at DESC);
+
+CREATE TABLE IF NOT EXISTS comparison_items (
+  comparison_id INTEGER NOT NULL REFERENCES comparisons(id) ON DELETE CASCADE,
+  slot SMALLINT NOT NULL,
+  scan_id INTEGER NOT NULL REFERENCES scans(id) ON DELETE CASCADE,
+  display_name VARCHAR(255) NOT NULL,
+  brand VARCHAR(255),
+  front_image_key TEXT,
+  flagged_count INTEGER NOT NULL DEFAULT 0,
+  ingredient_count INTEGER NOT NULL DEFAULT 0,
+  PRIMARY KEY (comparison_id, slot)
+);
+CREATE INDEX IF NOT EXISTS idx_comparison_items_scan ON comparison_items (scan_id);

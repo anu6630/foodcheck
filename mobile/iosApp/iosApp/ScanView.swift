@@ -15,12 +15,19 @@ struct ScanView: View {
     @State private var saveBrand = ""
     @State private var saveBrandId: Int? = nil
     @State private var showCompany = false
+    @State private var showTags = false
     @State private var companyQuery = ""
     @State private var selectedCompanies: [CatalogCompanyDto] = []
+    @State private var saveStance: ShelfStance = .unsure
+    @State private var selectedTags: [String] = []
     @State private var caption = ""
     @State private var expandedGroups: Set<String> = []
+    @State private var toastMessage: String? = nil
+    @State private var errorDialog: String? = nil
+    private let tagOptions = ["Kids", "Adults", "Elderly", "Home"]
     
     var body: some View {
+        ZStack {
         VStack(spacing: 24) {
             if model.loading {
                     Spacer()
@@ -122,17 +129,12 @@ struct ScanView: View {
                                     }
                                 }
                             }
-                            .frame(maxHeight: 280)
+                            .frame(maxHeight: .infinity)
                         }
-                        HStack {
-                            Button("Save to my list") { showSave = true }
+                        if FeatureFlags.shared.socialFeedEnabled {
+                            Button("Share as story") { showShare = true }
                                 .font(.system(size: 14, weight: .bold))
                                 .foregroundColor(Color(red: 0.06, green: 0.73, blue: 0.51))
-                            if FeatureFlags.shared.socialFeedEnabled {
-                                Button("Share as story") { showShare = true }
-                                    .font(.system(size: 14, weight: .bold))
-                                    .foregroundColor(Color(red: 0.06, green: 0.73, blue: 0.51))
-                            }
                         }
                         if !similar.isEmpty {
                             Text("Similar packs")
@@ -169,6 +171,17 @@ struct ScanView: View {
                                 }
                             }
                         }
+                        Spacer(minLength: 0)
+                        Button(action: { showSave = true }) {
+                            Text("Save to my list")
+                                .font(.system(size: 16, weight: .bold))
+                                .foregroundColor(.white)
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 48)
+                                .background(Color(red: 0.06, green: 0.73, blue: 0.51))
+                                .clipShape(RoundedRectangle(cornerRadius: 14))
+                        }
+                        .padding(.top, 8)
                     }
                     .padding(.horizontal, 20)
                     .sheet(isPresented: $showSave) {
@@ -210,16 +223,35 @@ struct ScanView: View {
                                         }
                                     }
                                 }
-                                if !showCompany {
+                                Section("Stance") {
+                                    Picker("Stance", selection: $saveStance) {
+                                        Text("Avoid").tag(ShelfStance.avoid)
+                                        Text("Occasional").tag(ShelfStance.occasional)
+                                        Text("OK").tag(ShelfStance.ok)
+                                        Text("Unsure").tag(ShelfStance.unsure)
+                                    }
+                                    .pickerStyle(.segmented)
+                                }
+                                if !showCompany || !showTags {
                                     Section {
-                                        Button {
-                                            showCompany = true
-                                            model.searchCompanies(query: "")
-                                        } label: {
-                                            Label("Company", systemImage: "plus")
+                                        if !showCompany {
+                                            Button {
+                                                showCompany = true
+                                                model.searchCompanies(query: "")
+                                            } label: {
+                                                Label("Company", systemImage: "plus")
+                                            }
+                                        }
+                                        if !showTags {
+                                            Button {
+                                                showTags = true
+                                            } label: {
+                                                Label("Tag", systemImage: "plus")
+                                            }
                                         }
                                     }
-                                } else {
+                                }
+                                if showCompany {
                                     Section("Related companies (optional)") {
                                         TextField("Search companies", text: $companyQuery)
                                             .onChange(of: companyQuery) { _, newValue in
@@ -248,6 +280,27 @@ struct ScanView: View {
                                         }
                                     }
                                 }
+                                if showTags {
+                                    Section("Tags (optional)") {
+                                        ForEach(tagOptions, id: \.self) { tag in
+                                            Button {
+                                                if let idx = selectedTags.firstIndex(of: tag) {
+                                                    selectedTags.remove(at: idx)
+                                                } else {
+                                                    selectedTags.append(tag)
+                                                }
+                                            } label: {
+                                                HStack {
+                                                    Text(tag)
+                                                    Spacer()
+                                                    if selectedTags.contains(tag) {
+                                                        Image(systemName: "checkmark")
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
                             }
                             .scrollContentBackground(.hidden)
                             .background(Color(red: 0.06, green: 0.08, blue: 0.14))
@@ -256,26 +309,26 @@ struct ScanView: View {
                             .toolbar {
                                 ToolbarItem(placement: .cancellationAction) {
                                     Button("Close") { showSave = false }
+                                        .disabled(model.saving)
                                 }
                                 ToolbarItem(placement: .confirmationAction) {
-                                    Button("Save") {
+                                    Button(model.saving ? "Saving…" : "Save") {
                                         model.saveToShelf(
                                             name: saveName,
                                             brand: saveBrand,
                                             brandId: saveBrandId,
-                                            companyIds: selectedCompanies.map { Int($0.id) }
+                                            companyIds: selectedCompanies.map { Int($0.id) },
+                                            stance: saveStance.apiValue,
+                                            tags: selectedTags
                                         )
-                                        showSave = false
-                                        saveName = ""
-                                        saveBrand = ""
-                                        saveBrandId = nil
-                                        selectedCompanies = []
-                                        showCompany = false
-                                        companyQuery = ""
                                     }
-                                    .disabled(saveName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                                    .disabled(
+                                        model.saving ||
+                                        saveName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                                    )
                                 }
                             }
+                            .interactiveDismissDisabled(model.saving)
                             .onAppear {
                                 model.searchBrands(query: saveBrand)
                             }
@@ -314,13 +367,11 @@ struct ScanView: View {
                         .presentationDetents([.medium])
                         .presentationDragIndicator(.visible)
                     }
-                    .alert("Done", isPresented: Binding(
-                        get: { model.actionMessage != nil },
-                        set: { if !$0 { model.clearActionMessage() } }
-                    )) {
-                        Button("OK") { model.clearActionMessage() }
-                    } message: {
-                        Text(model.actionMessage ?? "")
+                    .onChange(of: model.actionMessage) { _, _ in
+                        handleSaveActionMessage()
+                    }
+                    .onChange(of: model.saving) { _, saving in
+                        if !saving { handleSaveActionMessage() }
                     }
                 } else {
                     Spacer()
@@ -397,8 +448,98 @@ struct ScanView: View {
                     Spacer()
                 }
             }
+            if model.saving && !showSave {
+                Color.black.opacity(0.35).ignoresSafeArea()
+                HStack(spacing: 12) {
+                    ProgressView()
+                        .progressViewStyle(CircularProgressViewStyle(tint: Color(red: 0.06, green: 0.73, blue: 0.51)))
+                    Text("Saving…")
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundColor(.white)
+                }
+                .padding(.horizontal, 22)
+                .padding(.vertical, 16)
+                .background(Color(red: 0.06, green: 0.08, blue: 0.14))
+                .clipShape(RoundedRectangle(cornerRadius: 16))
+            }
+            if let toastMessage {
+                VStack {
+                    Spacer()
+                    HStack(spacing: 10) {
+                        Image(systemName: "checkmark")
+                            .foregroundColor(Color(red: 0.06, green: 0.73, blue: 0.51))
+                        Text(toastMessage)
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundColor(.white)
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 14)
+                    .frame(maxWidth: .infinity)
+                    .background(Color(red: 0.1, green: 0.12, blue: 0.21).opacity(0.96))
+                    .clipShape(RoundedRectangle(cornerRadius: 14))
+                    .padding(.horizontal, 24)
+                    .padding(.bottom, 28)
+                }
+            }
+            if let errorDialog {
+                Color.black.opacity(0.45).ignoresSafeArea()
+                    .onTapGesture { self.errorDialog = nil }
+                VStack(alignment: .leading, spacing: 12) {
+                    HStack {
+                        Text("Couldn’t save")
+                            .font(.system(size: 16, weight: .bold))
+                            .foregroundColor(.white)
+                        Spacer()
+                        Button { self.errorDialog = nil } label: {
+                            Image(systemName: "xmark")
+                                .foregroundColor(.white.opacity(0.5))
+                        }
+                    }
+                    Text(errorDialog)
+                        .font(.system(size: 13))
+                        .foregroundColor(.white.opacity(0.6))
+                    Button("OK") { self.errorDialog = nil }
+                        .font(.system(size: 14, weight: .bold))
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 12)
+                        .background(Color(red: 0.06, green: 0.73, blue: 0.51))
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                }
+                .padding(18)
+                .background(Color(red: 0.06, green: 0.08, blue: 0.14))
+                .clipShape(RoundedRectangle(cornerRadius: 18))
+                .padding(.horizontal, 28)
+            }
         }
+    }
     
+    private func handleSaveActionMessage() {
+        guard let msg = model.actionMessage, !model.saving else { return }
+        if msg == "Saved to your list" {
+            showSave = false
+            saveName = ""
+            saveBrand = ""
+            saveBrandId = nil
+            selectedCompanies = []
+            showCompany = false
+            showTags = false
+            companyQuery = ""
+            saveStance = .unsure
+            selectedTags = []
+            toastMessage = msg
+            model.clearActionMessage()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.1) {
+                model.clear()
+                onSavedToList()
+                dismiss()
+            }
+        } else {
+            errorDialog = msg
+            model.clearActionMessage()
+        }
+    }
+
     private func triggerPicker(source: ImagePickerSource) {
         guard let controller = topMostViewController() else { return }
         ImagePickerPresenter.present(source: source, from: controller) { data in

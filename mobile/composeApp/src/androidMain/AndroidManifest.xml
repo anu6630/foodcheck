@@ -3,15 +3,23 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
     <uses-feature android:name="android.hardware.camera" android:required="false" />
 
     <application
+        android:name="com.foodcheck.app.FoodCheckApplication"
         android:allowBackup="true"
-        android:label="FoodCheck"
+        android:label="LifeX Food"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
         android:theme="@style/Theme.LifeXFood"
         android:supportsRtl="true"
         android:usesCleartextTraffic="true">
-        
+
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-0071925550132359~5442242320" />
+
         <activity
             android:name="com.foodcheck.app.MainActivity"
             android:exported="true"
@@ -21,6 +29,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        
+
     </application>
 </manifest>

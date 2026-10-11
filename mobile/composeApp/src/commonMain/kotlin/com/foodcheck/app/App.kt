@@ -1,5 +1,8 @@
 package com.foodcheck.app
 
+import com.foodcheck.presentation.state.CompareSlot
+import com.foodcheck.presentation.navigation.HandleBack
+import com.foodcheck.ads.AdsController
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -68,7 +71,6 @@ import androidx.compose.material.icons.filled.PhotoLibrary
 import com.foodcheck.presentation.components.AttachedImageThumb
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Forum
-import androidx.compose.material.icons.filled.PostAdd
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Icon
@@ -94,9 +96,15 @@ import com.foodcheck.presentation.screens.SearchResultsScreen
 import com.foodcheck.presentation.screens.SubmitRequestScreen
 import com.foodcheck.presentation.screens.FeedScreen
 import com.foodcheck.presentation.screens.ShelfListScreen
+import com.foodcheck.presentation.screens.CompareScreen
+import com.foodcheck.presentation.screens.CompareResultScreen
+import com.foodcheck.presentation.screens.ComparisonDetailScreen
+import com.foodcheck.presentation.state.CompareViewModel
+import androidx.compose.material.icons.filled.Balance
 import com.foodcheck.presentation.state.FeedViewModel
 import com.foodcheck.presentation.state.ScanViewModel
 import com.foodcheck.FeatureFlags
+import com.foodcheck.ads.BannerAd
 import com.foodcheck.presentation.theme.AppColors
 import com.foodcheck.util.ImagePickerLauncher
 import org.koin.compose.viewmodel.koinViewModel
@@ -117,6 +125,7 @@ fun App(imagePickerLauncher: ImagePickerLauncher) {
     var clearQueryTrigger by remember { mutableStateOf(0) }
     var showScanSheet by remember { mutableStateOf(false) }
     val scanViewModel: ScanViewModel = koinViewModel()
+    val compareViewModel: CompareViewModel = koinViewModel()
     val feedViewModel: FeedViewModel = koinViewModel()
     val selectedStory by feedViewModel.selected.collectAsState()
 
@@ -169,7 +178,9 @@ fun App(imagePickerLauncher: ImagePickerLauncher) {
                             val topSubtitle = when {
                                 isOnFeed && selectedStory != null -> "Story"
                                 isOnFeed -> "Community"
-                                isOnMyList -> "My list"
+                                isOnMyList -> "My list · private"
+                                currentRoute?.contains("ComparisonDetail") == true -> "Saved comparison"
+                                currentRoute?.contains("Compare") == true -> "Compare products"
                                 else -> "Know what's banned, anywhere."
                             }
                             if (isIos) {
@@ -192,16 +203,6 @@ fun App(imagePickerLauncher: ImagePickerLauncher) {
                                     )
                                     Spacer(modifier = Modifier.height(2.dp))
                                     Text(topSubtitle, color = AppColors.TextMuted, fontSize = 10.sp)
-                                }
-                                IconButton(
-                                    onClick = { navController.navigate(Route.SubmitRequest) },
-                                    modifier = Modifier.align(Alignment.CenterEnd)
-                                ) {
-                                    Icon(
-                                        Icons.Default.PostAdd,
-                                        contentDescription = "Submit request",
-                                        tint = AppColors.Primary
-                                    )
                                 }
                             } else {
                                 Row(
@@ -265,13 +266,6 @@ fun App(imagePickerLauncher: ImagePickerLauncher) {
                                         Spacer(modifier = Modifier.height(2.dp))
                                         Text(topSubtitle, color = AppColors.TextMuted, fontSize = 11.sp)
                                     }
-                                    IconButton(onClick = { navController.navigate(Route.SubmitRequest) }) {
-                                        Icon(
-                                            Icons.Default.PostAdd,
-                                            contentDescription = "Submit request",
-                                            tint = AppColors.Primary
-                                        )
-                                    }
                                 }
                             }
                         }
@@ -287,62 +281,82 @@ fun App(imagePickerLauncher: ImagePickerLauncher) {
             ) {
                 NavHost(navController = navController, startDestination = Route.Landing) {
                     composable<Route.Landing> {
-                        Box(modifier = Modifier.fillMaxSize()) {
-                            SearchResultsScreen(
-                                initialQuery = "",
-                                onQueryChange = { isSearching = it },
-                                clearQueryTrigger = clearQueryTrigger,
-                                onProductClick = { result -> onProductClick(result.product.barcode) },
-                                onIngredientClick = { ing -> ing.id?.let { onIngredientClick(it) } },
-                            )
-
-                            // Floating Bottom Tab Bar overlay
-                            AnimatedVisibility(
-                                visible = !isSearching,
-                                enter = slideInVertically(initialOffsetY = { it }) + fadeIn(),
-                                exit = slideOutVertically(targetOffsetY = { it }) + fadeOut(),
-                                modifier = Modifier.align(Alignment.BottomCenter)
+                        // Search fills remaining space; bottom chrome is a real column so the
+                        // banner never overlays the tab bar (AdView z-order quirk).
+                        Column(modifier = Modifier.fillMaxSize()) {
+                            Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
+                                SearchResultsScreen(
+                                    initialQuery = "",
+                                    onQueryChange = { isSearching = it },
+                                    clearQueryTrigger = clearQueryTrigger,
+                                    onProductClick = { result -> onProductClick(result.product.barcode) },
+                                    onIngredientClick = { ing -> ing.id?.let { onIngredientClick(it) } },
+                                )
+                            }
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(AppColors.Background)
+                                    .navigationBarsPadding(),
+                                horizontalAlignment = Alignment.CenterHorizontally,
                             ) {
-                                Surface(
-                                    modifier = Modifier
-                                        .padding(bottom = 24.dp)
-                                        .shadow(12.dp, shape = RoundedCornerShape(24.dp)),
-                                    color = Color(0xFF0F1123).copy(alpha = 0.85f),
-                                    shape = RoundedCornerShape(24.dp),
-                                    border = BorderStroke(0.5.dp, Color.White.copy(alpha = 0.15f))
+                                // Banner above the tab menu (clipped AdView — see BannerAd.android).
+                                BannerAd(modifier = Modifier.fillMaxWidth())
+                                AnimatedVisibility(
+                                    visible = !isSearching,
+                                    enter = slideInVertically(initialOffsetY = { it }) + fadeIn(),
+                                    exit = slideOutVertically(targetOffsetY = { it }) + fadeOut(),
                                 ) {
-                                    Row(
-                                        modifier = Modifier.padding(horizontal = 24.dp, vertical = 10.dp),
-                                        horizontalArrangement = Arrangement.spacedBy(16.dp),
-                                        verticalAlignment = Alignment.CenterVertically
+                                    Surface(
+                                        modifier = Modifier
+                                            .padding(top = 10.dp, bottom = 16.dp)
+                                            .shadow(2.dp, shape = RoundedCornerShape(24.dp)),
+                                        color = Color(0xFF0F1123).copy(alpha = 0.96f),
+                                        shape = RoundedCornerShape(24.dp),
+                                        border = BorderStroke(0.5.dp, Color.White.copy(alpha = 0.15f))
                                     ) {
-                                        TabButtonCompose(
-                                            icon = Icons.Default.Search,
-                                            title = "Search",
-                                            isActive = true,
-                                            onClick = { /* Already on Search */ }
-                                        )
-                                        TabButtonCompose(
-                                            icon = Icons.Default.DocumentScanner,
-                                            title = "Scan",
-                                            isActive = false,
-                                            onClick = { showScanSheet = true }
-                                        )
-                                        if (FeatureFlags.socialFeedEnabled) {
+                                        Row(
+                                            modifier = Modifier.padding(horizontal = 24.dp, vertical = 10.dp),
+                                            horizontalArrangement = Arrangement.spacedBy(16.dp),
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
                                             TabButtonCompose(
-                                                icon = Icons.Default.Forum,
-                                                title = "Feed",
+                                                icon = Icons.Default.Search,
+                                                title = "Search",
+                                                isActive = true,
+                                                onClick = { /* Already on Search */ }
+                                            )
+                                            TabButtonCompose(
+                                                icon = Icons.Default.DocumentScanner,
+                                                title = "Scan",
                                                 isActive = false,
-                                                onClick = { navController.navigate(Route.Feed) }
+                                                onClick = { showScanSheet = true }
+                                            )
+                                            TabButtonCompose(
+                                                icon = Icons.Default.Balance,
+                                                title = "Compare",
+                                                isActive = false,
+                                                onClick = { navController.navigate(Route.Compare) }
+                                            )
+                                            if (FeatureFlags.socialFeedEnabled) {
+                                                TabButtonCompose(
+                                                    icon = Icons.Default.Forum,
+                                                    title = "Feed",
+                                                    isActive = false,
+                                                    onClick = { navController.navigate(Route.Feed) }
+                                                )
+                                            }
+                                            TabButtonCompose(
+                                                icon = Icons.Default.Bookmark,
+                                                title = "My list",
+                                                isActive = false,
+                                                onClick = { navController.navigate(Route.MyList) }
                                             )
                                         }
-                                        TabButtonCompose(
-                                            icon = Icons.Default.Bookmark,
-                                            title = "My list",
-                                            isActive = false,
-                                            onClick = { navController.navigate(Route.MyList) }
-                                        )
                                     }
+                                }
+                                if (isSearching) {
+                                    Spacer(modifier = Modifier.height(12.dp))
                                 }
                             }
                         }
@@ -360,6 +374,7 @@ fun App(imagePickerLauncher: ImagePickerLauncher) {
                         }
                     }
                     composable<Route.ScanSuggestions> {
+                        val compareState by compareViewModel.state.collectAsState()
                         ScanSuggestionsScreen(
                             viewModel = scanViewModel,
                             onBack = {
@@ -367,11 +382,60 @@ fun App(imagePickerLauncher: ImagePickerLauncher) {
                                 navController.popBackStack()
                             },
                             onCandidateClick = { candidate ->
+                                scanViewModel.clear()
                                 navController.navigate(Route.ProductDetail(candidate.product.barcode)) {
                                     popUpTo(Route.Landing)
                                 }
                             },
-                            onIngredientClick = { ing -> ing.id?.let { onIngredientClick(it) } }
+                            onIngredientClick = { ing -> ing.id?.let { onIngredientClick(it) } },
+                            compareSlots = compareState.slots.map { slot ->
+                                when (slot) {
+                                    CompareSlot.Empty -> null
+                                    is CompareSlot.Ready -> slot.name
+                                    is CompareSlot.Loading -> slot.name
+                                    else -> "Product"
+                                }
+                            },
+                            onAddToCompare = { replaceSlot ->
+                                scanViewModel.outcome.value?.let { outcome ->
+                                    compareViewModel.addFromScan(scanViewModel.capturedImages(), outcome, replaceSlot)
+                                }
+                                navController.navigate(Route.Compare)
+                            }
+                        )
+                    }
+                    composable<Route.Compare> {
+                        CompareScreen(
+                            viewModel = compareViewModel,
+                            imagePickerLauncher = imagePickerLauncher,
+                            onCompare = { navController.navigate(Route.CompareResult) },
+                            onOpenComparison = { id -> navController.navigate(Route.ComparisonDetail(id)) },
+                        )
+                    }
+                    composable<Route.CompareResult> {
+                        CompareResultScreen(
+                            viewModel = compareViewModel,
+                            onIngredientClick = { ing -> ing.id?.let { onIngredientClick(it) } },
+                            onSaved = { id, first ->
+                                val open = {
+                                    navController.navigate(Route.ComparisonDetail(id)) {
+                                        popUpTo(Route.Landing)
+                                    }
+                                }
+                                // Task finished: a natural break for an ad — except the first time, so a
+                                // new user sees the feature work end to end once.
+                                if (first) open() else AdsController.showInterstitial { open() }
+                            },
+                        )
+                    }
+                    composable<Route.ComparisonDetail> { entry ->
+                        val route = entry.toRoute<Route.ComparisonDetail>()
+                        ComparisonDetailScreen(
+                            id = route.id,
+                            onIngredientClick = { ing -> ing.id?.let { onIngredientClick(it) } },
+                            onRedo = { navController.navigate(Route.Compare) },
+                            onDeleted = { navController.popBackStack() },
+                            compareViewModel = compareViewModel,
                         )
                     }
                     if (FeatureFlags.socialFeedEnabled) {
@@ -384,14 +448,22 @@ fun App(imagePickerLauncher: ImagePickerLauncher) {
                     }
                     composable<Route.MyList> {
                         ShelfListScreen(
-                            onIngredientClick = { ing -> ing.id?.let { onIngredientClick(it) } }
+                            onIngredientClick = { ing -> ing.id?.let { onIngredientClick(it) } },
+                            onOpenComparison = { id -> navController.navigate(Route.ComparisonDetail(id)) },
+                            onCompareItem = { item ->
+                                compareViewModel.startFromShelf(item)
+                                navController.navigate(Route.Compare)
+                            },
                         )
                     }
                     composable<Route.ProductDetail> { entry ->
                         val route = entry.toRoute<Route.ProductDetail>()
+                        // Leaving a product page is a break (she has read it); the tap that opened it was not.
+                        val leave = { AdsController.showInterstitial { navController.popBackStack() } }
+                        HandleBack(enabled = true, onBack = leave)
                         ProductDetailScreen(
                             barcode = route.barcode,
-                            onBack = { navController.popBackStack() },
+                            onBack = leave,
                             onIngredientClick = { ing -> ing.id?.let { onIngredientClick(it) } }
                         )
                     }

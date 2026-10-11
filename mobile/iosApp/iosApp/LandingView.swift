@@ -16,7 +16,6 @@ struct LandingView: View {
     @State private var activeBarcode: String? = nil
     @State private var activeIngredientId: String? = nil
     @State private var isSearching = false
-    @State private var showSubmitSheet = false
     
     var body: some View {
         NavigationStack {
@@ -59,24 +58,17 @@ struct LandingView: View {
                                     .font(.custom("Georgia-BoldItalic", size: 25))
                                     .foregroundColor(.white)
                             }
-                            Text(selectedTab == .myList ? "My list" : selectedTab == .feed ? "Community" : "Know what's banned, anywhere.")
+                            Text(
+                                selectedTab == .myList
+                                    ? "My list · private"
+                                    : selectedTab == .feed
+                                        ? "Community"
+                                        : "Know what's banned, anywhere."
+                            )
                                 .font(.system(size: 11))
                                 .foregroundColor(.white.opacity(0.45))
                         }
                         Spacer()
-                        
-                        Button(action: { showSubmitSheet = true }) {
-                            Image(systemName: "square.and.pencil")
-                                .font(.system(size: 16, weight: .semibold))
-                                .foregroundColor(Color(red: 0.06, green: 0.73, blue: 0.51))
-                                .frame(width: 36, height: 36)
-                                .background(.ultraThinMaterial.opacity(0.85))
-                                .clipShape(Circle())
-                                .overlay(
-                                    Circle().stroke(Color.white.opacity(0.15), lineWidth: 0.5)
-                                )
-                        }
-                        .accessibilityLabel("Submit request")
                     }
                     .padding(.horizontal, 24)
                     .padding(.top, 16)
@@ -225,9 +217,6 @@ struct LandingView: View {
                 set: { activeIngredientId = $0?.id }
             )) { wrapper in
                 IngredientDetailView(ingredientId: wrapper.id)
-            }
-            .sheet(isPresented: $showSubmitSheet) {
-                SubmitRequestView()
             }
             .onAppear {
                 withAnimation(.easeInOut(duration: 25).repeatForever(autoreverses: true)) {

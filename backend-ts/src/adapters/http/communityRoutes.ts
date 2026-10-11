@@ -1,8 +1,7 @@
 import { Hono } from "hono";
-import { randomUUID } from "node:crypto";
 import { PgIngredientRepository } from "../repositories/ingredientRepository.js";
 import { getR2OrNull } from "../services/r2Storage.js";
-import { upsertDeviceUser } from "../../infrastructure/deviceUser.js";
+import { httpError, putScanImage, readImage, userId } from "./deviceRequest.js";
 import {
   LABEL_DISCLAIMER,
   addComment,
@@ -20,37 +19,13 @@ import {
   listStories,
   parseCompanyIds,
   parseSnapshot,
+  parseStance,
+  parseTags,
   toggleLike,
+  updateShelfStance,
 } from "../../infrastructure/community.js";
 
 export const communityRoutes = new Hono();
-
-async function userId(c: { req: { header: (n: string) => string | undefined } }): Promise<string> {
-  return upsertDeviceUser(c.req.header("x-device-key"));
-}
-
-function httpError(e: unknown): { detail: string; status: 400 | 401 | 500 } {
-  const status = (e as { status?: number }).status;
-  if (status === 401) return { detail: (e as Error).message, status: 401 };
-  return { detail: (e as Error).message, status: 500 };
-}
-
-async function readImage(form: Record<string, unknown>): Promise<{ buf: Buffer; ext: string } | null> {
-  const file = form.image;
-  if (!file || typeof file === "string" || !(file instanceof File)) return null;
-  const buf = Buffer.from(await file.arrayBuffer());
-  if (!buf.length) return null;
-  const ext = (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg";
-  return { buf, ext };
-}
-
-async function putScanImage(userId: string, file: { buf: Buffer; ext: string }): Promise<string | null> {
-  const r2 = getR2OrNull();
-  if (!r2) return null;
-  const key = `scans/${userId}/${randomUUID()}.${file.ext}`;
-  await r2.put(key, file.buf, file.ext === "png" ? "image/png" : "image/jpeg");
-  return key;
-}
 
 communityRoutes.get("/brands", async (c) => {
   try {
@@ -85,6 +60,8 @@ communityRoutes.post("/me/shelf", async (c) => {
     const brandIdRaw = form.brand_id ? Number(form.brand_id) : NaN;
     const brandId = Number.isFinite(brandIdRaw) && brandIdRaw > 0 ? brandIdRaw : null;
     const companyIds = parseCompanyIds(form.company_ids);
+    const stance = parseStance(form.stance);
+    const tags = parseTags(form.tags);
     const img = await readImage(form as Record<string, unknown>);
     const imageKey = img ? await putScanImage(uid, img) : null;
     const scanId = await createScan({
@@ -101,6 +78,8 @@ communityRoutes.post("/me/shelf", async (c) => {
       brandId,
       barcode: form.barcode ? String(form.barcode) : null,
       companyIds,
+      stance,
+      tags,
     });
     return c.json({ id, disclaimer: LABEL_DISCLAIMER }, 201);
   } catch (e) {
@@ -125,12 +104,24 @@ communityRoutes.get("/me/shelf", async (c) => {
         }
       }
       if (!Array.isArray(companies)) companies = [];
+      let tags = row.tags;
+      if (typeof tags === "string") {
+        try {
+          tags = JSON.parse(tags);
+        } catch {
+          tags = [];
+        }
+      }
+      if (!Array.isArray(tags)) tags = [];
       items.push({
         id: Number(row.id),
+        scan_id: Number(row.scan_id),
         display_name: row.display_name,
         brand: row.brand,
         brand_id: row.brand_id == null ? null : Number(row.brand_id),
         barcode: row.barcode,
+        stance: parseStance(row.stance),
+        tags,
         created_at: row.created_at,
         has_photo: Boolean(row.image_key),
         companies,
@@ -139,6 +130,23 @@ communityRoutes.get("/me/shelf", async (c) => {
       });
     }
     return c.json({ items });
+  } catch (e) {
+    const err = httpError(e);
+    return c.json({ detail: err.detail }, err.status);
+  }
+});
+
+communityRoutes.patch("/me/shelf/:id", async (c) => {
+  try {
+    const uid = await userId(c);
+    const id = Number(c.req.param("id"));
+    if (!Number.isFinite(id) || id <= 0) return c.json({ detail: "Invalid id" }, 400);
+    const body = await c.req.json<{ stance?: string }>().catch(() => ({} as { stance?: string }));
+    if (body.stance == null) return c.json({ detail: "stance is required" }, 400);
+    const stance = parseStance(body.stance);
+    const ok = await updateShelfStance(uid, id, stance);
+    if (!ok) return c.json({ detail: "Not found" }, 404);
+    return c.json({ id, stance });
   } catch (e) {
     const err = httpError(e);
     return c.json({ detail: err.detail }, err.status);

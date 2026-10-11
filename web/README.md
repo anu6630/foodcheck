@@ -1,11 +1,22 @@
-# FoodCheck Web App
+# LifeX Food — marketing site
 
-This is the web frontend of the FoodCheck mono-repo, providing a dashboard and public-facing portal to check ingredient statuses, browse products, and read safety documentation.
+Next.js landing page and **mobile app** privacy policy for FoodCheck / LifeX Food.
 
-## Architecture
-This project focuses on rich design, high performance, semantic accessibility, and search engine optimization. Detailed design principles can be found in the [.cursorrules](.cursorrules) file.
+- Site: https://foodcheck.lifex.biz
+- App privacy: https://foodcheck.lifex.biz/privacy
+- Android / iOS package: `biz.lifex.foodcheck`
 
-### Structure
-- `src/components`: Reusable UI components.
-- `src/hooks`: Custom React/Framework hooks for state and data fetching.
-- `src/pages` (or `src/app`): Application routes and pages.
+## Develop
+
+```bash
+npm install
+npm run dev
+```
+
+## Deploy
+
+```bash
+npx vercel --prod
+```
+
+Custom domain DNS (Cloudflare): `CNAME foodcheck → cname.vercel-dns.com` (or the project-specific Vercel DNS target shown after domain attach).

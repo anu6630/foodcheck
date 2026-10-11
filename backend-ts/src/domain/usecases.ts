@@ -1,5 +1,6 @@
 import type {
   AnnotatedIngredient,
+  DetectedLabel,
   ExtractedIngredientItem,
   HealthFlag,
   Ingredient,
@@ -386,6 +387,12 @@ export async function matchExtractedItems(
       matched.push(await annotateCodeOrName(ingredientRepo, name));
     }
   }
+  // Record label position before the display sort (flagged first) so clients can still
+  // compare by label order. A group is one label entry: its members share its position.
+  matched.forEach((ing, i) => {
+    ing.order = i + 1;
+    ing.members?.forEach((m) => (m.order = i + 1));
+  });
   matched.sort((a, b) => (SEVERITY_RANK[a.severity] ?? 3) - (SEVERITY_RANK[b.severity] ?? 3));
   return attachHealthFlags(ingredientRepo, matched);
 }
@@ -484,6 +491,14 @@ export class ScanWithAgentUseCase {
         : result.ingredients_text
           ? await matchIngredientsFromText(this.ingredientRepo, result.ingredients_text)
           : [];
+    // Label facts travel with every outcome; catalog matching is optional on top.
+    const detected: DetectedLabel = {
+      product_name: result.product_name?.trim() || null,
+      brand: result.brand?.trim() || null,
+      category: result.category ?? null,
+      image_roles: result.image_roles ?? [],
+      ingredients_complete: result.ingredients_complete ?? null,
+    };
     const candidates = [...result.candidates]
       .filter(([, score]) => score >= SUGGEST_SCORE_MIN)
       .sort((a, b) => b[1] - a[1]);
@@ -498,6 +513,7 @@ export class ScanWithAgentUseCase {
           match_type: "confident" as const,
           product: await withProductHealth(this.ingredientRepo, buildAnnotatedProduct(topProduct)),
           ingredients,
+          detected,
         };
       }
 
@@ -510,10 +526,11 @@ export class ScanWithAgentUseCase {
           }))
         ),
         ingredients,
+        detected,
       };
     }
 
-    return { match_type: "ingredients_only" as const, ingredients };
+    return { match_type: "ingredients_only" as const, ingredients, detected };
   }
 }
 

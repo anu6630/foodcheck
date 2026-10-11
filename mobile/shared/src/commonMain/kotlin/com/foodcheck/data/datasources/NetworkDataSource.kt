@@ -21,11 +21,24 @@ import com.foodcheck.data.dto.RequestSubmitResponse
 import com.foodcheck.data.dto.BrandListResponse
 import com.foodcheck.data.dto.CommunityIdResponse
 import com.foodcheck.data.dto.CommentsResponse
+import com.foodcheck.data.dto.ComparisonDraft
+import com.foodcheck.data.dto.ComparisonDto
+import com.foodcheck.data.dto.ComparisonListResponse
 import com.foodcheck.data.dto.CompanyListResponse
 import com.foodcheck.data.dto.LikeResponse
 import com.foodcheck.data.dto.ShelfListResponse
+import com.foodcheck.data.dto.ShelfStanceResponse
 import com.foodcheck.data.dto.StoryDto
 import com.foodcheck.data.dto.StoryListResponse
+import io.ktor.client.request.patch
+import io.ktor.client.request.delete
+import io.ktor.client.statement.readRawBytes
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonArray
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
+import kotlinx.serialization.json.putJsonArray
+import kotlinx.serialization.json.add
 import com.foodcheck.data.network.BackendConfig
 import com.foodcheck.domain.entities.IngredientDetail
 import com.foodcheck.domain.entities.SearchProductResult
@@ -64,6 +77,8 @@ class NetworkDataSource(
         brand: String?,
         brandId: Int? = null,
         companyIds: List<Int> = emptyList(),
+        stance: String = "unsure",
+        tags: List<String> = emptyList(),
         ingredientsText: String,
         snapshotJson: String,
         image: ByteArray?,
@@ -76,6 +91,13 @@ class NetworkDataSource(
                 brandId?.let { append("brand_id", it.toString()) }
                 if (companyIds.isNotEmpty()) {
                     append("company_ids", companyIds.joinToString(prefix = "[", postfix = "]"))
+                }
+                append("stance", stance)
+                if (tags.isNotEmpty()) {
+                    append(
+                        "tags",
+                        tags.joinToString(prefix = "[", postfix = "]") { "\"$it\"" },
+                    )
                 }
                 append("ingredients_text", ingredientsText)
                 append("snapshot", snapshotJson)
@@ -96,6 +118,118 @@ class NetworkDataSource(
             if (query.isNotBlank()) parameter("q", query)
         }
         return decodeOrThrow(response.bodyAsText(), response.status.value, ShelfListResponse.serializer())
+    }
+
+    suspend fun updateShelfStance(id: Int, stance: String): ShelfStanceResponse {
+        val response = client.patch("${BackendConfig.baseUrl}/api/me/shelf/$id") {
+            deviceKey()
+            contentType(ContentType.Application.Json)
+            setBody("""{"stance":"$stance"}""")
+        }
+        return decodeOrThrow(response.bodyAsText(), response.status.value, ShelfStanceResponse.serializer())
+    }
+
+    /** Saves a comparison; new label reads upload `label_<slot>` / `front_<slot>` photos. */
+    suspend fun createComparison(draft: ComparisonDraft): CommunityIdResponse {
+        val payload = buildJsonObject {
+            draft.category?.let { put("category", it) }
+            putJsonArray("tags") { draft.tags.forEach { add(it) } }
+            put("decision", draft.decision)
+            draft.chosenSlot?.let { put("chosen_slot", it) }
+            putJsonArray("reasons") { draft.reasons.forEach { add(it) } }
+            draft.note?.let { put("note", it) }
+            put("add_chosen_to_shelf", draft.addChosenToShelf)
+            putJsonArray("items") {
+                draft.items.forEach { item ->
+                    add(buildJsonObject {
+                        put("slot", item.slot)
+                        put("display_name", item.displayName)
+                        item.brand?.let { put("brand", it) }
+                        item.scanId?.let { put("scan_id", it) }
+                        if (item.scanId == null) {
+                            put("snapshot", buildJsonArray {
+                                item.snapshot.forEach { ing ->
+                                    add(buildJsonObject {
+                                        put("id", ing.id?.let(::JsonPrimitive) ?: kotlinx.serialization.json.JsonNull)
+                                        put("name", ing.name)
+                                        if (ing.order > 0) put("order", ing.order)
+                                    })
+                                }
+                            })
+                            put("ingredients_text", item.snapshot.joinToString(", ") { it.name })
+                        }
+                    })
+                }
+            }
+        }
+        val response = client.submitFormWithBinaryData(
+            url = "${BackendConfig.baseUrl}/api/me/comparisons",
+            formData = formData {
+                append("payload", payload.toString())
+                draft.items.forEach { item ->
+                    item.labelImage?.let { appendJpeg("label_${item.slot}", it) }
+                    item.frontImage?.let { appendJpeg("front_${item.slot}", it) }
+                }
+            }
+        ) { deviceKey() }
+        return decodeOrThrow(response.bodyAsText(), response.status.value, CommunityIdResponse.serializer())
+    }
+
+    suspend fun listComparisons(): ComparisonListResponse {
+        val response = client.get("${BackendConfig.baseUrl}/api/me/comparisons") { deviceKey() }
+        return decodeOrThrow(response.bodyAsText(), response.status.value, ComparisonListResponse.serializer())
+    }
+
+    suspend fun getComparison(id: Int): ComparisonDto {
+        val response = client.get("${BackendConfig.baseUrl}/api/me/comparisons/$id") { deviceKey() }
+        return decodeOrThrow(response.bodyAsText(), response.status.value, ComparisonDto.serializer())
+    }
+
+    suspend fun updateComparisonDecision(
+        id: Int,
+        decision: String,
+        chosenSlot: Int?,
+        reasons: List<String>,
+        note: String?,
+    ) {
+        val body = buildJsonObject {
+            put("decision", decision)
+            chosenSlot?.let { put("chosen_slot", it) }
+            putJsonArray("reasons") { reasons.forEach { add(it) } }
+            note?.let { put("note", it) }
+        }
+        val response = client.patch("${BackendConfig.baseUrl}/api/me/comparisons/$id") {
+            deviceKey()
+            contentType(ContentType.Application.Json)
+            setBody(body.toString())
+        }
+        requireSuccessBody(response, "Update")
+    }
+
+    suspend fun deleteComparison(id: Int) {
+        val response = client.delete("${BackendConfig.baseUrl}/api/me/comparisons/$id") { deviceKey() }
+        requireSuccessBody(response, "Delete")
+    }
+
+    /** [kind] is "front" or "label". Null when that photo was not saved. */
+    suspend fun comparisonPhoto(id: Int, slot: Int, kind: String): ByteArray? {
+        val response = client.get("${BackendConfig.baseUrl}/api/me/comparisons/$id/items/$slot/photo") {
+            deviceKey()
+            parameter("kind", kind)
+        }
+        return if (response.status.isSuccess()) response.readRawBytes() else null
+    }
+
+    suspend fun shelfPhoto(id: Int): ByteArray? {
+        val response = client.get("${BackendConfig.baseUrl}/api/me/shelf/$id/photo") { deviceKey() }
+        return if (response.status.isSuccess()) response.readRawBytes() else null
+    }
+
+    private fun io.ktor.client.request.forms.FormBuilder.appendJpeg(field: String, bytes: ByteArray) {
+        append(field, bytes, Headers.build {
+            append(HttpHeaders.ContentType, "image/jpeg")
+            append(HttpHeaders.ContentDisposition, "filename=\"$field.jpg\"")
+        })
     }
 
     suspend fun listBrands(query: String = "", limit: Int = 20): BrandListResponse {

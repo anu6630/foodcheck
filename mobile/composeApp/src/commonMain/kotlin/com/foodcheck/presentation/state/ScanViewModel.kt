@@ -5,8 +5,10 @@ import androidx.lifecycle.viewModelScope
 import com.foodcheck.data.datasources.NetworkDataSource
 import com.foodcheck.data.dto.CatalogBrandDto
 import com.foodcheck.data.dto.CatalogCompanyDto
+import com.foodcheck.data.repositories.ShelfRepository
 import com.foodcheck.domain.entities.AnnotatedIngredient
 import com.foodcheck.domain.entities.ScanOutcome
+import com.foodcheck.domain.entities.expandWithLabelOrder
 import com.foodcheck.domain.usecases.ScanUseCase
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -24,7 +26,8 @@ private val SCAN_STATUS_MESSAGES = listOf(
 
 class ScanViewModel(
     private val scanUseCase: ScanUseCase,
-    private val network: NetworkDataSource
+    private val network: NetworkDataSource,
+    private val shelfRepository: ShelfRepository,
 ) : ViewModel() {
 
     private val _outcome = MutableStateFlow<ScanOutcome?>(null)
@@ -41,6 +44,9 @@ class ScanViewModel(
 
     private val _actionMessage = MutableStateFlow<String?>(null)
     val actionMessage: StateFlow<String?> = _actionMessage.asStateFlow()
+
+    private val _saving = MutableStateFlow(false)
+    val saving: StateFlow<Boolean> = _saving.asStateFlow()
 
     private val _brandSuggestions = MutableStateFlow<List<CatalogBrandDto>>(emptyList())
     val brandSuggestions: StateFlow<List<CatalogBrandDto>> = _brandSuggestions.asStateFlow()
@@ -107,8 +113,13 @@ class ScanViewModel(
         brand: String?,
         brandId: Int? = null,
         companyIds: List<Int> = emptyList(),
+        stance: String = "unsure",
+        tags: List<String> = emptyList(),
     ) {
+        if (_saving.value) return
         viewModelScope.launch {
+            _saving.value = true
+            _actionMessage.value = null
             try {
                 val ings = _outcome.value?.labelIngredients().orEmpty()
                 network.saveToShelf(
@@ -116,13 +127,18 @@ class ScanViewModel(
                     brand = brand?.trim()?.ifBlank { null },
                     brandId = brandId,
                     companyIds = companyIds.distinct(),
+                    stance = stance,
+                    tags = tags.distinct(),
                     ingredientsText = ings.joinToString(", ") { it.name },
                     snapshotJson = snapshotJson(ings),
                     image = lastImages.firstOrNull(),
                 )
+                runCatching { shelfRepository.invalidateAndRefresh() }
                 _actionMessage.value = "Saved to your list"
             } catch (e: Exception) {
                 _actionMessage.value = e.message ?: "Could not save"
+            } finally {
+                _saving.value = false
             }
         }
     }
@@ -144,6 +160,9 @@ class ScanViewModel(
         }
     }
 
+    /** Photos behind the current outcome (front first when two were taken). */
+    fun capturedImages(): List<ByteArray> = lastImages
+
     fun clearActionMessage() {
         _actionMessage.value = null
     }
@@ -151,17 +170,21 @@ class ScanViewModel(
     fun clear() {
         _outcome.value = null
         _error.value = null
+        _actionMessage.value = null
+        _saving.value = false
         lastImages = emptyList()
         _brandSuggestions.value = emptyList()
         _companySuggestions.value = emptyList()
     }
 
     private fun snapshotJson(ings: List<AnnotatedIngredient>): String {
-        val flat = ings.flatMap { it.forSnapshot() }
+        // Label position travels with each entry so a saved pack can be compared by label order.
+        val flat = ings.expandWithLabelOrder()
         val parts = flat.joinToString(",") { ing ->
             val id = ing.id?.replace("\"", "")
             val name = ing.name.replace("\\", "\\\\").replace("\"", "\\\"")
-            if (id != null) """{"id":"$id","name":"$name"}""" else """{"id":null,"name":"$name"}"""
+            val order = if (ing.order > 0) ",\"order\":${ing.order}" else ""
+            if (id != null) """{"id":"$id","name":"$name"$order}""" else """{"id":null,"name":"$name"$order}"""
         }
         return "[$parts]"
     }

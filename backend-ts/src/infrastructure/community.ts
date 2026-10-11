@@ -6,7 +6,8 @@ import { annotateIngredient, attachHealthFlags, DEFAULT_MARKET } from "../domain
 export const LABEL_DISCLAIMER =
   "Status is for the substances on this label, not a certificate for the brand.";
 
-export type SnapshotName = { id: string | null; name: string };
+/** One saved label entry. `order` is its 1-based label position (absent on older saves). */
+export type SnapshotName = { id: string | null; name: string; order?: number };
 
 export type CatalogCompany = { id: number; name: string };
 export type CatalogBrand = {
@@ -30,6 +31,43 @@ export async function createScan(input: {
   return Number(rows[0]!.id);
 }
 
+export const SHELF_STANCES = ["avoid", "occasional", "ok", "unsure"] as const;
+export type ShelfStance = (typeof SHELF_STANCES)[number];
+export const SHELF_TAG_OPTIONS = ["Kids", "Adults", "Elderly", "Home"] as const;
+
+export function parseStance(raw: unknown): ShelfStance {
+  const s = String(raw ?? "")
+    .trim()
+    .toLowerCase();
+  return (SHELF_STANCES as readonly string[]).includes(s) ? (s as ShelfStance) : "unsure";
+}
+
+export function parseTags(raw: unknown): string[] {
+  let arr: unknown[] = [];
+  if (Array.isArray(raw)) arr = raw;
+  else if (typeof raw === "string" && raw.trim()) {
+    try {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) arr = parsed;
+      else arr = raw.split(",").map((x) => x.trim());
+    } catch {
+      arr = raw.split(",").map((x) => x.trim());
+    }
+  }
+  const allowed = new Set(SHELF_TAG_OPTIONS.map((t) => t.toLowerCase()));
+  const out: string[] = [];
+  for (const item of arr) {
+    const label = String(item ?? "").trim();
+    if (!label) continue;
+    const hit = SHELF_TAG_OPTIONS.find((t) => t.toLowerCase() === label.toLowerCase());
+    if (hit && !out.includes(hit)) out.push(hit);
+    else if (!allowed.size) {
+      /* keep typed later if we open free tags */
+    }
+  }
+  return out;
+}
+
 export async function createShelfItem(input: {
   userId: string;
   scanId: number;
@@ -38,10 +76,12 @@ export async function createShelfItem(input: {
   brandId: number | null;
   barcode: string | null;
   companyIds: number[];
+  stance: ShelfStance;
+  tags: string[];
 }): Promise<number> {
   const { rows } = await query<{ id: number }>(
-    `INSERT INTO shelf_items (user_id, scan_id, display_name, brand, brand_id, barcode)
-     VALUES ($1,$2,$3,$4,$5,$6) RETURNING id`,
+    `INSERT INTO shelf_items (user_id, scan_id, display_name, brand, brand_id, barcode, stance, tags)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8::jsonb) RETURNING id`,
     [
       input.userId,
       input.scanId,
@@ -49,6 +89,8 @@ export async function createShelfItem(input: {
       input.brand,
       input.brandId,
       input.barcode,
+      input.stance,
+      JSON.stringify(input.tags),
     ]
   );
   const id = Number(rows[0]!.id);
@@ -68,7 +110,7 @@ export async function createShelfItem(input: {
 export async function listShelf(userId: string, q: string) {
   const like = q.trim() ? `%${q.trim()}%` : null;
   const { rows } = await query<Record<string, unknown>>(
-    `SELECT s.id, s.display_name, s.brand, s.brand_id, s.barcode, s.created_at,
+    `SELECT s.id, s.scan_id, s.display_name, s.brand, s.brand_id, s.barcode, s.stance, s.tags, s.created_at,
             sc.snapshot, sc.ingredients_text, sc.image_key,
             COALESCE((
               SELECT json_agg(json_build_object('id', c.id, 'name', c.name) ORDER BY c.name)
@@ -88,11 +130,27 @@ export async function listShelf(userId: string, q: string) {
            JOIN companies c ON c.id = sic.company_id
            WHERE sic.shelf_item_id = s.id AND c.name ILIKE $2
          )
+         OR EXISTS (
+           SELECT 1 FROM jsonb_array_elements_text(COALESCE(s.tags, '[]'::jsonb)) t(tag)
+           WHERE t.tag ILIKE $2
+         )
        )
      ORDER BY s.created_at DESC`,
     [userId, like]
   );
   return rows;
+}
+
+export async function updateShelfStance(
+  userId: string,
+  id: number,
+  stance: ShelfStance
+): Promise<boolean> {
+  const { rows } = await query<{ id: number }>(
+    `UPDATE shelf_items SET stance = $1 WHERE user_id = $2 AND id = $3 RETURNING id`,
+    [stance, userId, id]
+  );
+  return Boolean(rows[0]);
 }
 
 export async function getShelfItem(userId: string, id: number) {
@@ -225,10 +283,15 @@ export function parseSnapshot(raw: unknown): SnapshotName[] {
   if (!Array.isArray(raw)) return [];
   return raw
     .map((x) => {
-      const o = x as { id?: unknown; name?: unknown };
+      const o = x as { id?: unknown; name?: unknown; order?: unknown };
       const name = typeof o.name === "string" ? o.name.trim() : "";
       if (!name) return null;
-      return { id: typeof o.id === "string" ? o.id : null, name };
+      const order = Number(o.order);
+      return {
+        id: typeof o.id === "string" ? o.id : null,
+        name,
+        ...(Number.isInteger(order) && order > 0 ? { order } : {}),
+      };
     })
     .filter((x): x is SnapshotName => x !== null);
 }
@@ -262,9 +325,10 @@ export async function annotateSnapshot(
     const hit = item.id
       ? await repo.getById(item.id)
       : await repo.findByNameOrSynonym(item.name);
-    if (hit) out.push(annotateIngredient(hit));
+    if (hit) out.push({ ...annotateIngredient(hit), ...(item.order ? { order: item.order } : {}) });
     else {
       out.push({
+        ...(item.order ? { order: item.order } : {}),
         id: null,
         name: item.name,
         category: null,

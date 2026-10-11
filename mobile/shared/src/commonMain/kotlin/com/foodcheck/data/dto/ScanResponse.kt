@@ -1,6 +1,7 @@
 package com.foodcheck.data.dto
 
 import com.foodcheck.domain.entities.AnnotatedIngredient
+import com.foodcheck.domain.entities.DetectedLabel
 import com.foodcheck.domain.entities.Product
 import com.foodcheck.domain.entities.SearchProductResult
 import kotlinx.serialization.Serializable
@@ -19,5 +20,6 @@ data class ScanResponse(
     val matchType: String, // "confident" | "suggestions" | "ingredients_only"
     val product: SearchProductResult? = null,
     val candidates: List<ScanCandidateDto> = emptyList(),
-    val ingredients: List<AnnotatedIngredient> = emptyList()
+    val ingredients: List<AnnotatedIngredient> = emptyList(),
+    val detected: DetectedLabel? = null,
 )

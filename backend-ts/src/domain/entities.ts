@@ -85,7 +85,31 @@ export interface ScanAgentResult {
   ingredients_text?: string | null;
   /** Preferred structured tokens from Gemini; falls back to splitting ingredients_text. */
   ingredient_items?: ExtractedIngredientItem[];
+  /** What each photo shows, in upload order (Image 1, Image 2…). */
+  image_roles?: ImageRole[];
+  /** Coarse pack category (one of SCAN_CATEGORIES) or null. */
+  category?: string | null;
+  /** False when the ingredients list looks cut off or partly unreadable; null if unknown. */
+  ingredients_complete?: boolean | null;
   candidates: Array<[Product, number]>;
+}
+
+export const IMAGE_ROLES = ["front", "ingredients", "both", "other"] as const;
+export type ImageRole = (typeof IMAGE_ROLES)[number];
+
+/** Categories the scan agent may suggest; mirrors the app's compare category chips. */
+export const SCAN_CATEGORIES = [
+  "Biscuits", "Noodles", "Chips & snacks", "Drinks", "Health drink",
+  "Chocolate", "Sweets & candy", "Breakfast cereal", "Baby food", "Sauces", "Other",
+] as const;
+
+/** Label facts read from the photos, returned with every scan (independent of catalog matching). */
+export interface DetectedLabel {
+  product_name: string | null;
+  brand: string | null;
+  category: string | null;
+  image_roles: ImageRole[];
+  ingredients_complete: boolean | null;
 }
 
 export type Severity = "red" | "amber" | "green" | "gray";

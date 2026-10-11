@@ -1,7 +1,10 @@
-import type {
-  ExtractedIngredientItem,
-  Product,
-  ScanAgentResult,
+import {
+  IMAGE_ROLES,
+  SCAN_CATEGORIES,
+  type ExtractedIngredientItem,
+  type ImageRole,
+  type Product,
+  type ScanAgentResult,
 } from "../../domain/entities.js";
 import type {
   IIngredientRepository,
@@ -10,13 +13,16 @@ import type {
 } from "../../domain/interfaces.js";
 
 const SYSTEM_PROMPT = `You are an expert food & cosmetic safety assistant for the FoodCheck app.
-You will be shown one or two photos of a product - typically a front-of-pack/branding photo
-and/or a photo of the ingredients label.
+You will be shown one or two numbered photos (Image 1, Image 2) of ONE product, in any order:
+a front-of-pack/branding photo and/or a photo of the ingredients label. One photo may show both.
 
 Extract whatever you can see and reply with ONLY a single JSON object (no markdown fences):
 {
-  "product_name": "<string or null>",
-  "brand": "<string or null>",
+  "image_roles": ["<role of Image 1>", "<role of Image 2, if any>"],
+  "product_name": "<product name as printed, or null>",
+  "brand": "<brand as printed, or null>",
+  "category": "<one of: ${SCAN_CATEGORIES.join(" | ")} — or null>",
+  "ingredients_complete": <true | false | null>,
   "country_hint": "<string or null>",
   "ingredients_text": "<full ingredients paragraph as printed, or null>",
   "ingredient_items": [
@@ -29,6 +35,19 @@ Extract whatever you can see and reply with ONLY a single JSON object (no markdo
     }
   ]
 }
+
+Rules for image_roles (one entry per image, same order):
+- "front" = branding/name side without an ingredients list
+- "ingredients" = ingredients list without the product name
+- "both" = shows the product name and the ingredients list
+- "other" = neither (nutrition table only, barcode, unrelated photo)
+
+Rules for product_name / brand / category:
+- Only what is printed or obvious on the pack; use null when unsure. Never guess a brand.
+- category must be exactly one of the listed values, or null.
+
+ingredients_complete: false if the ingredients list is cut off, blurred or partly hidden;
+true if it is fully readable; null if there is no ingredients list.
 
 Rules for ingredient_items:
 - Prefer splitting additive groups like "Colours (171, 102, 133)" or "Emulsifiers (322, 471)"
@@ -121,19 +140,25 @@ export class GeminiScanAgentService implements IScanAgentService {
     apiKey?: string
   ) {
     this.apiKey = apiKey || process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
-    this.mockMode =
-      (process.env.MOCK_GEMINI || "").toLowerCase() === "true" || !this.apiKey;
+    // Mock data only when explicitly requested (local dev/tests) — never as a silent
+    // stand-in for a failed read, or users would see invented ingredients and flags.
+    this.mockMode = (process.env.MOCK_GEMINI || "").toLowerCase() === "true";
   }
 
   async analyzeImages(images: Buffer[], mockType?: string | null): Promise<ScanAgentResult> {
     if (this.mockMode) {
       return this.getMockResponse(mockType);
     }
+    if (!this.apiKey) throw new Error("Label reading is not configured");
     try {
       return await this.runAgent(images);
     } catch (e) {
-      console.error("Gemini scan agent failed, falling back to mock", e);
-      return this.getMockResponse(mockType);
+      console.error("Gemini scan agent failed", e);
+      const msg = (e as Error).message || "";
+      if (/quota|rate.?limit|429/i.test(msg)) {
+        throw new Error("Label reading is busy right now. Please try again later.");
+      }
+      throw new Error("Could not read the label. Please try again.");
     }
   }
 
@@ -141,14 +166,15 @@ export class GeminiScanAgentService implements IScanAgentService {
     const parts: Array<Record<string, unknown>> = [
       { text: `${SYSTEM_PROMPT}\n\nAnalyze the attached product image(s).` },
     ];
-    for (const img of images) {
+    images.forEach((img, i) => {
+      parts.push({ text: `Image ${i + 1}:` });
       parts.push({
         inline_data: {
           mime_type: "image/jpeg",
           data: img.toString("base64"),
         },
       });
-    }
+    });
 
     const text = await generateContentText(this.apiKey!, parts);
     const extracted = parseFinalJson(text);
@@ -157,6 +183,7 @@ export class GeminiScanAgentService implements IScanAgentService {
     const countryHint = (extracted.country_hint as string | null) ?? null;
     const ingredientsText = (extracted.ingredients_text as string | null) ?? null;
     const ingredientItems = parseIngredientItems(extracted.ingredient_items);
+    const labelFacts = parseLabelFacts(extracted, images.length);
 
     const collected: Array<[Product, number]> = [];
 
@@ -190,6 +217,7 @@ export class GeminiScanAgentService implements IScanAgentService {
       country_hint: countryHint,
       ingredients_text: ingredientsText,
       ingredient_items: ingredientItems,
+      ...labelFacts,
       candidates: [...bestByKey.values()].sort((a, b) => b[1] - a[1]),
     };
   }
@@ -270,6 +298,27 @@ export class GeminiScanAgentService implements IScanAgentService {
 
     return { candidates: [] };
   }
+}
+
+/** Validates the model's photo roles / category / completeness. Pure — unit tested. */
+export function parseLabelFacts(
+  extracted: Record<string, unknown>,
+  imageCount: number
+): { image_roles: ImageRole[]; category: string | null; ingredients_complete: boolean | null } {
+  const rawRoles = Array.isArray(extracted.image_roles) ? extracted.image_roles : [];
+  const roles = rawRoles.slice(0, imageCount).map((r) => {
+    const v = String(r ?? "").trim().toLowerCase();
+    return (IMAGE_ROLES as readonly string[]).includes(v) ? (v as ImageRole) : "other";
+  });
+  const catRaw = typeof extracted.category === "string" ? extracted.category.trim().toLowerCase() : "";
+  const category = SCAN_CATEGORIES.find((c) => c.toLowerCase() === catRaw) ?? null;
+  const complete = extracted.ingredients_complete;
+  return {
+    // Partial/missing roles are worse than none: the app then falls back to upload order.
+    image_roles: roles.length === imageCount ? roles : [],
+    category,
+    ingredients_complete: typeof complete === "boolean" ? complete : null,
+  };
 }
 
 function parseIngredientItems(raw: unknown): ExtractedIngredientItem[] {

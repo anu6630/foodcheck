@@ -5,6 +5,7 @@ import com.foodcheck.data.datasources.NetworkDataSource
 import com.foodcheck.data.dto.ScanResponse
 import com.foodcheck.domain.entities.IngredientDetail
 import com.foodcheck.domain.entities.ScanCandidate
+import com.foodcheck.domain.entities.DetectedLabel
 import com.foodcheck.domain.entities.ScanOutcome
 import com.foodcheck.domain.entities.SearchProductResult
 import com.foodcheck.domain.entities.UnifiedSearchResult
@@ -84,21 +85,26 @@ class ProductRepository(
             Result.success(outcome)
         } catch (e: Exception) {
             // Never return a stale cached scan — that hides real upload/API failures.
-            val detail = e.message?.takeIf { it.isNotBlank() } ?: e::class.simpleName
-            Result.failure(Exception("Scan failed: $detail", e))
+            // The backend already returns a short, user-facing reason.
+            Result.failure(Exception(e.message?.takeIf { it.isNotBlank() } ?: "Could not read the label", e))
         }
     }
 
-    private fun ScanResponse.toDomain(): ScanOutcome = when (matchType) {
-        "confident" -> ScanOutcome.Confident(
-            product ?: error("Backend returned match_type=confident with no product"),
-            ingredients
-        )
-        "suggestions" -> ScanOutcome.Suggestions(
-            candidates.map { ScanCandidate(it.product, it.matchScore) },
-            ingredients
-        )
-        else -> ScanOutcome.IngredientsOnly(ingredients)
+    private fun ScanResponse.toDomain(): ScanOutcome {
+        val label = detected ?: DetectedLabel()
+        return when (matchType) {
+            "confident" -> ScanOutcome.Confident(
+                product ?: error("Backend returned match_type=confident with no product"),
+                ingredients,
+                label,
+            )
+            "suggestions" -> ScanOutcome.Suggestions(
+                candidates.map { ScanCandidate(it.product, it.matchScore) },
+                ingredients,
+                label,
+            )
+            else -> ScanOutcome.IngredientsOnly(ingredients, label)
+        }
     }
 
     /** Flow 1: Submit a product addition request to the community staging queue. */
