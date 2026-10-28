@@ -5,6 +5,14 @@ import { publicRoutes } from "../src/adapters/http/publicRoutes.js";
 import { query } from "../src/infrastructure/db.js";
 import { ensureSchema } from "../src/infrastructure/schemaEnsure.js";
 
+import {
+  actionRateLimiter,
+  adminRateLimiter,
+  aiScanRateLimiter,
+  generalRateLimiter,
+  uploadRateLimiter,
+} from "../src/adapters/http/rateLimiter.js";
+
 const app = new Hono();
 
 app.use(
@@ -20,6 +28,14 @@ app.use("*", async (_c, next) => {
   await ensureSchema();
   await next();
 });
+
+// Rate limiting middleware
+app.use("/api/*", generalRateLimiter);
+app.use("/api/scan", aiScanRateLimiter);
+app.use("/api/requests/*", uploadRateLimiter);
+app.use("/api/me/*", actionRateLimiter);
+app.use("/api/stories/*", actionRateLimiter);
+app.use("/api/admin/*", adminRateLimiter);
 
 app.get("/", (c) =>
   c.json({
