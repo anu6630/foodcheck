@@ -20,6 +20,9 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.ui.draw.shadow
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.CloudDone
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -69,6 +72,7 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.PhotoLibrary
 import com.foodcheck.presentation.components.AttachedImageThumb
+import com.foodcheck.presentation.components.UserAvatar
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Forum
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -103,6 +107,7 @@ import com.foodcheck.presentation.state.CompareViewModel
 import androidx.compose.material.icons.filled.Balance
 import com.foodcheck.presentation.state.FeedViewModel
 import com.foodcheck.presentation.state.ScanViewModel
+import com.foodcheck.presentation.components.MonthlyScansUsedDialog
 import com.foodcheck.FeatureFlags
 import com.foodcheck.ads.BannerAd
 import com.foodcheck.presentation.theme.AppColors
@@ -127,6 +132,9 @@ fun App(imagePickerLauncher: ImagePickerLauncher) {
     val scanViewModel: ScanViewModel = koinViewModel()
     val compareViewModel: CompareViewModel = koinViewModel()
     val feedViewModel: FeedViewModel = koinViewModel()
+    val authViewModel: com.foodcheck.presentation.state.AuthViewModel = koinViewModel()
+    var showAuthSheet by remember { mutableStateOf(false) }
+    val authState by authViewModel.state.collectAsState()
     val selectedStory by feedViewModel.selected.collectAsState()
 
     var activeProductBarcode by remember { mutableStateOf<String?>(null) }
@@ -265,6 +273,36 @@ fun App(imagePickerLauncher: ImagePickerLauncher) {
                                         )
                                         Spacer(modifier = Modifier.height(2.dp))
                                         Text(topSubtitle, color = AppColors.TextMuted, fontSize = 11.sp)
+                                    }
+                                    IconButton(
+                                        onClick = { showAuthSheet = true },
+                                        modifier = Modifier.size(36.dp)
+                                    ) {
+                                        val profile = authState.profile
+                                        if (profile != null && !profile.isAnonymous) {
+                                            UserAvatar(
+                                                photoUrl = profile.photoUrl,
+                                                displayName = profile.displayName,
+                                                size = 28.dp,
+                                                borderColor = AppColors.Green,
+                                                borderWidth = 1.2.dp
+                                            )
+                                        } else {
+                                            Box(
+                                                modifier = Modifier
+                                                    .size(28.dp)
+                                                    .background(Color.White.copy(alpha = 0.08f), CircleShape)
+                                                    .border(0.5.dp, Color.White.copy(alpha = 0.2f), CircleShape),
+                                                contentAlignment = Alignment.Center
+                                            ) {
+                                                Icon(
+                                                    Icons.Default.AccountCircle,
+                                                    contentDescription = "Sign In / Sync",
+                                                    tint = Color.White.copy(alpha = 0.8f),
+                                                    modifier = Modifier.size(18.dp)
+                                                )
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -518,6 +556,13 @@ fun App(imagePickerLauncher: ImagePickerLauncher) {
                 }
             }
         }
+
+        if (showAuthSheet) {
+            com.foodcheck.presentation.components.AuthSheet(
+                viewModel = authViewModel,
+                onDismiss = { showAuthSheet = false }
+            )
+        }
     }
 }
 
@@ -566,6 +611,8 @@ fun ScanBottomSheet(
     val statusText by viewModel.statusText.collectAsState()
     val error by viewModel.error.collectAsState()
     val outcome by viewModel.outcome.collectAsState()
+    val quota by viewModel.quota.collectAsState()
+    val quotaExceeded by viewModel.quotaExceeded.collectAsState()
     val scope = rememberCoroutineScope()
     
     var pickedImages by remember { mutableStateOf(listOf<ByteArray>()) }
@@ -602,7 +649,41 @@ fun ScanBottomSheet(
                 fontSize = 12.sp,
                 color = AppColors.TextMuted
             )
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(12.dp))
+
+            quota?.let { q ->
+                Surface(
+                    onClick = { viewModel.showQuotaDialog() },
+                    color = Color.White.copy(alpha = 0.06f),
+                    shape = RoundedCornerShape(20.dp),
+                    border = BorderStroke(
+                        1.dp,
+                        if (q.isExceeded) Color(0xFFEF4444).copy(alpha = 0.5f) else Color.White.copy(alpha = 0.12f)
+                    ),
+                    modifier = Modifier.padding(bottom = 14.dp)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 5.dp)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(7.dp)
+                                .background(
+                                    if (q.isExceeded) Color(0xFFEF4444) else AppColors.Primary,
+                                    shape = CircleShape
+                                )
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "${q.remaining} of ${q.limit} AI scans left this month",
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = Color.White.copy(alpha = 0.9f)
+                        )
+                    }
+                }
+            }
 
             if (loading) {
                 CircularProgressIndicator(color = AppColors.Primary)
@@ -699,5 +780,43 @@ fun ScanBottomSheet(
                 }
             }
         }
+    }
+
+    val showPaywall by viewModel.showPaywall.collectAsState()
+    val billingManager = remember { com.foodcheck.billing.getBillingManager() }
+    val proDetails by billingManager.proPlanDetails.collectAsState()
+    val purchaseState by billingManager.purchaseState.collectAsState()
+
+    LaunchedEffect(purchaseState) {
+        when (val state = purchaseState) {
+            is com.foodcheck.billing.BillingPurchaseState.Success -> {
+                viewModel.onPurchaseSuccessful(state.purchaseToken, state.productId)
+                billingManager.resetPurchaseState()
+            }
+            else -> {}
+        }
+    }
+
+    quotaExceeded?.let { q ->
+        MonthlyScansUsedDialog(
+            quota = q,
+            onDismiss = { viewModel.dismissQuotaExceeded() },
+            onUpgradeClick = { viewModel.openPaywall() }
+        )
+    }
+
+    if (showPaywall) {
+        val isLoading = purchaseState is com.foodcheck.billing.BillingPurchaseState.InProgress
+        val errorMsg = (purchaseState as? com.foodcheck.billing.BillingPurchaseState.Error)?.message
+
+        com.foodcheck.presentation.components.PaywallSheet(
+            priceFormatted = proDetails?.formattedPrice ?: "₹99/month",
+            isLoading = isLoading,
+            errorMessage = errorMsg,
+            onSubscribeClick = {
+                billingManager.launchSubscriptionFlow("pro_monthly")
+            },
+            onDismiss = { viewModel.dismissPaywall() }
+        )
     }
 }

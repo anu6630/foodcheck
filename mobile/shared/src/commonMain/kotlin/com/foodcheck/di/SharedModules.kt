@@ -57,6 +57,9 @@ val sharedModule = module {
     single<IProductRepository> { get<ProductRepository>() }
     single { ShelfRepository(get(), get()) }
     single { ComparisonRepository(get(), get(), get()) }
+    single<com.foodcheck.domain.repositories.AuthRepository> {
+        com.foodcheck.data.repositories.AuthRepositoryImpl(get(), get())
+    }
 
     // Use cases
     single { SearchProductsUseCase(get()) }

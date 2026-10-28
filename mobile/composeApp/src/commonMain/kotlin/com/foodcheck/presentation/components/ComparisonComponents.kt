@@ -63,8 +63,10 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.foodcheck.domain.entities.AnnotatedIngredient
 import com.foodcheck.domain.entities.ComparedProductSummary
+import com.foodcheck.domain.entities.ComparisonInsight
 import com.foodcheck.domain.entities.ComparisonMatrix
 import com.foodcheck.domain.entities.ComparisonRow
+import com.foodcheck.domain.entities.buildComparisonInsights
 import com.foodcheck.presentation.state.CompareDecision
 import com.foodcheck.presentation.theme.AppColors
 import com.foodcheck.util.decodeImageBitmap
@@ -138,8 +140,19 @@ fun ComparisonHeader(
                 Text(hint, color = AppColors.TextMuted.copy(alpha = 0.45f), fontSize = 9.sp)
             }
             columns.forEach { col ->
+                val s = col.summary
+                val status = when {
+                    s.banned > 0 -> AppColors.Red
+                    s.flagged > 0 -> AppColors.Amber
+                    else -> AppColors.Green
+                }
                 Column(
-                    modifier = Modifier.width(CompareCellWidth + 14.dp),
+                    modifier = Modifier
+                        .width(CompareCellWidth + 14.dp)
+                        .padding(horizontal = 2.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(status.copy(alpha = 0.10f))
+                        .padding(vertical = 4.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     SlotThumb(
@@ -159,18 +172,14 @@ fun ComparisonHeader(
                         overflow = TextOverflow.Ellipsis,
                         textAlign = TextAlign.Center,
                     )
-                    val s = col.summary
                     Text(
-                        if (s.flagged == 0) "0" else "${s.flagged} ⚑",
-                        color = when {
-                            s.banned > 0 -> AppColors.Red
-                            s.flagged > 0 -> AppColors.Amber
-                            else -> AppColors.Green
-                        },
+                        if (s.flagged == 0) "✓ 0" else "${s.flagged} ⚑",
+                        color = status,
                         fontSize = 13.sp,
                         fontWeight = FontWeight.Bold,
                     )
                     Text("${s.total}", color = AppColors.TextMuted, fontSize = 11.sp)
+                    if (s.childWarning) Text("⚠ child", color = AppColors.Amber, fontSize = 10.sp, maxLines = 1)
                 }
             }
         }
@@ -197,6 +206,19 @@ fun LazyListScope.comparisonSections(
 ) {
     if (matrix.childWarnings.isNotEmpty()) {
         item(key = "child_warnings") { ChildWarningCallout(matrix.childWarnings, letters) }
+    }
+    item(key = "insights") {
+        val insights = remember(matrix) { buildComparisonInsights(matrix) }
+        InsightsCard(insights, letters, onIngredientClick)
+    }
+    item(key = "table_title") {
+        Text(
+            "Full ingredient table",
+            color = AppColors.TextMuted,
+            fontWeight = FontWeight.Bold,
+            fontSize = 12.sp,
+            modifier = Modifier.padding(start = 12.dp, end = 12.dp, top = 10.dp, bottom = 2.dp),
+        )
     }
     val sections = listOf(
         MatrixSection.Flagged to matrix.flagged,
@@ -239,6 +261,113 @@ fun LazyListScope.comparisonSections(
             }
         }
     }
+}
+
+/** "What's different" — the matrix in plain sentences, so nobody has to read the table first. */
+@Composable
+private fun InsightsCard(
+    insights: List<ComparisonInsight>,
+    letters: List<String>,
+    onIngredientClick: (AnnotatedIngredient) -> Unit,
+) {
+    if (insights.isEmpty()) return
+    Column(
+        Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 12.dp, vertical = 6.dp)
+            .clip(RoundedCornerShape(10.dp))
+            .background(AppColors.BackgroundSecondary)
+            .padding(horizontal = 10.dp, vertical = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+        Text("What's different", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+        insights.forEach { insight ->
+            val line = insightLine(insight, letters)
+            val ingredient = line.ingredient?.takeIf { it.id != null }
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .clickable(enabled = ingredient != null) { ingredient?.let(onIngredientClick) },
+                verticalAlignment = Alignment.Top,
+            ) {
+                Text(line.icon, color = line.color, fontSize = 13.sp, modifier = Modifier.width(22.dp))
+                Text(line.text, color = Color.White.copy(alpha = 0.9f), fontSize = 13.sp, modifier = Modifier.weight(1f))
+            }
+        }
+        Text(
+            "Labels list ingredients by amount, most first.",
+            color = AppColors.TextMuted.copy(alpha = 0.7f),
+            fontSize = 10.sp,
+        )
+    }
+}
+
+private class InsightLine(val icon: String, val color: Color, val text: String, val ingredient: AnnotatedIngredient? = null)
+
+private fun insightLine(insight: ComparisonInsight, letters: List<String>): InsightLine = when (insight) {
+    is ComparisonInsight.Flagged -> {
+        val ing = insight.row.ingredient
+        InsightLine(
+            icon = "⚠",
+            color = if (ing.severity.equals("red", true)) AppColors.Red else AppColors.Amber,
+            text = "${ing.codesText()?.let { "${ing.name} · $it" } ?: ing.name} — ${presence(insight.row, letters, withPositions = false)}",
+            ingredient = ing,
+        )
+    }
+    is ComparisonInsight.MainOnlyIn -> InsightLine(
+        icon = "●",
+        color = AppColors.Primary,
+        text = "${insight.row.ingredient.name} — ${presence(insight.row, letters, withPositions = true)}",
+        ingredient = insight.row.ingredient,
+    )
+    is ComparisonInsight.HighestIn -> {
+        val p = insight.row.positions
+        val others = p.indices.filter { it != insight.product }.joinToString(", ") { "${letters[it]} ${ordinal(p[it]!!)}" }
+        InsightLine(
+            icon = "⬆",
+            color = AppColors.Primary,
+            text = "${insight.row.ingredient.name} — highest in ${letters[insight.product]} (${ordinal(p[insight.product]!!)}); $others",
+            ingredient = insight.row.ingredient,
+        )
+    }
+    is ComparisonInsight.OnlyOnOne -> InsightLine(
+        icon = "＋",
+        color = AppColors.TextMuted,
+        text = "${letters[insight.product]} has ${insight.count} ingredient${if (insight.count == 1) "" else "s"} " +
+            if (letters.size == 2) "the other doesn't" else "the others don't",
+    )
+    is ComparisonInsight.Shared -> InsightLine(
+        icon = "＝",
+        color = AppColors.TextMuted,
+        text = "${if (letters.size == 2) "Both" else "All ${letters.size}"} share ${insight.count} ingredient${if (insight.count == 1) "" else "s"}",
+    )
+    ComparisonInsight.SameLabel -> InsightLine(
+        icon = "＝",
+        color = AppColors.Green,
+        text = "Same ingredients in the same order",
+    )
+}
+
+/** "only in A (2nd ingredient)", "in A, C — not in B", "in both". */
+private fun presence(row: ComparisonRow, letters: List<String>, withPositions: Boolean): String {
+    val inIdx = row.positions.indices.filter { row.positions[it] != null }
+    val outIdx = row.positions.indices - inIdx.toSet()
+    fun name(i: Int) = if (withPositions) "${letters[i]} (${ordinal(row.positions[i]!!)})" else letters[i]
+    return when {
+        outIdx.isEmpty() -> if (letters.size == 2) "in both" else "in all ${letters.size}"
+        inIdx.size == 1 -> inIdx.single().let { i ->
+            if (withPositions) "only in ${letters[i]} (${ordinal(row.positions[i]!!)} ingredient)" else "only in ${letters[i]}"
+        }
+        else -> "in ${inIdx.joinToString(", ") { name(it) }} — not in ${outIdx.joinToString(", ") { letters[it] }}"
+    }
+}
+
+private fun ordinal(n: Int): String = n.toString() + when {
+    n % 100 in 11..13 -> "th"
+    n % 10 == 1 -> "st"
+    n % 10 == 2 -> "nd"
+    n % 10 == 3 -> "rd"
+    else -> "th"
 }
 
 /** EU-mandated children's warning, shown to everyone because it is a fact about the colour. */

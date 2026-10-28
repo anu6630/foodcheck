@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.kotlinSerialization)
+    alias(libs.plugins.googleServices)
 }
 
 apply(from = rootProject.file("gradle/release-versioning.gradle.kts"))
@@ -74,8 +75,17 @@ kotlin {
             implementation(libs.androidx.core.ktx)
             implementation(libs.ktor.client.okhttp)
             implementation(libs.play.services.ads)
+            implementation(libs.play.billing)
             implementation("androidx.lifecycle:lifecycle-process:2.8.3")
             implementation(project(":appupdate"))
+
+            // Firebase & Auth
+            implementation(project.dependencies.platform(libs.firebase.bom))
+            implementation(libs.firebase.auth)
+            implementation(libs.androidx.credentials)
+            implementation(libs.androidx.credentials.play.services.auth)
+            implementation(libs.googleid)
+            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.9.0")
 
             // Dependency Injection
             implementation(libs.koin.android)

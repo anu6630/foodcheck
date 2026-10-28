@@ -17,6 +17,11 @@ import io.ktor.http.contentType
 import io.ktor.client.statement.HttpResponse
 import com.foodcheck.data.newClientRequestId
 import com.foodcheck.data.dto.ScanResponse
+import com.foodcheck.data.dto.ScanQuotaDto
+import com.foodcheck.data.dto.ScanQuotaExceededDto
+import com.foodcheck.domain.entities.ScanQuota
+import com.foodcheck.domain.entities.ScanQuotaExceededException
+import com.foodcheck.util.sha256Hex
 import com.foodcheck.data.dto.RequestSubmitResponse
 import com.foodcheck.data.dto.BrandListResponse
 import com.foodcheck.data.dto.CommunityIdResponse
@@ -334,11 +339,35 @@ class NetworkDataSource(
         return json.decodeFromString(IngredientDetail.serializer(), text)
     }
 
+    suspend fun getEntitlement(): ScanQuota {
+        val response = client.get("${BackendConfig.baseUrl}/api/me/entitlement") {
+            deviceKey()
+        }
+        val text = requireSuccessBody(response, "Entitlement")
+        val dto = json.decodeFromString(ScanQuotaDto.serializer(), text)
+        return dto.toDomain()
+    }
+
+    suspend fun activateSubscription(purchaseToken: String, productId: String = "pro_monthly"): Boolean {
+        val response = client.post("${BackendConfig.baseUrl}/api/me/subscription") {
+            contentType(io.ktor.http.ContentType.Application.Json)
+            setBody(
+                kotlinx.serialization.json.buildJsonObject {
+                    put("purchaseToken", kotlinx.serialization.json.JsonPrimitive(purchaseToken))
+                    put("productId", kotlinx.serialization.json.JsonPrimitive(productId))
+                }.toString()
+            )
+            deviceKey()
+        }
+        return response.status.value in 200..299
+    }
+
     suspend fun scan(images: List<ByteArray>): ScanResponse {
         if (images.isEmpty()) throw Exception("No images to scan")
         val totalBytes = images.sumOf { it.size }
         if (totalBytes <= 0) throw Exception("Image data is empty")
         val idempotencyKey = newClientRequestId()
+        val imageSha256 = sha256Hex(images.first())
         val response = client.submitFormWithBinaryData(
             url = "${BackendConfig.baseUrl}/api/scan",
             formData = formData {
@@ -353,7 +382,21 @@ class NetworkDataSource(
             }
         ) {
             header("Idempotency-Key", idempotencyKey)
+            header("X-Image-Sha256", imageSha256)
+            deviceKey()
         }
+
+        if (response.status.value == 402) {
+            val text = response.bodyAsText()
+            val exceeded = try {
+                json.decodeFromString(ScanQuotaExceededDto.serializer(), text)
+            } catch (_: Exception) {
+                null
+            }
+            val quota = exceeded?.quota?.toDomain() ?: ScanQuota(used = 5, limit = 5)
+            throw ScanQuotaExceededException(quota)
+        }
+
         val text = requireSuccessBody(response, "Scan")
         return try {
             json.decodeFromString(ScanResponse.serializer(), text)
@@ -429,6 +472,31 @@ class NetworkDataSource(
         }
         val text = response.bodyAsText()
         return json.decodeFromString(RequestSubmitResponse.serializer(), text)
+    }
+
+    suspend fun getProfile(): com.foodcheck.domain.entities.UserProfile {
+        val response = client.get("${BackendConfig.baseUrl}/api/me/profile") {
+            deviceKey()
+        }
+        return decodeOrThrow(response.bodyAsText(), response.status.value, com.foodcheck.domain.entities.UserProfile.serializer())
+    }
+
+    suspend fun linkAccount(req: com.foodcheck.domain.entities.AuthLinkRequest): com.foodcheck.domain.entities.AuthLinkResponse {
+        val response = client.post("${BackendConfig.baseUrl}/api/me/auth/link") {
+            deviceKey()
+            contentType(ContentType.Application.Json)
+            setBody(json.encodeToString(com.foodcheck.domain.entities.AuthLinkRequest.serializer(), req))
+        }
+        return decodeOrThrow(response.bodyAsText(), response.status.value, com.foodcheck.domain.entities.AuthLinkResponse.serializer())
+    }
+
+    suspend fun signOut(): Boolean {
+        return runCatching {
+            val response = client.post("${BackendConfig.baseUrl}/api/me/auth/signout") {
+                deviceKey()
+            }
+            response.status.isSuccess()
+        }.getOrDefault(false)
     }
 
     private suspend fun requireSuccessBody(response: HttpResponse, action: String): String {

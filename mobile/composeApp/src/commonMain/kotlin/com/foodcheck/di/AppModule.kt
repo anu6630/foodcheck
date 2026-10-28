@@ -17,6 +17,7 @@ val appModule = module {
     viewModel { com.foodcheck.presentation.state.ShelfViewModel(get()) }
     viewModel { com.foodcheck.presentation.state.CompareViewModel(get(), get()) }
     viewModel { com.foodcheck.presentation.state.ComparisonsViewModel(get()) }
+    viewModel { com.foodcheck.presentation.state.AuthViewModel(get()) }
     viewModel {
         SubmitRequestViewModel(
             submitProductRequestUseCase = get(),

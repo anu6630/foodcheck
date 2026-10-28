@@ -64,6 +64,7 @@ import com.foodcheck.presentation.components.AttachedImageThumb
 import com.foodcheck.presentation.state.COMPARE_CATEGORIES
 import com.foodcheck.presentation.components.CompactChoiceDialog
 import com.foodcheck.presentation.components.CompactChoiceOption
+import com.foodcheck.presentation.components.CompactToast
 import com.foodcheck.presentation.components.PhotoLoader
 import com.foodcheck.presentation.components.RenameProductDialog
 import com.foodcheck.presentation.components.SearchHeroBar
@@ -107,6 +108,7 @@ fun CompareScreen(
     var renameSlot by remember { mutableStateOf<Int?>(null) }
     var pickerSlot by remember { mutableStateOf<Int?>(null) }
     var categoryOpen by remember { mutableStateOf(false) }
+    var toastMessage by remember { mutableStateOf<String?>(null) }
     LaunchedEffect(Unit) {
         shelf.load("")
         comparisons.load()
@@ -121,6 +123,7 @@ fun CompareScreen(
         .filter { it.scanId != null && it.ingredients.isNotEmpty() && it.scanId !in state.usedScanIds }
         .take(MY_LIST_SUGGESTIONS)
 
+    Box(Modifier.fillMaxSize()) {
     Column(Modifier.fillMaxSize().padding(horizontal = 16.dp, vertical = 12.dp)) {
         Text(
             "Snap the ingredients list of 2–3 packs. Tap a box to open the camera.",
@@ -209,7 +212,10 @@ fun CompareScreen(
                             item.brand,
                             "${item.ingredients.count { it.severity in setOf("red", "amber") || it.showsWatch }} ⚑",
                         ).joinToString(" · "),
-                        onAdd = { viewModel.fillFromShelf(nextEmpty, item) },
+                        onAdd = {
+                            viewModel.fillFromShelf(nextEmpty, item)
+                            toastMessage = "Added ${item.displayName} to Slot ${slotLetter(nextEmpty)}"
+                        },
                     )
                 }
             }
@@ -325,10 +331,12 @@ fun CompareScreen(
             shelf = shelf,
             onPickShelf = {
                 viewModel.fillFromShelf(slot, it)
+                toastMessage = "Added ${it.displayName} to Slot ${slotLetter(slot)}"
                 pickerSlot = null
             },
             onPickSaved = { comparisonId, item ->
                 viewModel.fillFromSavedComparison(slot, comparisonId, item)
+                toastMessage = "Added ${item.displayName} to Slot ${slotLetter(slot)}"
                 pickerSlot = null
             },
             onDismiss = { pickerSlot = null },
@@ -351,6 +359,13 @@ fun CompareScreen(
             },
             onDismiss = { categoryOpen = false },
         )
+    }
+
+    CompactToast(
+        message = toastMessage.orEmpty(),
+        visible = toastMessage != null,
+        onDismiss = { toastMessage = null },
+    )
     }
 }
 

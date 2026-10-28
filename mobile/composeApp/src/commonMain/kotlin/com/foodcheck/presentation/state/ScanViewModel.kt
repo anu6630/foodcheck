@@ -8,6 +8,8 @@ import com.foodcheck.data.dto.CatalogCompanyDto
 import com.foodcheck.data.repositories.ShelfRepository
 import com.foodcheck.domain.entities.AnnotatedIngredient
 import com.foodcheck.domain.entities.ScanOutcome
+import com.foodcheck.domain.entities.ScanQuota
+import com.foodcheck.domain.entities.ScanQuotaExceededException
 import com.foodcheck.domain.entities.expandWithLabelOrder
 import com.foodcheck.domain.usecases.ScanUseCase
 import kotlinx.coroutines.Job
@@ -33,6 +35,12 @@ class ScanViewModel(
     private val _outcome = MutableStateFlow<ScanOutcome?>(null)
     val outcome: StateFlow<ScanOutcome?> = _outcome.asStateFlow()
 
+    private val _quota = MutableStateFlow<ScanQuota?>(null)
+    val quota: StateFlow<ScanQuota?> = _quota.asStateFlow()
+
+    private val _quotaExceeded = MutableStateFlow<ScanQuota?>(null)
+    val quotaExceeded: StateFlow<ScanQuota?> = _quotaExceeded.asStateFlow()
+
     private val _loading = MutableStateFlow(false)
     val loading: StateFlow<Boolean> = _loading.asStateFlow()
 
@@ -44,6 +52,58 @@ class ScanViewModel(
 
     private val _actionMessage = MutableStateFlow<String?>(null)
     val actionMessage: StateFlow<String?> = _actionMessage.asStateFlow()
+
+    init {
+        loadQuota()
+    }
+
+    fun loadQuota() {
+        viewModelScope.launch {
+            try {
+                val q = network.getEntitlement()
+                _quota.value = q
+                if (q.adsSuppressed || q.isPro) {
+                    com.foodcheck.ads.AdsController.adsSuppressed = true
+                }
+            } catch (_: Exception) {
+                // Keep local or null
+            }
+        }
+    }
+
+    private val _showPaywall = MutableStateFlow(false)
+    val showPaywall: StateFlow<Boolean> = _showPaywall.asStateFlow()
+
+    fun openPaywall() {
+        _showPaywall.value = true
+    }
+
+    fun dismissPaywall() {
+        _showPaywall.value = false
+    }
+
+    fun onPurchaseSuccessful(purchaseToken: String, productId: String) {
+        viewModelScope.launch {
+            try {
+                val ok = network.activateSubscription(purchaseToken, productId)
+                if (ok) {
+                    loadQuota()
+                    _showPaywall.value = false
+                    _actionMessage.value = "Welcome to FoodCheck Pro! 50 AI scans unlocked."
+                }
+            } catch (e: Exception) {
+                _error.value = "Failed to sync subscription with server: ${e.message}"
+            }
+        }
+    }
+
+    fun dismissQuotaExceeded() {
+        _quotaExceeded.value = null
+    }
+
+    fun showQuotaDialog() {
+        _quotaExceeded.value = _quota.value
+    }
 
     private val _saving = MutableStateFlow(false)
     val saving: StateFlow<Boolean> = _saving.asStateFlow()
@@ -73,10 +133,16 @@ class ScanViewModel(
             scanUseCase(images)
                 .onSuccess {
                     _outcome.value = it
+                    it.quota?.let { q -> _quota.value = q }
                     _loading.value = false
                 }
                 .onFailure {
-                    _error.value = it.message ?: "Scan failed"
+                    if (it is ScanQuotaExceededException) {
+                        _quotaExceeded.value = it.quota
+                        _quota.value = it.quota
+                    } else {
+                        _error.value = it.message ?: "Scan failed"
+                    }
                     _loading.value = false
                 }
             statusJob.cancel()

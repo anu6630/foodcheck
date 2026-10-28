@@ -4,6 +4,8 @@ package com.foodcheck.ads
  * Platform ads entry points. Android loads/shows AdMob; iOS is a no-op.
  */
 expect object AdsController {
+    var adsSuppressed: Boolean
+
     /** Prefetch interstitial so a later show is instant. */
     fun preloadInterstitial()
 

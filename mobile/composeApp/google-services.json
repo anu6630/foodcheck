@@ -1,0 +1,63 @@
+{
+  "project_info": {
+    "project_number": "36255520715",
+    "project_id": "foodcheck-app-80740",
+    "storage_bucket": "foodcheck-app-80740.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:36255520715:android:1322952c501d53974b084e",
+        "android_client_info": {
+          "package_name": "biz.lifex.foodcheck"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "36255520715-omtk1gi8fhfgjs7j3usk8pv66cdpanvb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "biz.lifex.foodcheck",
+            "certificate_hash": "fd44e9e817db3657e1dc0691a6f8c4e3f15a197a"
+          }
+        },
+        {
+          "client_id": "36255520715-pm80svr68ht913kkb8a5jf3o46h8lu10.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "biz.lifex.foodcheck",
+            "certificate_hash": "a32411c3a459c34eacddc95dc1aa0709ba5ae7ef"
+          }
+        },
+        {
+          "client_id": "36255520715-ujd4dcg76ajmrdo5lvnacr8vgaaend5u.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "biz.lifex.foodcheck",
+            "certificate_hash": "00d8d79722e8ed67e4931deb6bc96852ef7aeb98"
+          }
+        },
+        {
+          "client_id": "36255520715-oap582rggip95r6fv62m46k2nbo1jk1m.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBUF0rv1_aS2ja-_WKybq5zl_sChroSGI4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "36255520715-oap582rggip95r6fv62m46k2nbo1jk1m.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

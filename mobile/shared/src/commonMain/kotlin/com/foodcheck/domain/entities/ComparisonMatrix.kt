@@ -31,6 +31,8 @@ data class ComparedProductSummary(
     val restricted: Int,
     val watch: Int,
     val flagged: Int,
+    /** True when the label has a colour that needs the EU children's warning. */
+    val childWarning: Boolean = false,
 )
 
 data class ComparisonRow(
@@ -107,7 +109,10 @@ fun buildComparisonMatrix(labels: List<List<AnnotatedIngredient>>): ComparisonMa
     val inAll = afterMain.filter { row -> row.positions.all { it != null } }
     val onlyInSome = afterMain - inAll.toSet()
 
-    val summaries = flat.map { items ->
+    val childWarnings = flagged.filter { row ->
+        row.ingredient.healthFlags.any { it.kind == ComparisonMatrix.CHILD_HYPERACTIVITY_KIND }
+    }
+    val summaries = flat.mapIndexed { productIndex, items ->
         val distinct = items.distinctBy(::comparisonKey)
         ComparedProductSummary(
             total = distinct.size,
@@ -115,6 +120,7 @@ fun buildComparisonMatrix(labels: List<List<AnnotatedIngredient>>): ComparisonMa
             restricted = distinct.count { it.severity.equals("amber", true) },
             watch = distinct.count { it.hasHealthWatch || it.healthFlags.isNotEmpty() },
             flagged = distinct.count { it.isComparisonFlagged() },
+            childWarning = childWarnings.any { it.positions[productIndex] != null },
         )
     }
 
@@ -124,8 +130,6 @@ fun buildComparisonMatrix(labels: List<List<AnnotatedIngredient>>): ComparisonMa
         main = main,
         onlyInSome = onlyInSome,
         inAll = inAll,
-        childWarnings = flagged.filter { row ->
-            row.ingredient.healthFlags.any { it.kind == ComparisonMatrix.CHILD_HYPERACTIVITY_KIND }
-        },
+        childWarnings = childWarnings,
     )
 }

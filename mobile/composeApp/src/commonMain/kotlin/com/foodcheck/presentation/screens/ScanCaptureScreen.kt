@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.foodcheck.domain.entities.ScanOutcome
 import com.foodcheck.presentation.components.AttachedImageThumb
+import com.foodcheck.presentation.components.MonthlyScansUsedDialog
 import com.foodcheck.presentation.state.ScanViewModel
 import com.foodcheck.presentation.theme.AppColors
 import com.foodcheck.util.ImagePickerLauncher
@@ -43,6 +44,8 @@ fun ScanCaptureScreen(
     val statusText by viewModel.statusText.collectAsState()
     val error by viewModel.error.collectAsState()
     val outcome by viewModel.outcome.collectAsState()
+    val quota by viewModel.quota.collectAsState()
+    val quotaExceeded by viewModel.quotaExceeded.collectAsState()
     val scope = rememberCoroutineScope()
     var pendingImage by remember { mutableStateOf<ByteArray?>(null) }
 
@@ -155,7 +158,39 @@ fun ScanCaptureScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
-                Spacer(modifier = Modifier.height(10.dp))
+                quota?.let { q ->
+                    Surface(
+                        onClick = { viewModel.showQuotaDialog() },
+                        color = Color.White.copy(alpha = 0.06f),
+                        shape = RoundedCornerShape(20.dp),
+                        border = BorderStroke(
+                            1.dp,
+                            if (q.isExceeded) Color(0xFFEF4444).copy(alpha = 0.5f) else Color.White.copy(alpha = 0.12f)
+                        ),
+                        modifier = Modifier.padding(top = 10.dp)
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp)
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(7.dp)
+                                    .background(
+                                        if (q.isExceeded) Color(0xFFEF4444) else AppColors.Primary,
+                                        shape = CircleShape
+                                    )
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = "${q.remaining} of ${q.limit} AI scans left",
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = Color.White.copy(alpha = 0.9f)
+                            )
+                        }
+                    }
+                } ?: Spacer(modifier = Modifier.height(10.dp))
 
                 ScannerTargetCompose()
 
@@ -264,6 +299,44 @@ fun ScanCaptureScreen(
                 }
             }
         }
+    }
+
+    val showPaywall by viewModel.showPaywall.collectAsState()
+    val billingManager = remember { com.foodcheck.billing.getBillingManager() }
+    val proDetails by billingManager.proPlanDetails.collectAsState()
+    val purchaseState by billingManager.purchaseState.collectAsState()
+
+    LaunchedEffect(purchaseState) {
+        when (val state = purchaseState) {
+            is com.foodcheck.billing.BillingPurchaseState.Success -> {
+                viewModel.onPurchaseSuccessful(state.purchaseToken, state.productId)
+                billingManager.resetPurchaseState()
+            }
+            else -> {}
+        }
+    }
+
+    quotaExceeded?.let { q ->
+        MonthlyScansUsedDialog(
+            quota = q,
+            onDismiss = { viewModel.dismissQuotaExceeded() },
+            onUpgradeClick = { viewModel.openPaywall() }
+        )
+    }
+
+    if (showPaywall) {
+        val isLoading = purchaseState is com.foodcheck.billing.BillingPurchaseState.InProgress
+        val errorMsg = (purchaseState as? com.foodcheck.billing.BillingPurchaseState.Error)?.message
+
+        com.foodcheck.presentation.components.PaywallSheet(
+            priceFormatted = proDetails?.formattedPrice ?: "₹99/month",
+            isLoading = isLoading,
+            errorMessage = errorMsg,
+            onSubscribeClick = {
+                billingManager.launchSubscriptionFlow("pro_monthly")
+            },
+            onDismiss = { viewModel.dismissPaywall() }
+        )
     }
 }
 

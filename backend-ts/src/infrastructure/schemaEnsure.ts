@@ -285,6 +285,58 @@ CREATE TABLE IF NOT EXISTS story_likes (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   PRIMARY KEY (story_id, user_id)
 );
+
+CREATE TABLE IF NOT EXISTS ai_calls (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID REFERENCES app_users(id) ON DELETE SET NULL,
+  family_id UUID,
+  kind TEXT NOT NULL,
+  model TEXT NOT NULL,
+  input_tokens INTEGER NOT NULL DEFAULT 0,
+  output_tokens INTEGER NOT NULL DEFAULT 0,
+  cost_usd NUMERIC(10, 6) NOT NULL DEFAULT 0,
+  cache_hit BOOLEAN NOT NULL DEFAULT FALSE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_ai_calls_user ON ai_calls (user_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_ai_calls_created_at ON ai_calls (created_at DESC);
+
+CREATE TABLE IF NOT EXISTS scan_cache (
+  key TEXT PRIMARY KEY,
+  kind TEXT NOT NULL,
+  result JSONB NOT NULL,
+  hits INTEGER NOT NULL DEFAULT 0,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS scan_usage (
+  subject_type TEXT NOT NULL,
+  subject_id UUID NOT NULL,
+  period_start DATE NOT NULL,
+  used INTEGER NOT NULL DEFAULT 0,
+  topup_left INTEGER NOT NULL DEFAULT 0,
+  PRIMARY KEY (subject_type, subject_id, period_start)
+);
+
+CREATE TABLE IF NOT EXISTS subscriptions (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID NOT NULL REFERENCES app_users(id) ON DELETE CASCADE,
+  purchase_token TEXT NOT NULL UNIQUE,
+  product_id TEXT NOT NULL,
+  base_plan_id TEXT,
+  status TEXT NOT NULL,
+  auto_renewing BOOLEAN NOT NULL DEFAULT TRUE,
+  starts_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  expires_at TIMESTAMPTZ,
+  raw_state JSONB,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_subscriptions_user_status ON subscriptions (user_id, status);
+CREATE INDEX IF NOT EXISTS idx_subscriptions_token ON subscriptions (purchase_token);
 `;
 
 let ensured = false;
@@ -417,10 +469,34 @@ export async function ensureSchema(): Promise<void> {
     `ALTER TABLE shelf_items ADD COLUMN IF NOT EXISTS tags JSONB NOT NULL DEFAULT '[]'`
   );
   await query(
-    `CREATE INDEX IF NOT EXISTS idx_brand_names_company ON brand_names (company_id)`
+    `CREATE INDEX IF NOT EXISTS idx_shelf_item_companies_company ON shelf_item_companies (company_id)`
+  );
+
+  // Auth & Multi-Device Sync migrations
+  await query(
+    `ALTER TABLE app_users ADD COLUMN IF NOT EXISTS firebase_uid VARCHAR(128)`
   );
   await query(
-    `CREATE INDEX IF NOT EXISTS idx_shelf_item_companies_company ON shelf_item_companies (company_id)`
+    `CREATE UNIQUE INDEX IF NOT EXISTS uq_app_users_firebase_uid ON app_users (firebase_uid) WHERE firebase_uid IS NOT NULL`
+  );
+  await query(
+    `ALTER TABLE app_users ADD COLUMN IF NOT EXISTS email VARCHAR(255)`
+  );
+  await query(
+    `ALTER TABLE app_users ADD COLUMN IF NOT EXISTS display_name VARCHAR(120)`
+  );
+  await query(
+    `ALTER TABLE app_users ADD COLUMN IF NOT EXISTS photo_url TEXT`
+  );
+  await query(
+    `CREATE TABLE IF NOT EXISTS user_devices (
+      device_key VARCHAR(80) PRIMARY KEY,
+      user_id UUID NOT NULL REFERENCES app_users(id) ON DELETE CASCADE,
+      last_seen_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )`
+  );
+  await query(
+    `CREATE INDEX IF NOT EXISTS idx_user_devices_user ON user_devices (user_id)`
   );
 
   await seedBrandCompanyCatalog();

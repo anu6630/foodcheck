@@ -12,8 +12,16 @@ object BackendConfig {
     /** Set to a LAN URL for local dev; null uses Neon. */
     var customBaseUrl: String? = null
 
+    var onDeviceKeyChanged: ((String) -> Unit)? = null
+
     /** Anonymous device identity for shelf/stories. Persist on the platform; do not log. */
     var deviceKey: String = ""
+        set(value) {
+            field = value
+            if (value.isNotBlank()) {
+                onDeviceKeyChanged?.invoke(value)
+            }
+        }
 
     fun ensureDeviceKey(): String {
         if (deviceKey.isBlank()) {
