@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.foodcheck.data.dto.ShelfItemDto
 import com.foodcheck.data.repositories.ShelfRepository
+import com.foodcheck.domain.entities.AnnotatedIngredient
 import com.foodcheck.domain.entities.UnifiedSearchResult
 import com.foodcheck.domain.usecases.UnifiedSearchUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -60,9 +61,35 @@ class SearchViewModel(
                             shelfRepository.refresh()
                         }
                     }
-                    _shelf.value = shelfRepository.filtered(q)
+                    val matchedIngredientIds = buildSet {
+                        fun collectIds(ing: AnnotatedIngredient) {
+                            ing.id?.let { add(it) }
+                            ing.eNumber?.let { add(it) }
+                            ing.codes.forEach { add(it.code) }
+                            ing.members.forEach { collectIds(it) }
+                        }
+                        _results.value.ingredients.forEach { collectIds(it) }
+                    }
+                    _shelf.value = shelfRepository.filtered(q, matchedIngredientIds)
                     _loading.value = false
                 }
+        }
+        viewModelScope.launch {
+            shelfRepository.items.collect {
+                val q = _query.value
+                if (q.isNotBlank()) {
+                    val matchedIngredientIds = buildSet {
+                        fun collectIds(ing: AnnotatedIngredient) {
+                            ing.id?.let { add(it) }
+                            ing.eNumber?.let { add(it) }
+                            ing.codes.forEach { add(it.code) }
+                            ing.members.forEach { collectIds(it) }
+                        }
+                        _results.value.ingredients.forEach { collectIds(it) }
+                    }
+                    _shelf.value = shelfRepository.filtered(q, matchedIngredientIds)
+                }
+            }
         }
     }
 

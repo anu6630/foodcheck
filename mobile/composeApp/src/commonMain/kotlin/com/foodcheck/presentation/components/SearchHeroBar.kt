@@ -52,7 +52,7 @@ fun SearchHeroBar(
     query: String,
     onQueryChange: (String) -> Unit,
     modifier: Modifier = Modifier,
-    placeholder: String = "Search packs or additives",
+    placeholder: String = "Search additives or saved packs",
     showScopeHints: Boolean = true,
 ) {
     val focusManager = LocalFocusManager.current
@@ -169,21 +169,14 @@ fun SearchHeroBar(
             ) {
                 HintDot()
                 Text(
-                    "Products",
+                    "Ingredient reference",
                     color = AppColors.TextMuted.copy(alpha = 0.75f),
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Medium,
                 )
                 HintDot()
                 Text(
-                    "Ingredients",
-                    color = AppColors.TextMuted.copy(alpha = 0.75f),
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Medium,
-                )
-                HintDot()
-                Text(
-                    "My list",
+                    "Your saved packs",
                     color = AppColors.TextMuted.copy(alpha = 0.75f),
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Medium,

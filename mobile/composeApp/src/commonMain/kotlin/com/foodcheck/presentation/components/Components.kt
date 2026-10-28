@@ -215,8 +215,7 @@ fun IngredientChip(ingredient: AnnotatedIngredient, onClick: () -> Unit) {
         ingredient.members.any { it.hasHealthWatch || it.healthFlags.isNotEmpty() }
     val isIos = currentPlatform == Platform.IOS
     Surface(
-        modifier = Modifier
-            .clickable(onClick = onClick),
+        onClick = onClick,
         color = if (isIos) Color.White.copy(alpha = 0.05f) else color.copy(alpha = 0.08f),
         border = if (isIos) BorderStroke(0.5.dp, Color.White.copy(alpha = 0.15f)) else BorderStroke(1.dp, color.copy(alpha = 0.4f)),
         shape = if (isIos) RoundedCornerShape(12.dp) else RoundedCornerShape(16.dp)

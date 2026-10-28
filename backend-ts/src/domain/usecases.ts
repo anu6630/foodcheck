@@ -542,25 +542,12 @@ export class UnifiedSearchUseCase {
   ) {}
 
   async execute(query: string) {
-    const products = await new SearchProductUseCase(this.productRepo, this.ingredientRepo).execute(
-      query
-    );
+    // Deprecated public product lookup from public DB/catalog to avoid brand/legal disputes.
+    // The app does not display public commercial products for ingredient/name searches.
+    // Matching is cross-referenced client-side against the user's private saved packs.
     const ingredients = await this.ingredientRepo.searchIngredients(query);
-    let extra: Product[] = [];
-    if (products.length < 5 && this.lookup?.searchByName) {
-      extra = await this.lookup.searchByName(query);
-    }
-    const seen = new Set(products.map((p) => p.product.barcode));
-    const merged = [...products];
-    for (const p of extra) {
-      if (!p.barcode || seen.has(p.barcode)) continue;
-      seen.add(p.barcode);
-      merged.push(
-        await withProductHealth(this.ingredientRepo, buildAnnotatedProduct(p))
-      );
-    }
     return {
-      products: merged.slice(0, 12),
+      products: [],
       ingredients: await attachHealthFlags(
         this.ingredientRepo,
         ingredients.map((i) => annotateIngredient(i))

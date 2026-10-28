@@ -6,6 +6,7 @@ import com.foodcheck.data.datasources.ShelfCacheSnapshot
 import com.foodcheck.data.datasources.ShelfLocalStore
 import com.foodcheck.data.dto.ShelfItemDto
 import com.foodcheck.data.network.BackendConfig
+import com.foodcheck.domain.entities.AnnotatedIngredient
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -42,17 +43,10 @@ class ShelfRepository(
         scope.launch { hydrateFromDisk() }
     }
 
-    fun filtered(query: String): List<ShelfItemDto> {
-        val q = query.trim()
-        if (q.isEmpty()) return _items.value
-        return _items.value.filter { item ->
-            item.displayName.contains(q, ignoreCase = true) ||
-                (item.brand?.contains(q, ignoreCase = true) == true) ||
-                item.tags.any { it.contains(q, ignoreCase = true) } ||
-                item.companies.any { it.name.contains(q, ignoreCase = true) } ||
-                item.ingredients.any { it.name.contains(q, ignoreCase = true) }
-        }
-    }
+    fun filtered(
+        query: String,
+        matchedIngredientIds: Set<String> = emptySet(),
+    ): List<ShelfItemDto> = filterShelfItems(_items.value, query, matchedIngredientIds)
 
     suspend fun hydrateFromDisk() {
         val snap = local.load() ?: return
@@ -175,3 +169,61 @@ class ShelfRepository(
 
     private fun nowMs(): Long = Clock.System.now().toEpochMilliseconds()
 }
+
+fun filterShelfItems(
+    items: List<ShelfItemDto>,
+    query: String,
+    matchedIngredientIds: Set<String> = emptySet(),
+): List<ShelfItemDto> {
+    val q = query.trim()
+    if (q.isEmpty() && matchedIngredientIds.isEmpty()) return items
+
+    fun normalize(text: String): String {
+        val lower = text.lowercase()
+        val sb = StringBuilder(lower.length)
+        for (ch in lower) {
+            val replacement = when (ch) {
+                'é', 'è', 'ê', 'ë' -> 'e'
+                'á', 'à', 'â', 'ä', 'ã', 'å' -> 'a'
+                'í', 'ì', 'î', 'ï' -> 'i'
+                'ó', 'ò', 'ô', 'ö', 'õ' -> 'o'
+                'ú', 'ù', 'û', 'ü' -> 'u'
+                'ç' -> 'c'
+                'ñ' -> 'n'
+                else -> ch
+            }
+            sb.append(replacement)
+        }
+        return sb.toString()
+    }
+
+    fun String?.containsLoose(target: String): Boolean {
+        if (this == null) return false
+        return normalize(this).contains(normalize(target))
+    }
+
+    fun ingredientMatches(ing: AnnotatedIngredient): Boolean {
+        if (matchedIngredientIds.isNotEmpty()) {
+            if (ing.id != null && ing.id in matchedIngredientIds) return true
+            if (ing.eNumber != null && (ing.eNumber in matchedIngredientIds || ing.eNumber.lowercase() in matchedIngredientIds)) return true
+            if (ing.codes.any { it.code in matchedIngredientIds }) return true
+        }
+        if (q.isNotEmpty()) {
+            if (ing.name.containsLoose(q)) return true
+            if (ing.eNumber.containsLoose(q)) return true
+            if (ing.labelText.containsLoose(q)) return true
+        }
+        return ing.members.any { ingredientMatches(it) }
+    }
+
+    return items.filter { item ->
+        val textMatch = q.isNotEmpty() && (
+            item.displayName.containsLoose(q) ||
+                item.brand.containsLoose(q) ||
+                item.tags.any { it.containsLoose(q) } ||
+                item.companies.any { it.name.containsLoose(q) }
+        )
+        textMatch || item.ingredients.any { ingredientMatches(it) }
+    }
+}
+

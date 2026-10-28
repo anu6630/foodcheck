@@ -45,6 +45,7 @@ import com.foodcheck.domain.entities.ShelfStance
 import com.foodcheck.presentation.components.CompactChoiceDialog
 import com.foodcheck.presentation.components.CompactChoiceOption
 import com.foodcheck.presentation.components.CompactIngredientChips
+import com.foodcheck.presentation.components.CompactToast
 import com.foodcheck.presentation.components.LabelIngredientChips
 import com.foodcheck.presentation.components.SearchHeroBar
 import com.foodcheck.presentation.components.SmallChoice
@@ -73,8 +74,10 @@ fun ShelfListScreen(
     val error by viewModel.error.collectAsState()
     var expandedIds by remember { mutableStateOf(setOf<Int>()) }
     var stanceEditId by remember { mutableStateOf<Int?>(null) }
+    var toastMessage by remember { mutableStateOf<String?>(null) }
     LaunchedEffect(Unit) { viewModel.load() }
 
+    Box(modifier = Modifier.fillMaxSize()) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -197,11 +200,20 @@ fun ShelfListScreen(
                 )
             },
             onSelect = { choice ->
-                viewModel.updateStance(id, ShelfStance.fromApi(choice.id))
+                val newStance = ShelfStance.fromApi(choice.id)
+                viewModel.updateStance(id, newStance)
                 stanceEditId = null
+                toastMessage = "Updated stance to ${newStance.label}"
             },
             onDismiss = { stanceEditId = null },
         )
+    }
+
+    CompactToast(
+        message = toastMessage.orEmpty(),
+        visible = toastMessage != null,
+        onDismiss = { toastMessage = null },
+    )
     }
 }
 

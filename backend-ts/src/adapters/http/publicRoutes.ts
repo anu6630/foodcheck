@@ -17,6 +17,10 @@ import {
   SearchProductUseCase,
   UnifiedSearchUseCase,
 } from "../../domain/usecases.js";
+import { MeteredScanUseCase } from "../../domain/meteredScan.js";
+import { ScanQuotaExceededError } from "../../domain/entitlements.js";
+import { PgMeteredScanRepository } from "../../infrastructure/meteredScanRepo.js";
+import { upsertDeviceUser } from "../../infrastructure/deviceUser.js";
 
 export const publicRoutes = new Hono();
 publicRoutes.route("/", communityRoutes);
@@ -36,14 +40,37 @@ publicRoutes.post("/scan", async (c) => {
       files.map(async (f) => Buffer.from(await f.arrayBuffer()))
     );
     const mockType = c.req.header("x-mock-image-type") ?? null;
+    const clientSha256 = c.req.header("x-image-sha256") ?? null;
+
+    const deviceKey = c.req.header("x-device-key") || c.req.header("x-device-id");
+    let uid: string;
+    try {
+      uid = await upsertDeviceUser(deviceKey);
+    } catch {
+      return c.json({ detail: "X-Device-Key is required" }, 401);
+    }
 
     const productRepo = new PgProductRepository();
     const ingredientRepo = new PgIngredientRepository();
     const agent = new GeminiScanAgentService(productRepo, ingredientRepo);
-    const usecase = new ScanWithAgentUseCase(agent, ingredientRepo);
-    const result = await usecase.execute(images, mockType);
+    const scanWithAgent = new ScanWithAgentUseCase(agent, ingredientRepo);
+    const meteredRepo = new PgMeteredScanRepository();
+    const meteredUsecase = new MeteredScanUseCase(meteredRepo, scanWithAgent);
+
+    const result = await meteredUsecase.execute(images, uid, mockType, clientSha256);
     return c.json(result);
   } catch (e) {
+    if (e instanceof ScanQuotaExceededError || (e as Error)?.name === "ScanQuotaExceededError") {
+      const quotaErr = e as ScanQuotaExceededError;
+      return c.json(
+        {
+          code: "SCAN_QUOTA_EXCEEDED",
+          detail: "Monthly AI scan limit reached",
+          quota: quotaErr.quota,
+        },
+        402
+      );
+    }
     // The scan agent already returns a user-facing reason (busy, unreadable, not configured).
     return c.json({ detail: (e as Error).message || "Image scanning failed" }, 500);
   }

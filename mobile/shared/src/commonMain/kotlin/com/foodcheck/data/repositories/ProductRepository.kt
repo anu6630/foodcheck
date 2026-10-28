@@ -92,18 +92,21 @@ class ProductRepository(
 
     private fun ScanResponse.toDomain(): ScanOutcome {
         val label = detected ?: DetectedLabel()
+        val domainQuota = quota?.toDomain()
         return when (matchType) {
             "confident" -> ScanOutcome.Confident(
                 product ?: error("Backend returned match_type=confident with no product"),
                 ingredients,
                 label,
+                domainQuota,
             )
             "suggestions" -> ScanOutcome.Suggestions(
                 candidates.map { ScanCandidate(it.product, it.matchScore) },
                 ingredients,
                 label,
+                domainQuota,
             )
-            else -> ScanOutcome.IngredientsOnly(ingredients, label)
+            else -> ScanOutcome.IngredientsOnly(ingredients, label, domainQuota)
         }
     }
 

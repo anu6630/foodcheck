@@ -24,8 +24,85 @@ import {
   toggleLike,
   updateShelfStance,
 } from "../../infrastructure/community.js";
+import { getUserProfile, linkFirebaseAccount, unlinkDeviceSession } from "../../infrastructure/authLink.js";
+import { PgMeteredScanRepository } from "../../infrastructure/meteredScanRepo.js";
+import { periodStart, resetsAt } from "../../domain/entitlements.js";
+import { upsertDeviceUser } from "../../infrastructure/deviceUser.js";
 
 export const communityRoutes = new Hono();
+
+communityRoutes.get("/me/profile", async (c) => {
+  try {
+    const key = c.req.header("x-device-key") || c.req.header("x-device-id");
+    if (!key) return c.json({ detail: "X-Device-Key is required" }, 401);
+    const profile = await getUserProfile(key);
+    return c.json(profile);
+  } catch (e) {
+    const err = httpError(e);
+    return c.json({ detail: err.detail }, err.status);
+  }
+});
+
+communityRoutes.get("/me/entitlement", async (c) => {
+  try {
+    const key = c.req.header("x-device-key") || c.req.header("x-device-id");
+    if (!key) return c.json({ detail: "X-Device-Key is required" }, 401);
+    const uId = await upsertDeviceUser(key);
+    const repo = new PgMeteredScanRepository();
+    const entitlement = await repo.getEntitlement(uId);
+    const usage = await repo.getUsage("user", uId, periodStart());
+    return c.json({
+      plan: entitlement.plan,
+      scan_quota: entitlement.scanQuota,
+      used: usage.used,
+      topup_left: usage.topupLeft,
+      resets_at: resetsAt(),
+      family_id: entitlement.familyId ?? null,
+      ads_suppressed: entitlement.adsSuppressed ?? (entitlement.plan !== "free"),
+    });
+  } catch (e) {
+    const err = httpError(e);
+    return c.json({ detail: err.detail }, err.status);
+  }
+});
+
+communityRoutes.post("/me/auth/link", async (c) => {
+  try {
+    const key = c.req.header("x-device-key") || c.req.header("x-device-id");
+    if (!key) return c.json({ detail: "X-Device-Key is required" }, 401);
+    const body = await c.req.json<{
+      firebase_uid: string;
+      email?: string;
+      display_name?: string;
+      photo_url?: string;
+      phone?: string;
+    }>();
+    const result = await linkFirebaseAccount(key, {
+      firebaseUid: body.firebase_uid,
+      email: body.email,
+      displayName: body.display_name,
+      photoUrl: body.photo_url,
+      phone: body.phone,
+    });
+    return c.json(result);
+  } catch (e) {
+    const err = httpError(e);
+    return c.json({ detail: err.detail }, err.status);
+  }
+});
+
+communityRoutes.post("/me/auth/signout", async (c) => {
+  try {
+    const key = c.req.header("x-device-key") || c.req.header("x-device-id");
+    if (key) {
+      await unlinkDeviceSession(key);
+    }
+    return c.json({ status: "signed_out" });
+  } catch (e) {
+    const err = httpError(e);
+    return c.json({ detail: err.detail }, err.status);
+  }
+});
 
 communityRoutes.get("/brands", async (c) => {
   try {

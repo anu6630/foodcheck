@@ -339,11 +339,13 @@ class UnifiedSearchUseCase:
         self.ingredient_repo = ingredient_repo
 
     async def execute(self, query: str) -> Dict[str, Any]:
-        products = await SearchProductUseCase(self.product_repo).execute(query)
+        # Deprecated public commercial product lookup for ingredient/name search to prevent legal/brand liability.
+        # Public search acts strictly as an educational/regulatory reference.
+        # Cross-referencing against products is performed client-side exclusively against the user's private saved packs.
         ingredients = await self.ingredient_repo.search_ingredients(query)
         annotated_ingredients = [annotate_ingredient(ing) for ing in ingredients]
         return {
-            "products": products,
+            "products": [],
             "ingredients": annotated_ingredients
         }
 

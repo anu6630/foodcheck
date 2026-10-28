@@ -19,6 +19,8 @@ import com.google.android.gms.ads.AdView
 
 @Composable
 actual fun BannerAd(modifier: Modifier) {
+    if (AdsController.adsSuppressed) return
+
     val context = LocalContext.current
     // Fixed 50dp banner — predictable height, avoids adaptive overflow into Compose.
     val adSize = AdSize.BANNER

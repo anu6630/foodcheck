@@ -28,6 +28,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -112,6 +113,7 @@ fun ScanSuggestionsScreen(
     var saveStance by remember { mutableStateOf(ShelfStance.Unsure) }
     var selectedTags by remember { mutableStateOf<List<String>>(emptyList()) }
     var caption by remember { mutableStateOf("") }
+    var isSaved by remember { mutableStateOf(false) }
     var toastMessage by remember { mutableStateOf<String?>(null) }
     val brandSuggestions by viewModel.brandSuggestions.collectAsState()
     val companySuggestions by viewModel.companySuggestions.collectAsState()
@@ -119,15 +121,17 @@ fun ScanSuggestionsScreen(
 
     HandleBack(enabled = !saving, onBack = onBack)
 
-    // After a successful save: toast, then clear scan so returning to Scan is fresh.
+    // After a successful save: show green confirmation in sheet, toast, then clear scan.
     LaunchedEffect(actionMessage, saving) {
         val msg = actionMessage ?: return@LaunchedEffect
         if (saving) return@LaunchedEffect
         if (msg == "Saved to your list") {
+            isSaved = true
+            delay(500)
             saveOpen = false
             toastMessage = msg
             viewModel.clearActionMessage()
-            delay(1100)
+            delay(1200)
             // Task finished: a natural break for a full-screen ad.
             AdsController.showInterstitial { onBack() }
         }
@@ -333,6 +337,7 @@ fun ScanSuggestionsScreen(
                 selectedCompanies = selectedCompanies.filterNot { it.id == id }
             },
             saving = saving,
+            isSaved = isSaved,
             onSave = {
                 viewModel.saveToShelf(
                     displayName = saveName,
@@ -345,6 +350,7 @@ fun ScanSuggestionsScreen(
             },
             onClose = { if (!saving) saveOpen = false },
             onOpen = {
+                isSaved = false
                 viewModel.searchBrands(saveBrand)
                 viewModel.searchCompanies("")
             },
@@ -412,6 +418,7 @@ private fun SaveToListBottomSheet(
     onCompanyToggle: (CatalogCompanyDto) -> Unit,
     onCompanyRemove: (Int) -> Unit,
     saving: Boolean = false,
+    isSaved: Boolean = false,
     onSave: () -> Unit,
     onClose: () -> Unit,
     onOpen: () -> Unit,
@@ -590,21 +597,37 @@ private fun SaveToListBottomSheet(
 
             Button(
                 onClick = onSave,
-                enabled = name.isNotBlank() && !saving,
+                enabled = name.isNotBlank() && !saving && !isSaved,
                 modifier = Modifier.fillMaxWidth().height(48.dp),
                 shape = RoundedCornerShape(14.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = AppColors.Primary),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (isSaved) Color(0xFF10B981) else AppColors.Primary,
+                    disabledContainerColor = if (isSaved) Color(0xFF10B981) else AppColors.Primary.copy(alpha = 0.5f),
+                ),
             ) {
-                if (saving) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(20.dp),
-                        color = Color.White,
-                        strokeWidth = 2.dp,
-                    )
-                    Spacer(modifier = Modifier.width(10.dp))
-                    Text("Saving…", fontWeight = FontWeight.Bold, color = Color.White)
-                } else {
-                    Text("Save", fontWeight = FontWeight.Bold, color = Color.White)
+                when {
+                    isSaved -> {
+                        Icon(
+                            Icons.Default.Check,
+                            contentDescription = null,
+                            tint = Color.White,
+                            modifier = Modifier.size(20.dp),
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Saved to My List!", fontWeight = FontWeight.Bold, color = Color.White)
+                    }
+                    saving -> {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(20.dp),
+                            color = Color.White,
+                            strokeWidth = 2.dp,
+                        )
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Text("Saving to list…", fontWeight = FontWeight.Bold, color = Color.White)
+                    }
+                    else -> {
+                        Text("Save to My List", fontWeight = FontWeight.Bold, color = Color.White)
+                    }
                 }
             }
         }

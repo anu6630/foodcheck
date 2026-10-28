@@ -20,6 +20,8 @@ object AppColors {
     val SecondaryLighter = Color(0xFFE0E7FF)
     val TextMuted = Color(0xFF94A3B8)
     val TextFaint = Color(0xFFCBD5E1)
+    val TextPrimary = Color.White
+    val TextSecondary = Color(0xFF94A3B8)
     val Red = Color(0xFFF43F5E)
     val RedLight = Color(0xFFFDA4AF)
     val Amber = Color(0xFFF59E0B)

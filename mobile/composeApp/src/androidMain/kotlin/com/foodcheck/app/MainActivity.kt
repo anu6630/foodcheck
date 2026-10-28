@@ -39,8 +39,12 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         AdsController.attach(this)
+        com.foodcheck.billing.initAndroidBillingManager(this).startBillingConnection()
 
         val prefs = getSharedPreferences("foodcheck", MODE_PRIVATE)
+        BackendConfig.onDeviceKeyChanged = { key ->
+            prefs.edit().putString("device_key", key).apply()
+        }
         val stored = prefs.getString("device_key", null)
         if (!stored.isNullOrBlank()) BackendConfig.deviceKey = stored
         prefs.edit().putString("device_key", BackendConfig.ensureDeviceKey()).apply()

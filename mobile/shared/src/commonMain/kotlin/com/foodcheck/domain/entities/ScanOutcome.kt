@@ -15,20 +15,24 @@ data class ScanCandidate(
 sealed class ScanOutcome {
     /** Name/brand/category/photo roles read from the photos — present for every outcome. */
     abstract val detected: DetectedLabel
+    open val quota: ScanQuota? get() = null
 
     data class Confident(
         val product: SearchProductResult,
         val ingredients: List<AnnotatedIngredient> = emptyList(),
         override val detected: DetectedLabel = DetectedLabel(),
+        override val quota: ScanQuota? = null,
     ) : ScanOutcome()
     data class Suggestions(
         val candidates: List<ScanCandidate>,
         val ingredients: List<AnnotatedIngredient> = emptyList(),
         override val detected: DetectedLabel = DetectedLabel(),
+        override val quota: ScanQuota? = null,
     ) : ScanOutcome()
     data class IngredientsOnly(
         val ingredients: List<AnnotatedIngredient>,
         override val detected: DetectedLabel = DetectedLabel(),
+        override val quota: ScanQuota? = null,
     ) : ScanOutcome()
 
     /** Best product name: what the pack says, else the confident catalog match. */

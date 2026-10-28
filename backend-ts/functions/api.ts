@@ -60,7 +60,10 @@ app.get("/health", async (c) => {
   }
 });
 
+import { billingRoutes } from "../src/adapters/http/billingRoutes.js";
+
 app.route("/api", publicRoutes);
+app.route("/api", billingRoutes);
 app.route("/api/admin", adminRoutes);
 
 export default app;
