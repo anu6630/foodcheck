@@ -73,36 +73,52 @@ class ScanViewModel(
 
     private val _showPaywall = MutableStateFlow(false)
     val showPaywall: StateFlow<Boolean> = _showPaywall.asStateFlow()
+    private var paywallOpenedAt: kotlin.time.TimeMark? = null
 
-    fun openPaywall() {
+    fun openPaywall(trigger: String = "quota_dialog") {
+        paywallOpenedAt = kotlin.time.TimeSource.Monotonic.markNow()
+        com.foodcheck.analytics.getAnalyticsTracker().logPaywallViewed(trigger, "₹99/month")
         _showPaywall.value = true
     }
 
-    fun dismissPaywall() {
+    fun dismissPaywall(trigger: String = "paywall") {
+        val durationSeconds = paywallOpenedAt?.elapsedNow()?.inWholeSeconds ?: 0L
+        com.foodcheck.analytics.getAnalyticsTracker().logPaywallDismissed(trigger, durationSeconds)
         _showPaywall.value = false
     }
 
     fun onPurchaseSuccessful(purchaseToken: String, productId: String) {
         viewModelScope.launch {
+            com.foodcheck.analytics.getAnalyticsTracker().logSubscriptionSyncStarted(productId)
             try {
                 val ok = network.activateSubscription(purchaseToken, productId)
                 if (ok) {
                     loadQuota()
                     _showPaywall.value = false
                     _actionMessage.value = "Welcome to FoodCheck Pro! 50 AI scans unlocked."
+                    com.foodcheck.analytics.getAnalyticsTracker().logSubscriptionSyncSuccess(productId, "pro", 50)
+                    com.foodcheck.analytics.getAnalyticsTracker().setUserProperty("user_plan", "pro")
                 }
             } catch (e: Exception) {
+                com.foodcheck.analytics.getAnalyticsTracker().logSubscriptionSyncFailed(productId, e.message ?: "unknown")
                 _error.value = "Failed to sync subscription with server: ${e.message}"
             }
         }
     }
 
-    fun dismissQuotaExceeded() {
+    fun dismissQuotaExceeded(trigger: String = "quota_dialog") {
+        com.foodcheck.analytics.getAnalyticsTracker().logQuotaDialogDismissed(trigger)
         _quotaExceeded.value = null
     }
 
-    fun showQuotaDialog() {
-        _quotaExceeded.value = _quota.value
+    fun showQuotaDialog(trigger: String = "quota_badge") {
+        val currentQuota = _quota.value
+        com.foodcheck.analytics.getAnalyticsTracker().logQuotaDialogShown(
+            remaining = currentQuota?.remaining ?: 0,
+            limit = currentQuota?.limit ?: 5,
+            trigger = trigger
+        )
+        _quotaExceeded.value = currentQuota
     }
 
     private val _saving = MutableStateFlow(false)
@@ -118,12 +134,14 @@ class ScanViewModel(
     private var brandSearchJob: Job? = null
     private var companySearchJob: Job? = null
 
-    fun scan(images: List<ByteArray>) {
+    fun scan(images: List<ByteArray>, source: String = "camera") {
         lastImages = images
         viewModelScope.launch {
             _loading.value = true
             _error.value = null
             _outcome.value = null
+            val startTime = kotlin.time.TimeSource.Monotonic.markNow()
+            com.foodcheck.analytics.getAnalyticsTracker().logScanStarted(source, images.size)
             val statusJob = launch {
                 for (message in SCAN_STATUS_MESSAGES) {
                     _statusText.value = message
@@ -133,15 +151,33 @@ class ScanViewModel(
             scanUseCase(images)
                 .onSuccess {
                     _outcome.value = it
-                    it.quota?.let { q -> _quota.value = q }
+                    val durationMs = startTime.elapsedNow().inWholeMilliseconds
+                    val totalCount = it.labelIngredients().size
+                    val flaggedCount = it.labelIngredients().count { ing -> ing.severity in setOf("red", "amber") || ing.showsWatch }
+                    com.foodcheck.analytics.getAnalyticsTracker().logScanCompleted(
+                        flaggedCount = flaggedCount,
+                        ingredientCount = totalCount,
+                        isCached = false,
+                        durationMs = durationMs
+                    )
+                    it.quota?.let { q ->
+                        _quota.value = q
+                        com.foodcheck.analytics.getAnalyticsTracker().setUserProperty("quota_remaining", q.remaining.toString())
+                        com.foodcheck.analytics.getAnalyticsTracker().setUserProperty("user_plan", if (q.isPro) "pro" else "free")
+                    }
                     _loading.value = false
                 }
                 .onFailure {
+                    val durationMs = startTime.elapsedNow().inWholeMilliseconds
                     if (it is ScanQuotaExceededException) {
                         _quotaExceeded.value = it.quota
                         _quota.value = it.quota
+                        com.foodcheck.analytics.getAnalyticsTracker().logQuotaLimitReached(it.quota.used, it.quota.limit, "scan")
+                        com.foodcheck.analytics.getAnalyticsTracker().logQuotaDialogShown(it.quota.remaining, it.quota.limit, "scan_quota_exceeded")
                     } else {
-                        _error.value = it.message ?: "Scan failed"
+                        val errMsg = it.message ?: "Scan failed"
+                        _error.value = errMsg
+                        com.foodcheck.analytics.getAnalyticsTracker().logScanFailed(source, errMsg, durationMs)
                     }
                     _loading.value = false
                 }
@@ -201,6 +237,7 @@ class ScanViewModel(
                 )
                 runCatching { shelfRepository.invalidateAndRefresh() }
                 _actionMessage.value = "Saved to your list"
+                com.foodcheck.analytics.getAnalyticsTracker().logShelfItemSaved(brand, stance)
             } catch (e: Exception) {
                 _actionMessage.value = e.message ?: "Could not save"
             } finally {

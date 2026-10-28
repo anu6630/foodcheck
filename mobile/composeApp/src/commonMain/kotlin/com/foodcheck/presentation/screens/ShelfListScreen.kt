@@ -177,7 +177,10 @@ fun ShelfListScreen(
                             },
                             onStanceClick = { stanceEditId = item.id },
                             onIngredientClick = onIngredientClick,
-                            onCompare = { onCompareItem(item) },
+                            onCompare = {
+                                com.foodcheck.analytics.getAnalyticsTracker().logShelfItemCompared(item.id)
+                                onCompareItem(item)
+                            },
                         )
                     }
                     item { Spacer(Modifier.height(72.dp)) }

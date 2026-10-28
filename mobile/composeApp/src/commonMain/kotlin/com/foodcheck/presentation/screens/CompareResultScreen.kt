@@ -132,7 +132,14 @@ fun CompareResultScreen(
             saving = state.saving,
             confirmLabel = "Save comparison",
             onDismiss = { if (!state.saving) picking = false },
-            onConfirm = { decision -> viewModel.save(decision) { id, first -> picking = false; onSaved(id, first) } },
+            onConfirm = { decision ->
+                com.foodcheck.analytics.getAnalyticsTracker().logCompareDecision(
+                    decision = decision.decision,
+                    chosenSlot = decision.chosenSlot,
+                    addChosenToShelf = decision.addChosenToShelf
+                )
+                viewModel.save(decision) { id, first -> picking = false; onSaved(id, first) }
+            },
         )
     }
     renameSlot?.let { slot ->

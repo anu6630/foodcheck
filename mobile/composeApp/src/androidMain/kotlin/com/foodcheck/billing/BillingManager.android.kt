@@ -179,26 +179,34 @@ class AndroidBillingManager(
             .build()
 
         _purchaseState.value = BillingPurchaseState.InProgress
+        pendingProductId = productId
+        com.foodcheck.analytics.getAnalyticsTracker().logBillingFlowStarted(productId)
         billingClient.launchBillingFlow(activity, flowParams)
     }
 
+    private var pendingProductId: String? = null
+
     override fun onPurchasesUpdated(billingResult: BillingResult, purchases: List<Purchase>?) {
+        val prodId = pendingProductId ?: "pro_monthly"
         if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && purchases != null) {
             for (purchase in purchases) {
                 if (purchase.purchaseState == Purchase.PurchaseState.PURCHASED) {
+                    val pid = purchase.products.firstOrNull() ?: prodId
+                    com.foodcheck.analytics.getAnalyticsTracker().logBillingFlowCompleted(pid)
                     acknowledgePurchaseIfNecessary(purchase)
                     _purchaseState.value = BillingPurchaseState.Success(
                         purchaseToken = purchase.purchaseToken,
-                        productId = purchase.products.firstOrNull() ?: "pro_monthly"
+                        productId = pid
                     )
                 }
             }
         } else if (billingResult.responseCode == BillingClient.BillingResponseCode.USER_CANCELED) {
+            com.foodcheck.analytics.getAnalyticsTracker().logBillingFlowCancelled(prodId, "user_canceled")
             _purchaseState.value = BillingPurchaseState.Idle
         } else {
-            _purchaseState.value = BillingPurchaseState.Error(
-                billingResult.debugMessage.ifBlank { "Purchase failed with code ${billingResult.responseCode}" }
-            )
+            val errorMsg = billingResult.debugMessage.ifBlank { "Purchase failed with code ${billingResult.responseCode}" }
+            com.foodcheck.analytics.getAnalyticsTracker().logBillingFlowFailed(prodId, billingResult.responseCode, errorMsg)
+            _purchaseState.value = BillingPurchaseState.Error(errorMsg)
         }
     }
 

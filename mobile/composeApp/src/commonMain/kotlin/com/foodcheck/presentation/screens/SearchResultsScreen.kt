@@ -84,7 +84,14 @@ fun SearchResultsScreen(
         }
     }
 
-    fun openIngredient(ingredient: AnnotatedIngredient) = onIngredientClick(ingredient)
+    fun openIngredient(ingredient: AnnotatedIngredient) {
+        com.foodcheck.analytics.getAnalyticsTracker().logSearchResultSelected(
+            resultType = "ingredient",
+            itemId = ingredient.id ?: ingredient.eNumber ?: "unknown",
+            itemName = ingredient.name
+        )
+        onIngredientClick(ingredient)
+    }
 
     val matchedIngredientIds = remember(results.ingredients) {
         buildSet {

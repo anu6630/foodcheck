@@ -112,10 +112,24 @@ fun CompareScreen(
     LaunchedEffect(Unit) {
         shelf.load("")
         comparisons.load()
+        com.foodcheck.analytics.getAnalyticsTracker().logCompareScreenViewed(
+            slotCount = state.slots.size,
+            filledSlots = state.filledCount,
+            readySlots = state.readySlots.size
+        )
     }
 
     fun capture(slot: Int, source: ImagePickerSource) {
-        scope.launch { imagePickerLauncher.pickImage(source)?.let { viewModel.readPhoto(slot, it) } }
+        val srcStr = if (source == ImagePickerSource.CAMERA) "camera" else "gallery"
+        com.foodcheck.analytics.getAnalyticsTracker().logScanInputSelected(srcStr, "compare_slot", slot)
+        scope.launch {
+            val bytes = imagePickerLauncher.pickImage(source)
+            com.foodcheck.analytics.getAnalyticsTracker().logImagePickerResult(srcStr, bytes != null, bytes?.size)
+            bytes?.let {
+                viewModel.readPhoto(slot, it)
+                com.foodcheck.analytics.getAnalyticsTracker().logCompareItemAdded(slot, srcStr, "Slot ${slotLetter(slot)}")
+            }
+        }
     }
 
     val nextEmpty = state.nextEmptySlot
@@ -214,6 +228,7 @@ fun CompareScreen(
                         ).joinToString(" · "),
                         onAdd = {
                             viewModel.fillFromShelf(nextEmpty, item)
+                            com.foodcheck.analytics.getAnalyticsTracker().logCompareItemAdded(nextEmpty, "shelf_suggestions", item.displayName)
                             toastMessage = "Added ${item.displayName} to Slot ${slotLetter(nextEmpty)}"
                         },
                     )
@@ -238,7 +253,10 @@ fun CompareScreen(
                             shortDate(c.createdAt).ifBlank { null },
                         ).joinToString(" · "),
                         disabledReason = null,
-                        onClick = { onOpenComparison(c.id) },
+                        onClick = {
+                            com.foodcheck.analytics.getAnalyticsTracker().logCompareRecentOpened(c.id)
+                            onOpenComparison(c.id)
+                        },
                     )
                 }
             }
@@ -246,7 +264,10 @@ fun CompareScreen(
 
         val ready = state.readySlots.size
         Button(
-            onClick = onCompare,
+            onClick = {
+                com.foodcheck.analytics.getAnalyticsTracker().logCompareEvaluated(ready, state.category)
+                onCompare()
+            },
             enabled = state.canCompare,
             modifier = Modifier.fillMaxWidth().height(48.dp),
             shape = RoundedCornerShape(14.dp),
@@ -305,7 +326,10 @@ fun CompareScreen(
                 when (choice.id) {
                     "rename" -> renameSlot = slot
                     "retake" -> capture(slot, ImagePickerSource.CAMERA)
-                    "remove" -> viewModel.remove(slot)
+                    "remove" -> {
+                        com.foodcheck.analytics.getAnalyticsTracker().logCompareSlotCleared(slot)
+                        viewModel.remove(slot)
+                    }
                 }
             },
             onDismiss = { menuSlot = null },
@@ -331,11 +355,13 @@ fun CompareScreen(
             shelf = shelf,
             onPickShelf = {
                 viewModel.fillFromShelf(slot, it)
+                com.foodcheck.analytics.getAnalyticsTracker().logCompareItemAdded(slot, "my_list_shelf", it.displayName)
                 toastMessage = "Added ${it.displayName} to Slot ${slotLetter(slot)}"
                 pickerSlot = null
             },
             onPickSaved = { comparisonId, item ->
                 viewModel.fillFromSavedComparison(slot, comparisonId, item)
+                com.foodcheck.analytics.getAnalyticsTracker().logCompareItemAdded(slot, "my_list_saved", item.displayName)
                 toastMessage = "Added ${item.displayName} to Slot ${slotLetter(slot)}"
                 pickerSlot = null
             },

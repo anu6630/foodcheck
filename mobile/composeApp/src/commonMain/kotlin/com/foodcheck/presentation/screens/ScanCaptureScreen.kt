@@ -207,8 +207,10 @@ fun ScanCaptureScreen(
                         modifier = Modifier
                             .weight(1f)
                             .clickable {
+                                com.foodcheck.analytics.getAnalyticsTracker().logScanInputSelected("camera", "scan_capture_screen")
                                 scope.launch {
                                     val image = imagePickerLauncher.pickImage(ImagePickerSource.CAMERA)
+                                    com.foodcheck.analytics.getAnalyticsTracker().logImagePickerResult("camera", image != null, image?.size)
                                     if (image != null) pendingImage = image
                                 }
                             },
@@ -254,8 +256,10 @@ fun ScanCaptureScreen(
                         modifier = Modifier
                             .weight(1f)
                             .clickable {
+                                com.foodcheck.analytics.getAnalyticsTracker().logScanInputSelected("gallery", "scan_capture_screen")
                                 scope.launch {
                                     val image = imagePickerLauncher.pickImage(ImagePickerSource.GALLERY)
+                                    com.foodcheck.analytics.getAnalyticsTracker().logImagePickerResult("gallery", image != null, image?.size)
                                     if (image != null) pendingImage = image
                                 }
                             },
@@ -319,23 +323,28 @@ fun ScanCaptureScreen(
     quotaExceeded?.let { q ->
         MonthlyScansUsedDialog(
             quota = q,
-            onDismiss = { viewModel.dismissQuotaExceeded() },
-            onUpgradeClick = { viewModel.openPaywall() }
+            onDismiss = { viewModel.dismissQuotaExceeded("scan_capture_dialog") },
+            onUpgradeClick = {
+                com.foodcheck.analytics.getAnalyticsTracker().logQuotaDialogUpgradeClicked("scan_capture_dialog")
+                viewModel.openPaywall("scan_capture_dialog")
+            }
         )
     }
 
     if (showPaywall) {
         val isLoading = purchaseState is com.foodcheck.billing.BillingPurchaseState.InProgress
         val errorMsg = (purchaseState as? com.foodcheck.billing.BillingPurchaseState.Error)?.message
+        val price = proDetails?.formattedPrice ?: "₹99/month"
 
         com.foodcheck.presentation.components.PaywallSheet(
-            priceFormatted = proDetails?.formattedPrice ?: "₹99/month",
+            priceFormatted = price,
             isLoading = isLoading,
             errorMessage = errorMsg,
             onSubscribeClick = {
+                com.foodcheck.analytics.getAnalyticsTracker().logPaywallSubscribeClicked("pro_monthly", price, "scan_capture_paywall")
                 billingManager.launchSubscriptionFlow("pro_monthly")
             },
-            onDismiss = { viewModel.dismissPaywall() }
+            onDismiss = { viewModel.dismissPaywall("scan_capture_paywall") }
         )
     }
 }

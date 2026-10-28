@@ -121,6 +121,15 @@ fun ScanSuggestionsScreen(
 
     HandleBack(enabled = !saving, onBack = onBack)
 
+    LaunchedEffect(outcome) {
+        outcome?.let {
+            com.foodcheck.analytics.getAnalyticsTracker().logScanSuggestionsViewed(
+                candidateCount = similar.size,
+                flaggedCount = summary.banned + summary.restricted + summary.watch
+            )
+        }
+    }
+
     // After a successful save: show green confirmation in sheet, toast, then clear scan.
     LaunchedEffect(actionMessage, saving) {
         val msg = actionMessage ?: return@LaunchedEffect
@@ -239,7 +248,10 @@ fun ScanSuggestionsScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .border(1.dp, AppColors.Border.copy(alpha = 0.3f), RoundedCornerShape(12.dp))
-                            .clickable { onCandidateClick(candidate) },
+                            .clickable {
+                                com.foodcheck.analytics.getAnalyticsTracker().logSearchResultSelected("scan_candidate", candidate.product.barcode, candidate.product.name)
+                                onCandidateClick(candidate)
+                            },
                         color = AppColors.Surface.copy(alpha = 0.4f),
                         shape = RoundedCornerShape(12.dp)
                     ) {
@@ -269,7 +281,10 @@ fun ScanSuggestionsScreen(
             if (ingredients.isNotEmpty()) {
                 val waiting = compareSlots.count { it != null }
                 androidx.compose.material3.OutlinedButton(
-                    onClick = { if (waiting == compareSlots.size) replaceOpen = true else onAddToCompare(null) },
+                    onClick = {
+                        com.foodcheck.analytics.getAnalyticsTracker().logScanAddToCompare(if (waiting == compareSlots.size) -1 else waiting)
+                        if (waiting == compareSlots.size) replaceOpen = true else onAddToCompare(null)
+                    },
                     modifier = Modifier.weight(1f).height(48.dp),
                     shape = RoundedCornerShape(14.dp),
                     contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 8.dp),

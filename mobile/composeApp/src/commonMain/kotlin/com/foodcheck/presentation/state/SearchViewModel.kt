@@ -48,6 +48,7 @@ class SearchViewModel(
                         _results.value = UnifiedSearchResult()
                         _shelf.value = emptyList()
                         _error.value = null
+                        com.foodcheck.analytics.getAnalyticsTracker().logSearchCleared()
                         return@collectLatest
                     }
                     _loading.value = true
@@ -70,7 +71,13 @@ class SearchViewModel(
                         }
                         _results.value.ingredients.forEach { collectIds(it) }
                     }
-                    _shelf.value = shelfRepository.filtered(q, matchedIngredientIds)
+                    val filteredShelf = shelfRepository.filtered(q, matchedIngredientIds)
+                    _shelf.value = filteredShelf
+                    com.foodcheck.analytics.getAnalyticsTracker().logSearchPerformed(
+                        query = q,
+                        resultCount = _results.value.ingredients.size,
+                        shelfCount = filteredShelf.size
+                    )
                     _loading.value = false
                 }
         }

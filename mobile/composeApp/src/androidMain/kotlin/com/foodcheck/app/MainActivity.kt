@@ -40,6 +40,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         AdsController.attach(this)
         com.foodcheck.billing.initAndroidBillingManager(this).startBillingConnection()
+        com.foodcheck.analytics.initAndroidAnalyticsTracker(this)
 
         val prefs = getSharedPreferences("foodcheck", MODE_PRIVATE)
         BackendConfig.onDeviceKeyChanged = { key ->
