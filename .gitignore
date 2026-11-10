@@ -50,6 +50,8 @@ eggs/
 .eggs/
 lib/
 lib64/
+# The Python template's lib/ is for virtualenvs; the web app's source module is not one.
+!web/src/lib/
 parts/
 sdist/
 var/
