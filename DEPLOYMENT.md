@@ -10,7 +10,8 @@ git push main ─┬─► Vercel Git integration ──────────
                      → cluster job web-deployer rolls Nomad job web-foodcheck to it (~2 min,
                        rolling, health check on `/`, automatic revert if unhealthy)
 
-visitor → Cloudflare → Worker lifex-failover ─┬─ primary: Cloudflare Tunnel → the cluster (2 copies)
+visitor → Cloudflare → Worker lifex-failover ─┬─ primary: Cloudflare Tunnel → the cluster (1 copy; moved to
+                                              │            another node within ~1 min if its node is lost)
                                               └─ fallback: foodcheck-lifex-biz-anu6630s-projects.vercel.app (cluster unreachable)
 ```
 
