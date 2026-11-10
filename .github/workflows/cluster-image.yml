@@ -1,0 +1,26 @@
+# Builds this site's main for the home Nomad cluster, which serves it (Vercel's Git integration
+# deploys the fallback). The cluster's web-deployer job rolls the new image out. See DEPLOYMENT.md.
+name: Cluster image
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'web/**'
+      - '.github/workflows/cluster-image.yml'
+  workflow_dispatch:
+concurrency:
+  group: cluster-image
+  cancel-in-progress: true
+permissions:
+  contents: read
+  packages: write
+jobs:
+  image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: anu6630/web-deploy@main
+        with:
+          site: foodcheck
+          build-env: ${{ secrets.WEB_BUILD_ENV }}
+          token: ${{ secrets.GITHUB_TOKEN }}
